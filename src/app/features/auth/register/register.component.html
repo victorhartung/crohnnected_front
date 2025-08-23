@@ -1,0 +1,235 @@
+
+<div class="auth-container">
+  <div class="auth-card-wrapper">
+    <mat-card class="auth-card">
+      <mat-card-header>
+        <div class="auth-header">
+          <div class="auth-logo">
+            <mat-icon class="logo-icon">medical_services</mat-icon>
+          </div>
+          <mat-card-title>Create Account</mat-card-title>
+          <mat-card-subtitle>Join the Crohnnected community</mat-card-subtitle>
+        </div>
+      </mat-card-header>
+
+      <mat-card-content>
+        <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" novalidate>
+          <div class="form-row">
+            <!-- First Name -->
+            <mat-form-field appearance="fill" class="half-width">
+              <mat-label>First Name</mat-label>
+              <input 
+                matInput 
+                formControlName="firstName"
+                type="text"
+                placeholder="Enter first name"
+                aria-describedby="firstName-error">
+              <mat-error id="firstName-error">
+                {{ getFieldError('firstName') }}
+              </mat-error>
+            </mat-form-field>
+
+            <!-- Last Name -->
+            <mat-form-field appearance="fill" class="half-width">
+              <mat-label>Last Name</mat-label>
+              <input 
+                matInput 
+                formControlName="lastName"
+                type="text"
+                placeholder="Enter last name"
+                aria-describedby="lastName-error">
+              <mat-error id="lastName-error">
+                {{ getFieldError('lastName') }}
+              </mat-error>
+            </mat-form-field>
+          </div>
+
+          <!-- Username -->
+          <mat-form-field appearance="fill" class="full-width">
+            <mat-label>Username</mat-label>
+            <input 
+              matInput 
+              formControlName="username"
+              type="text"
+              placeholder="Choose a username"
+              aria-describedby="username-error">
+            <mat-icon matSuffix>person</mat-icon>
+            <mat-error id="username-error">
+              {{ getFieldError('username') }}
+            </mat-error>
+          </mat-form-field>
+
+          <!-- Email -->
+          <mat-form-field appearance="fill" class="full-width">
+            <mat-label>Email</mat-label>
+            <input 
+              matInput 
+              formControlName="email"
+              type="email"
+              placeholder="Enter your email"
+              aria-describedby="email-error">
+            <mat-icon matSuffix>email</mat-icon>
+            <mat-error id="email-error">
+              {{ getFieldError('email') }}
+            </mat-error>
+          </mat-form-field>
+
+          <div class="form-row">
+            <!-- Password -->
+            <mat-form-field appearance="fill" class="half-width">
+              <mat-label>Password</mat-label>
+              <input 
+                matInput 
+                formControlName="password"
+                [type]="hidePassword ? 'password' : 'text'"
+                placeholder="Create password"
+                aria-describedby="password-error">
+              <button 
+                mat-icon-button 
+                matSuffix 
+                type="button"
+                (click)="hidePassword = !hidePassword"
+                [attr.aria-label]="'Hide password'"
+                [attr.aria-pressed]="hidePassword">
+                <mat-icon>{{hidePassword ? 'visibility_off' : 'visibility'}}</mat-icon>
+              </button>
+              <mat-error id="password-error">
+                {{ getFieldError('password') }}
+              </mat-error>
+            </mat-form-field>
+
+            <!-- Confirm Password -->
+            <mat-form-field appearance="fill" class="half-width">
+              <mat-label>Confirm Password</mat-label>
+              <input 
+                matInput 
+                formControlName="confirmPassword"
+                [type]="hideConfirmPassword ? 'password' : 'text'"
+                placeholder="Confirm password"
+                aria-describedby="confirmPassword-error">
+              <button 
+                mat-icon-button 
+                matSuffix 
+                type="button"
+                (click)="hideConfirmPassword = !hideConfirmPassword"
+                [attr.aria-label]="'Hide confirm password'"
+                [attr.aria-pressed]="hideConfirmPassword">
+                <mat-icon>{{hideConfirmPassword ? 'visibility_off' : 'visibility'}}</mat-icon>
+              </button>
+              <mat-error id="confirmPassword-error">
+                {{ getFieldError('confirmPassword') }}
+              </mat-error>
+            </mat-form-field>
+          </div>
+
+          <!-- Role Selection -->
+          <mat-form-field appearance="fill" class="full-width">
+            <mat-label>I am a...</mat-label>
+            <mat-select formControlName="role" aria-describedby="role-error">
+              <mat-option *ngFor="let role of userRoles" [value]="role">
+                <div class="role-option">
+                  <span class="role-name">{{ getRoleDisplayName(role) }}</span>
+                  <span class="role-description">{{ getRoleDescription(role) }}</span>
+                </div>
+              </mat-option>
+            </mat-select>
+            <mat-icon matSuffix>assignment_ind</mat-icon>
+            <mat-error id="role-error">
+              {{ getFieldError('role') }}
+            </mat-error>
+          </mat-form-field>
+
+          <!-- Optional Fields -->
+          <div class="optional-section">
+            <h3>Optional Information</h3>
+            
+            <div class="form-row">
+              <!-- Date of Birth -->
+              <mat-form-field appearance="fill" class="half-width">
+                <mat-label>Date of Birth</mat-label>
+                <input 
+                  matInput 
+                  [matDatepicker]="dobPicker"
+                  formControlName="dateOfBirth"
+                  placeholder="Select date">
+                <mat-datepicker-toggle matIconSuffix [for]="dobPicker"></mat-datepicker-toggle>
+                <mat-datepicker #dobPicker></mat-datepicker>
+                <mat-error id="dateOfBirth-error">
+                  {{ getFieldError('dateOfBirth') }}
+                </mat-error>
+              </mat-form-field>
+
+              <!-- Phone Number -->
+              <mat-form-field appearance="fill" class="half-width">
+                <mat-label>Phone Number</mat-label>
+                <input 
+                  matInput 
+                  formControlName="phoneNumber"
+                  type="tel"
+                  placeholder="Enter phone number">
+                <mat-icon matSuffix>phone</mat-icon>
+                <mat-error id="phoneNumber-error">
+                  {{ getFieldError('phoneNumber') }}
+                </mat-error>
+              </mat-form-field>
+            </div>
+
+            <!-- Location -->
+            <mat-form-field appearance="fill" class="full-width">
+              <mat-label>Location</mat-label>
+              <input 
+                matInput 
+                formControlName="location"
+                type="text"
+                placeholder="City, Country">
+              <mat-icon matSuffix>location_on</mat-icon>
+              <mat-error id="location-error">
+                {{ getFieldError('location') }}
+              </mat-error>
+            </mat-form-field>
+
+            <!-- Bio -->
+            <mat-form-field appearance="fill" class="full-width">
+              <mat-label>Bio</mat-label>
+              <textarea 
+                matInput 
+                formControlName="bio"
+                rows="3"
+                placeholder="Tell us about yourself (optional)">
+              </textarea>
+              <mat-error id="bio-error">
+                {{ getFieldError('bio') }}
+              </mat-error>
+            </mat-form-field>
+          </div>
+
+          <!-- Error Message -->
+          <div class="error-message" *ngIf="errorMessage" role="alert" aria-live="polite">
+            <mat-icon>error</mat-icon>
+            <span>{{ errorMessage }}</span>
+          </div>
+
+          <!-- Submit Button -->
+          <button 
+            mat-raised-button 
+            color="primary" 
+            type="submit"
+            class="full-width submit-button"
+            [disabled]="isLoading"
+            aria-describedby="submit-status">
+            <span *ngIf="!isLoading">Create Account</span>
+            <mat-spinner *ngIf="isLoading" diameter="24" aria-hidden="true"></mat-spinner>
+            <span *ngIf="isLoading" class="loading-text">Creating Account...</span>
+          </button>
+        </form>
+
+        <div class="auth-links">
+          <p>
+            Already have an account? 
+            <a routerLink="/auth/login" class="auth-link">Sign in here</a>
+          </p>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>

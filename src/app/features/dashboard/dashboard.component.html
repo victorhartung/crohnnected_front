@@ -1,0 +1,133 @@
+
+<app-main-layout>
+  <div class="dashboard-container">
+    <!-- Welcome Section -->
+    <div class="welcome-section">
+      <div class="welcome-content">
+        <h1 class="welcome-title">{{ getWelcomeMessage() }}</h1>
+        <p class="welcome-description">{{ getRoleBasedMessage() }}</p>
+      </div>
+      <div class="welcome-stats" *ngIf="currentUser?.role === 'PATIENT'">
+        <div class="stat-cards">
+          <div class="stat-card" *ngFor="let metric of getHealthMetrics()">
+            <mat-icon [style.color]="metric.color === 'primary' ? 'var(--primary-color)' : 'var(--secondary-color)'">
+              {{ metric.icon }}
+            </mat-icon>
+            <div class="stat-info">
+              <span class="stat-value">{{ metric.value }}{{ metric.unit }}</span>
+              <span class="stat-title">{{ metric.title }}</span>
+            </div>
+            <mat-icon 
+              class="trend-icon"
+              [class.trend-up]="metric.trend === 'up'"
+              [class.trend-down]="metric.trend === 'down'">
+              {{ metric.trend === 'up' ? 'trending_up' : 'trending_down' }}
+            </mat-icon>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="section">
+      <h2 class="section-title">Quick Actions</h2>
+      <div class="quick-actions-grid">
+        <mat-card class="action-card" *ngFor="let action of getQuickActions()">
+          <mat-card-content class="action-content">
+            <div class="action-icon">
+              <mat-icon [style.color]="action.color === 'primary' ? 'var(--primary-color)' : 'var(--secondary-color)'">
+                {{ action.icon }}
+              </mat-icon>
+            </div>
+            <div class="action-info">
+              <h3 class="action-title">{{ action.title }}</h3>
+              <p class="action-description">{{ action.description }}</p>
+            </div>
+            <button mat-icon-button class="action-button" [attr.aria-label]="'Go to ' + action.title">
+              <mat-icon>arrow_forward</mat-icon>
+            </button>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </div>
+
+    <!-- Recent Activity (for patients) -->
+    <div class="section" *ngIf="currentUser?.role === 'PATIENT'">
+      <h2 class="section-title">Recent Activity</h2>
+      <mat-card class="activity-card">
+        <mat-card-content>
+          <div class="activity-list">
+            <div class="activity-item" *ngFor="let activity of getRecentActivity()">
+              <div class="activity-icon">
+                <mat-icon [class]="'activity-' + activity.type">{{ activity.icon }}</mat-icon>
+              </div>
+              <div class="activity-info">
+                <h4 class="activity-title">{{ activity.title }}</h4>
+                <p class="activity-description">{{ activity.description }}</p>
+                <span class="activity-time">{{ activity.time }}</span>
+              </div>
+            </div>
+          </div>
+          <div class="activity-actions">
+            <button mat-button color="primary">View All Activity</button>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <!-- Getting Started (for new users) -->
+    <div class="section" *ngIf="currentUser && !currentUser.isEmailVerified">
+      <h2 class="section-title">Getting Started</h2>
+      <mat-card class="getting-started-card">
+        <mat-card-content>
+          <div class="getting-started-content">
+            <mat-icon class="getting-started-icon">rocket_launch</mat-icon>
+            <div class="getting-started-info">
+              <h3>Welcome to Crohnnected!</h3>
+              <p>Complete your profile setup to get the most out of your health management journey.</p>
+              <div class="getting-started-actions">
+                <button mat-raised-button color="primary" routerLink="/profile">
+                  Complete Profile
+                </button>
+                <button mat-button>Take a Tour</button>
+              </div>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <!-- Support Resources -->
+    <div class="section">
+      <h2 class="section-title">Resources & Support</h2>
+      <div class="resources-grid">
+        <mat-card class="resource-card">
+          <mat-card-content>
+            <mat-icon class="resource-icon">help</mat-icon>
+            <h4>Help Center</h4>
+            <p>Find answers to common questions</p>
+            <button mat-button color="primary">Learn More</button>
+          </mat-card-content>
+        </mat-card>
+
+        <mat-card class="resource-card">
+          <mat-card-content>
+            <mat-icon class="resource-icon">support_agent</mat-icon>
+            <h4>24/7 Support</h4>
+            <p>Get help when you need it</p>
+            <button mat-button color="primary">Contact Support</button>
+          </mat-card-content>
+        </mat-card>
+
+        <mat-card class="resource-card">
+          <mat-card-content>
+            <mat-icon class="resource-icon">group</mat-icon>
+            <h4>Community</h4>
+            <p>Connect with others like you</p>
+            <button mat-button color="primary">Join Community</button>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </div>
+  </div>
+</app-main-layout>

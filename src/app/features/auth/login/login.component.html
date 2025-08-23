@@ -1,0 +1,86 @@
+
+<div class="auth-container">
+  <div class="auth-card-wrapper">
+    <mat-card class="auth-card">
+      <mat-card-header>
+        <div class="auth-header">
+          <div class="auth-logo">
+            <mat-icon class="logo-icon">medical_services</mat-icon>
+          </div>
+          <mat-card-title>Welcome Back</mat-card-title>
+          <mat-card-subtitle>Sign in to your Crohnnected account</mat-card-subtitle>
+        </div>
+      </mat-card-header>
+
+      <mat-card-content>
+        <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" novalidate>
+          <!-- Username/Email Field -->
+          <mat-form-field appearance="fill" class="full-width">
+            <mat-label>Username or Email</mat-label>
+            <input 
+              matInput 
+              formControlName="usernameOrEmail"
+              type="text"
+              autocomplete="username"
+              placeholder="Enter username or email"
+              aria-describedby="usernameOrEmail-error">
+            <mat-icon matSuffix>person</mat-icon>
+            <mat-error id="usernameOrEmail-error">
+              {{ getFieldError('usernameOrEmail') }}
+            </mat-error>
+          </mat-form-field>
+
+          <!-- Password Field -->
+          <mat-form-field appearance="fill" class="full-width">
+            <mat-label>Password</mat-label>
+            <input 
+              matInput 
+              formControlName="password"
+              [type]="hidePassword ? 'password' : 'text'"
+              autocomplete="current-password"
+              placeholder="Enter your password"
+              aria-describedby="password-error">
+            <button 
+              mat-icon-button 
+              matSuffix 
+              type="button"
+              (click)="hidePassword = !hidePassword"
+              [attr.aria-label]="'Hide password'"
+              [attr.aria-pressed]="hidePassword">
+              <mat-icon>{{hidePassword ? 'visibility_off' : 'visibility'}}</mat-icon>
+            </button>
+            <mat-error id="password-error">
+              {{ getFieldError('password') }}
+            </mat-error>
+          </mat-form-field>
+
+          <!-- Error Message -->
+          <div class="error-message" *ngIf="errorMessage" role="alert" aria-live="polite">
+            <mat-icon>error</mat-icon>
+            <span>{{ errorMessage }}</span>
+          </div>
+
+          <!-- Submit Button -->
+          <button 
+            mat-raised-button 
+            color="primary" 
+            type="submit"
+            class="full-width submit-button"
+            [disabled]="isLoading"
+            aria-describedby="submit-status">
+            <span *ngIf="!isLoading">Sign In</span>
+            <mat-spinner *ngIf="isLoading" diameter="24" aria-hidden="true"></mat-spinner>
+            <span *ngIf="isLoading" class="loading-text">Signing In...</span>
+          </button>
+        </form>
+
+        <div class="auth-links">
+          <p>
+            Don't have an account? 
+            <a routerLink="/auth/register" class="auth-link">Sign up here</a>
+          </p>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>

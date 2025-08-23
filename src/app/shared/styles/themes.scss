@@ -1,0 +1,54 @@
+
+:root {
+  // Healthcare-focused color palette
+  --primary-color: #2E7D9A;        // Calming blue
+  --primary-light: #5BA4C7;
+  --primary-dark: #1D5A73;
+  
+  --secondary-color: #4CAF50;       // Healing green
+  --secondary-light: #81C784;
+  --secondary-dark: #388E3C;
+  
+  --accent-color: #FF7043;          // Warm accent
+  --accent-light: #FFAB91;
+  --accent-dark: #D84315;
+  
+  // Neutral colors
+  --background-color: #FAFAFA;
+  --surface-color: #FFFFFF;
+  --text-color: #333333;
+  --text-secondary: #666666;
+  --text-disabled: #9E9E9E;
+  
+  // Status colors
+  --success-color: #4CAF50;
+  --warning-color: #FF9800;
+  --error-color: #F44336;
+  --info-color: #2196F3;
+  
+  // Shadows
+  --shadow-light: 0 2px 4px rgba(0, 0, 0, 0.1);
+  --shadow-medium: 0 4px 8px rgba(0, 0, 0, 0.12);
+  --shadow-heavy: 0 8px 16px rgba(0, 0, 0, 0.15);
+  
+  // Border radius
+  --border-radius: 8px;
+  --border-radius-large: 12px;
+}
+
+// Material Design integration
+.mat-mdc-button {
+  --mdc-protected-button-container-color: var(--primary-color);
+  --mdc-protected-button-label-text-color: white;
+}
+
+.mat-mdc-card {
+  --mdc-elevated-card-container-color: var(--surface-color);
+  box-shadow: var(--shadow-light);
+  border-radius: var(--border-radius);
+}
+
+.mat-mdc-form-field {
+  --mdc-filled-text-field-active-indicator-color: var(--primary-color);
+  --mdc-filled-text-field-focus-active-indicator-color: var(--primary-color);
+}

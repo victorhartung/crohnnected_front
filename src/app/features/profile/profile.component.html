@@ -1,0 +1,327 @@
+
+<app-main-layout>
+  <div class="profile-container">
+    <div class="profile-header">
+      <div class="profile-avatar">
+        <mat-icon class="avatar-icon">account_circle</mat-icon>
+      </div>
+      <div class="profile-info" *ngIf="currentUser">
+        <h1 class="profile-name">{{ currentUser.firstName }} {{ currentUser.lastName }}</h1>
+        <p class="profile-role">{{ getRoleDisplayName(currentUser.role) }}</p>
+        <div class="profile-meta">
+          <span class="profile-username">@{{ currentUser.username }}</span>
+          <span class="profile-email">{{ currentUser.email }}</span>
+        </div>
+      </div>
+    </div>
+
+    <mat-tab-group class="profile-tabs" animationDuration="300ms">
+      <!-- Personal Information Tab -->
+      <mat-tab label="Personal Information">
+        <div class="tab-content">
+          <mat-card class="profile-card">
+            <mat-card-header>
+              <mat-card-title>
+                <mat-icon>person</mat-icon>
+                Edit Profile
+              </mat-card-title>
+              <mat-card-subtitle>Update your personal information</mat-card-subtitle>
+            </mat-card-header>
+
+            <mat-card-content>
+              <form [formGroup]="profileForm" (ngSubmit)="onSubmit()" novalidate>
+                <div class="form-row">
+                  <!-- First Name -->
+                  <mat-form-field appearance="fill" class="half-width">
+                    <mat-label>First Name</mat-label>
+                    <input 
+                      matInput 
+                      formControlName="firstName"
+                      type="text"
+                      placeholder="Enter first name"
+                      aria-describedby="firstName-error">
+                    <mat-error id="firstName-error">
+                      {{ getFieldError('firstName') }}
+                    </mat-error>
+                  </mat-form-field>
+
+                  <!-- Last Name -->
+                  <mat-form-field appearance="fill" class="half-width">
+                    <mat-label>Last Name</mat-label>
+                    <input 
+                      matInput 
+                      formControlName="lastName"
+                      type="text"
+                      placeholder="Enter last name"
+                      aria-describedby="lastName-error">
+                    <mat-error id="lastName-error">
+                      {{ getFieldError('lastName') }}
+                    </mat-error>
+                  </mat-form-field>
+                </div>
+
+                <div class="form-row">
+                  <!-- Email -->
+                  <mat-form-field appearance="fill" class="half-width">
+                    <mat-label>Email</mat-label>
+                    <input 
+                      matInput 
+                      formControlName="email"
+                      type="email"
+                      placeholder="Enter your email"
+                      aria-describedby="email-error">
+                    <mat-icon matSuffix>email</mat-icon>
+                    <mat-error id="email-error">
+                      {{ getFieldError('email') }}
+                    </mat-error>
+                  </mat-form-field>
+
+                  <!-- Username -->
+                  <mat-form-field appearance="fill" class="half-width">
+                    <mat-label>Username</mat-label>
+                    <input 
+                      matInput 
+                      formControlName="username"
+                      type="text"
+                      placeholder="Choose a username"
+                      aria-describedby="username-error">
+                    <mat-icon matSuffix>alternate_email</mat-icon>
+                    <mat-error id="username-error">
+                      {{ getFieldError('username') }}
+                    </mat-error>
+                  </mat-form-field>
+                </div>
+
+                <div class="form-row">
+                  <!-- Date of Birth -->
+                  <mat-form-field appearance="fill" class="half-width">
+                    <mat-label>Date of Birth</mat-label>
+                    <input 
+                      matInput 
+                      [matDatepicker]="dobPicker"
+                      formControlName="dateOfBirth"
+                      placeholder="Select date">
+                    <mat-datepicker-toggle matIconSuffix [for]="dobPicker"></mat-datepicker-toggle>
+                    <mat-datepicker #dobPicker></mat-datepicker>
+                    <mat-error id="dateOfBirth-error">
+                      {{ getFieldError('dateOfBirth') }}
+                    </mat-error>
+                  </mat-form-field>
+
+                  <!-- Phone Number -->
+                  <mat-form-field appearance="fill" class="half-width">
+                    <mat-label>Phone Number</mat-label>
+                    <input 
+                      matInput 
+                      formControlName="phoneNumber"
+                      type="tel"
+                      placeholder="Enter phone number">
+                    <mat-icon matSuffix>phone</mat-icon>
+                    <mat-error id="phoneNumber-error">
+                      {{ getFieldError('phoneNumber') }}
+                    </mat-error>
+                  </mat-form-field>
+                </div>
+
+                <!-- Location -->
+                <mat-form-field appearance="fill" class="full-width">
+                  <mat-label>Location</mat-label>
+                  <input 
+                    matInput 
+                    formControlName="location"
+                    type="text"
+                    placeholder="City, Country">
+                  <mat-icon matSuffix>location_on</mat-icon>
+                  <mat-error id="location-error">
+                    {{ getFieldError('location') }}
+                  </mat-error>
+                </mat-form-field>
+
+                <!-- Bio -->
+                <mat-form-field appearance="fill" class="full-width">
+                  <mat-label>Bio</mat-label>
+                  <textarea 
+                    matInput 
+                    formControlName="bio"
+                    rows="4"
+                    placeholder="Tell us about yourself">
+                  </textarea>
+                  <mat-error id="bio-error">
+                    {{ getFieldError('bio') }}
+                  </mat-error>
+                </mat-form-field>
+
+                <!-- Role (Read-only) -->
+                <mat-form-field appearance="fill" class="full-width">
+                  <mat-label>Role</mat-label>
+                  <input 
+                    matInput 
+                    formControlName="role"
+                    readonly>
+                  <mat-icon matSuffix>assignment_ind</mat-icon>
+                  <mat-hint>Role cannot be changed after registration</mat-hint>
+                </mat-form-field>
+
+                <!-- Success Message -->
+                <div class="success-message" *ngIf="successMessage" role="alert" aria-live="polite">
+                  <mat-icon>check_circle</mat-icon>
+                  <span>{{ successMessage }}</span>
+                </div>
+
+                <!-- Error Message -->
+                <div class="error-message" *ngIf="errorMessage" role="alert" aria-live="polite">
+                  <mat-icon>error</mat-icon>
+                  <span>{{ errorMessage }}</span>
+                </div>
+
+                <!-- Submit Button -->
+                <div class="form-actions">
+                  <button 
+                    mat-raised-button 
+                    color="primary" 
+                    type="submit"
+                    [disabled]="isLoading || profileForm.invalid">
+                    <mat-icon *ngIf="!isLoading">save</mat-icon>
+                    <mat-spinner *ngIf="isLoading" diameter="20" aria-hidden="true"></mat-spinner>
+                    {{ isLoading ? 'Saving...' : 'Save Changes' }}
+                  </button>
+                  <button 
+                    mat-button 
+                    type="button"
+                    (click)="profileForm.reset()"
+                    [disabled]="isLoading">
+                    Cancel
+                  </button>
+                </div>
+              </form>
+            </mat-card-content>
+          </mat-card>
+        </div>
+      </mat-tab>
+
+      <!-- Account Information Tab -->
+      <mat-tab label="Account Information">
+        <div class="tab-content">
+          <mat-card class="profile-card">
+            <mat-card-header>
+              <mat-card-title>
+                <mat-icon>info</mat-icon>
+                Account Details
+              </mat-card-title>
+              <mat-card-subtitle>View your account information</mat-card-subtitle>
+            </mat-card-header>
+
+            <mat-card-content>
+              <div class="account-info-grid">
+                <div class="info-item">
+                  <mat-icon class="info-icon">calendar_today</mat-icon>
+                  <div class="info-content">
+                    <span class="info-label">Member Since</span>
+                    <span class="info-value">{{ getAccountInfo().accountCreated }}</span>
+                  </div>
+                </div>
+
+                <div class="info-item">
+                  <mat-icon class="info-icon">schedule</mat-icon>
+                  <div class="info-content">
+                    <span class="info-label">Last Login</span>
+                    <span class="info-value">{{ getAccountInfo().lastLogin }}</span>
+                  </div>
+                </div>
+
+                <div class="info-item">
+                  <mat-icon class="info-icon" 
+                    [style.color]="currentUser?.isEmailVerified ? 'var(--success-color)' : 'var(--warning-color)'">
+                    {{ currentUser?.isEmailVerified ? 'verified' : 'warning' }}
+                  </mat-icon>
+                  <div class="info-content">
+                    <span class="info-label">Email Status</span>
+                    <span class="info-value" 
+                      [style.color]="currentUser?.isEmailVerified ? 'var(--success-color)' : 'var(--warning-color)'">
+                      {{ getAccountInfo().emailVerified }}
+                    </span>
+                  </div>
+                </div>
+
+                <div class="info-item">
+                  <mat-icon class="info-icon"
+                    [style.color]="currentUser?.isActive ? 'var(--success-color)' : 'var(--error-color)'">
+                    {{ currentUser?.isActive ? 'check_circle' : 'cancel' }}
+                  </mat-icon>
+                  <div class="info-content">
+                    <span class="info-label">Account Status</span>
+                    <span class="info-value"
+                      [style.color]="currentUser?.isActive ? 'var(--success-color)' : 'var(--error-color)'">
+                      {{ getAccountInfo().accountStatus }}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Email Verification Notice -->
+              <div class="verification-notice" *ngIf="!currentUser?.isEmailVerified">
+                <mat-icon class="notice-icon">mail</mat-icon>
+                <div class="notice-content">
+                  <h4>Verify Your Email</h4>
+                  <p>Please verify your email address to access all features of your account.</p>
+                  <button mat-raised-button color="primary">Resend Verification Email</button>
+                </div>
+              </div>
+            </mat-card-content>
+          </mat-card>
+        </div>
+      </mat-tab>
+
+      <!-- Security Tab -->
+      <mat-tab label="Security">
+        <div class="tab-content">
+          <mat-card class="profile-card">
+            <mat-card-header>
+              <mat-card-title>
+                <mat-icon>security</mat-icon>
+                Security Settings
+              </mat-card-title>
+              <mat-card-subtitle>Manage your account security</mat-card-subtitle>
+            </mat-card-header>
+
+            <mat-card-content>
+              <div class="security-options">
+                <div class="security-item">
+                  <div class="security-info">
+                    <h4>Password</h4>
+                    <p>Change your account password</p>
+                  </div>
+                  <button mat-raised-button color="primary">Change Password</button>
+                </div>
+
+                <div class="security-item">
+                  <div class="security-info">
+                    <h4>Two-Factor Authentication</h4>
+                    <p>Add an extra layer of security to your account</p>
+                  </div>
+                  <button mat-raised-button>Enable 2FA</button>
+                </div>
+
+                <div class="security-item">
+                  <div class="security-info">
+                    <h4>Login Sessions</h4>
+                    <p>View and manage your active sessions</p>
+                  </div>
+                  <button mat-raised-button>View Sessions</button>
+                </div>
+
+                <div class="security-item danger-zone">
+                  <div class="security-info">
+                    <h4>Delete Account</h4>
+                    <p>Permanently delete your account and all associated data</p>
+                  </div>
+                  <button mat-raised-button color="warn">Delete Account</button>
+                </div>
+              </div>
+            </mat-card-content>
+          </mat-card>
+        </div>
+      </mat-tab>
+    </mat-tab-group>
+  </div>
+</app-main-layout>
