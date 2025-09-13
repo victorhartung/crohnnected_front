@@ -1,4 +1,3 @@
-
 'use client'
 
 import { useState, useEffect } from 'react'
@@ -17,12 +16,11 @@ import {
   Download,
   Layers,
   Info,
-  BarChart3
+  BarChart3,
+  X
 } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
-import { MultiSelect } from '@/components/multi-select'
-import { COMMON_SYMPTOMS } from '@/lib/constants'
 import { toast } from 'sonner'
 
 // Dynamically import the map component to avoid SSR issues
@@ -39,10 +37,9 @@ const MapView = dynamic(() => import('@/components/map-view'), {
 })
 
 interface MapFilters {
-  countries: string[]
-  severity: string[]
-  symptoms: string[]
-  ageRange: [number, number]
+  country: string
+  severity: string
+  symptom: string
   approvedOnly: boolean
   showHeatmap: boolean
   showIncidence: boolean
@@ -61,16 +58,14 @@ interface MapData {
 
 export default function MapPage() {
   const { data: session, status } = useSession()
-  console.log("SESSION: ", session);
-  console.log("STATUS: ", status);
   const [isLoading, setIsLoading] = useState(true)
   const [mapData, setMapData] = useState<MapData | null>(null)
   const [availableCountries, setAvailableCountries] = useState<string[]>([])
+  const [availableSymptoms, setAvailableSymptoms] = useState<string[]>([])
   const [filters, setFilters] = useState<MapFilters>({
-    countries: [],
-    severity: [],
-    symptoms: [],
-    ageRange: [1, 100],
+    country: 'all',
+    severity: 'all',
+    symptom: 'all',
     approvedOnly: false,
     showHeatmap: true,
     showIncidence: false
@@ -79,62 +74,98 @@ export default function MapPage() {
   const canExport = session?.user?.role === 'RESEARCHER' || session?.user?.role === 'ADMIN' || session?.user?.role === 'MODERATOR'
 
   useEffect(() => {
-    loadMapData()
-  }, [filters])
+    if (status === 'authenticated') {
+      loadMapData()
+    }
+  }, [filters, status])
 
   const loadMapData = async () => {
     setIsLoading(true)
 
     try {
-      // Build query parameters
+      // Build query parameters - Vamos testar diferentes formatos
       const params = new URLSearchParams()
       
-      if (filters.countries.length > 0) {
-        params.append('countries', filters.countries.join(','))
+      // Formato 1: Enviar como array (se a API espera múltiplos valores)
+      if (filters.country && filters.country !== 'all') {
+        // Se a API espera countries[]=Germany&countries[]=USA, precisamos usar append múltiplas vezes
+        // Mas para um único país, podemos enviar como string simples
+        params.append('countries', filters.country)
       }
-      if (filters.severity.length > 0) {
-        params.append('severity', filters.severity.join(','))
+      
+      if (filters.severity && filters.severity !== 'all') {
+        params.append('severity', filters.severity)
       }
-      if (filters.symptoms.length > 0) {
-        params.append('symptoms', filters.symptoms.join(','))
+      
+      if (filters.symptom && filters.symptom !== 'all') {
+        params.append('symptoms', filters.symptom)
       }
+      
       if (filters.approvedOnly) {
         params.append('approvedOnly', 'true')
       }
-      params.append('minAge', filters.ageRange[0].toString())
-      params.append('maxAge', filters.ageRange[1].toString())
 
-      const [reportsRes, incidenceRes] = await Promise.all([
-        fetch(`/api/map/reports?${params.toString()}`),
-        fetch(`/api/map/incidence?${params.toString()}`)
-      ])
+      console.log('API Request params:', params.toString())
 
-      if (!reportsRes.ok || !incidenceRes.ok) {
-        throw new Error('Failed to fetch map data')
+      // Primeiro, vamos testar apenas a API de reports para debugging
+      const reportsRes = await fetch(`/api/map/reports?${params.toString()}`)
+      
+      if (!reportsRes.ok) {
+        const errorText = await reportsRes.text()
+        console.error('Reports API error:', errorText)
+        throw new Error(`Failed to fetch reports: ${reportsRes.status}`)
       }
 
-      const [reportsData, incidenceData] = await Promise.all([
-        reportsRes.json(),
-        incidenceRes.json()
-      ])
+      const reportsData = await reportsRes.json()
+      console.log('Reports API response:', reportsData)
+
+      // Verificar se os dados estão sendo filtrados corretamente
+      const filteredReports = reportsData.data?.features || []
+      console.log('Filtered reports count:', filteredReports.length)
+      
+      if (filteredReports.length > 0 && filters.country !== 'all') {
+        const countriesInResponse = new Set(filteredReports.map((f: any) => f.properties?.country))
+        console.log('Countries in filtered response:', Array.from(countriesInResponse))
+      }
+
+      // Agora buscar incidence data se necessário
+      let incidenceData = { data: { regions: [] } }
+      try {
+        const incidenceRes = await fetch(`/api/map/incidence?${params.toString()}`)
+        if (incidenceRes.ok) {
+          incidenceData = await incidenceRes.json()
+        }
+      } catch (incidenceError) {
+        console.warn('Failed to fetch incidence data:', incidenceError)
+      }
 
       const data: MapData = {
-        reports: reportsData.data.features || [],
-        incidence: incidenceData.data.regions || [],
+        reports: filteredReports,
+        incidence: incidenceData.data?.regions || [],
         summary: {
-          totalReports: reportsData.data.features?.length || 0,
-          approvedReports: reportsData.data.features?.filter((f: any) => f.properties.status === 'APPROVED').length || 0,
-          countries: new Set(reportsData.data.features?.map((f: any) => f.properties.country)).size || 0,
-          avgAge: reportsData.data.features?.length > 0 ? 
-            Math.round(reportsData.data.features.reduce((sum: number, f: any) => sum + (f.properties.ageAtReport || 0), 0) / reportsData.data.features.length) : 0
+          totalReports: filteredReports.length,
+          approvedReports: filteredReports.filter((f: any) => f.properties?.status === 'APPROVED').length,
+          countries: new Set(filteredReports.map((f: any) => f.properties?.country).filter(Boolean)).size,
+          avgAge: filteredReports.length > 0 ? 
+            Math.round(filteredReports.reduce((sum: number, f: any) => sum + (f.properties?.ageAtReport || 0), 0) / filteredReports.length) : 0
         }
       }
 
       setMapData(data)
 
-      // Extract available countries for filter
-      const countries = Array.from(new Set(reportsData.data.features?.map((f: any) => f.properties.country).filter(Boolean))).sort() as string[]
-      setAvailableCountries(countries)
+      // Extrair países disponíveis de TODOS os dados (sem filtro) para o dropdown
+      if (filters.country === 'all') {
+        const allCountries = Array.from(
+          new Set(filteredReports.map((f: any) => f.properties?.country).filter(Boolean))
+        ).sort() as string[]
+        setAvailableCountries(allCountries)
+      }
+
+      // Extrair sintomas disponíveis
+      const symptoms = Array.from(
+        new Set(filteredReports.flatMap((f: any) => f.properties?.symptoms || []).filter(Boolean))
+      ).sort() as string[]
+      setAvailableSymptoms(symptoms)
 
     } catch (error) {
       console.error('Failed to load map data:', error)
@@ -143,6 +174,28 @@ export default function MapPage() {
       setIsLoading(false)
     }
   }
+
+  // Função separada para carregar todos os países disponíveis (sem filtros)
+  const loadAvailableCountries = async () => {
+    try {
+      const response = await fetch('/api/map/reports')
+      if (response.ok) {
+        const data = await response.json()
+        const countries = Array.from(
+          new Set(data.data?.features?.map((f: any) => f.properties?.country).filter(Boolean))
+        ).sort() as string[]
+        setAvailableCountries(countries)
+      }
+    } catch (error) {
+      console.error('Failed to load available countries:', error)
+    }
+  }
+
+  useEffect(() => {
+    if (status === 'authenticated') {
+      loadAvailableCountries()
+    }
+  }, [status])
 
   const handleExportData = async () => {
     if (!canExport) {
@@ -153,20 +206,18 @@ export default function MapPage() {
     try {
       const params = new URLSearchParams()
       
-      if (filters.countries.length > 0) {
-        params.append('countries', filters.countries.join(','))
+      if (filters.country && filters.country !== 'all') {
+        params.append('countries', filters.country)
       }
-      if (filters.severity.length > 0) {
-        params.append('severity', filters.severity.join(','))
+      if (filters.severity && filters.severity !== 'all') {
+        params.append('severity', filters.severity)
       }
-      if (filters.symptoms.length > 0) {
-        params.append('symptoms', filters.symptoms.join(','))
+      if (filters.symptom && filters.symptom !== 'all') {
+        params.append('symptoms', filters.symptom)
       }
       if (filters.approvedOnly) {
         params.append('approvedOnly', 'true')
       }
-      params.append('minAge', filters.ageRange[0].toString())
-      params.append('maxAge', filters.ageRange[1].toString())
       params.append('format', 'csv')
 
       const response = await fetch(`/api/reports/export?${params.toString()}`)
@@ -192,14 +243,25 @@ export default function MapPage() {
     }
   }
 
-  const updateFilters = (key: keyof MapFilters, value: any) => {
+  const updateFilter = (key: keyof MapFilters, value: any) => {
     setFilters(prev => ({ ...prev, [key]: value }))
   }
 
-  const symptomOptions = COMMON_SYMPTOMS.map(symptom => ({
-    label: symptom,
-    value: symptom
-  }))
+  const clearFilters = () => {
+    setFilters({
+      country: 'all',
+      severity: 'all',
+      symptom: 'all',
+      approvedOnly: false,
+      showHeatmap: true,
+      showIncidence: false
+    })
+  }
+
+  const hasActiveFilters = filters.country !== 'all' || 
+                          filters.severity !== 'all' || 
+                          filters.symptom !== 'all' || 
+                          filters.approvedOnly
 
   if (status === 'loading' || isLoading) {
     return (
@@ -212,14 +274,33 @@ export default function MapPage() {
     )
   }
 
+  if (status === 'unauthenticated') {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <Alert>
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>Please sign in to view the map.</AlertDescription>
+        </Alert>
+      </div>
+    )
+  }
+
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="space-y-6">
-        <div>
-          <h1 className="text-3xl font-bold">Geographic Map</h1>
-          <p className="text-muted-foreground">
-            Explore geographic distribution of Crohn's disease reports and incidence data.
-          </p>
+        <div className="flex justify-between items-center">
+          <div>
+            <h1 className="text-3xl font-bold">Geographic Map</h1>
+            <p className="text-muted-foreground">
+              Explore geographic distribution of Crohn's disease reports and incidence data.
+            </p>
+          </div>
+          {hasActiveFilters && (
+            <Button variant="outline" onClick={clearFilters}>
+              <X className="mr-2 h-4 w-4" />
+              Clear Filters
+            </Button>
+          )}
         </div>
 
         {/* Summary Cards */}
@@ -287,40 +368,63 @@ export default function MapPage() {
             <CardContent className="space-y-4">
               {/* Countries Filter */}
               <div className="space-y-2">
-                <label className="text-sm font-medium">Countries</label>
-                <MultiSelect
-                  options={availableCountries.map(country => ({ label: country, value: country }))}
-                  value={filters.countries}
-                  onChange={(countries) => updateFilters('countries', countries)}
-                  placeholder="All countries..."
-                />
+                <label className="text-sm font-medium">Country</label>
+                <Select
+                  value={filters.country}
+                  onValueChange={(value) => updateFilter('country', value)}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select country" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Countries</SelectItem>
+                    {availableCountries.map((country) => (
+                      <SelectItem key={country} value={country}>
+                        {country}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
 
               {/* Severity Filter */}
               <div className="space-y-2">
                 <label className="text-sm font-medium">Severity</label>
-                <MultiSelect
-                  options={[
-                    { label: 'Mild', value: 'MILD' },
-                    { label: 'Moderate', value: 'MODERATE' },
-                    { label: 'Severe', value: 'SEVERE' }
-                  ]}
+                <Select
                   value={filters.severity}
-                  onChange={(severity) => updateFilters('severity', severity)}
-                  placeholder="All severities..."
-                />
+                  onValueChange={(value) => updateFilter('severity', value)}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select severity" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Severities</SelectItem>
+                    <SelectItem value="MILD">Mild</SelectItem>
+                    <SelectItem value="MODERATE">Moderate</SelectItem>
+                    <SelectItem value="SEVERE">Severe</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
 
               {/* Symptoms Filter */}
               <div className="space-y-2">
-                <label className="text-sm font-medium">Symptoms</label>
-                <MultiSelect
-                  options={symptomOptions}
-                  value={filters.symptoms}
-                  onChange={(symptoms) => updateFilters('symptoms', symptoms)}
-                  placeholder="All symptoms..."
-                  maxItems={5}
-                />
+                <label className="text-sm font-medium">Symptom</label>
+                <Select
+                  value={filters.symptom}
+                  onValueChange={(value) => updateFilter('symptom', value)}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select symptom" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Symptoms</SelectItem>
+                    {availableSymptoms.map((symptom) => (
+                      <SelectItem key={symptom} value={symptom}>
+                        {symptom}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
 
               <Separator />
@@ -331,7 +435,7 @@ export default function MapPage() {
                   <Checkbox
                     id="approvedOnly"
                     checked={filters.approvedOnly}
-                    onCheckedChange={(checked) => updateFilters('approvedOnly', checked)}
+                    onCheckedChange={(checked) => updateFilter('approvedOnly', checked === true)}
                   />
                   <label
                     htmlFor="approvedOnly"
@@ -345,7 +449,7 @@ export default function MapPage() {
                   <Checkbox
                     id="showHeatmap"
                     checked={filters.showHeatmap}
-                    onCheckedChange={(checked) => updateFilters('showHeatmap', checked)}
+                    onCheckedChange={(checked) => updateFilter('showHeatmap', checked === true)}
                   />
                   <label
                     htmlFor="showHeatmap"
@@ -359,7 +463,7 @@ export default function MapPage() {
                   <Checkbox
                     id="showIncidence"
                     checked={filters.showIncidence}
-                    onCheckedChange={(checked) => updateFilters('showIncidence', checked)}
+                    onCheckedChange={(checked) => updateFilter('showIncidence', checked === true)}
                   />
                   <label
                     htmlFor="showIncidence"
@@ -379,22 +483,6 @@ export default function MapPage() {
                   Export Data
                 </Button>
               )}
-
-              <Button 
-                variant="outline" 
-                className="w-full"
-                onClick={() => setFilters({
-                  countries: [],
-                  severity: [],
-                  symptoms: [],
-                  ageRange: [0, 100],
-                  approvedOnly: false,
-                  showHeatmap: true,
-                  showIncidence: false
-                })}
-              >
-                Clear Filters
-              </Button>
             </CardContent>
           </Card>
 
@@ -407,12 +495,15 @@ export default function MapPage() {
                   Interactive Map
                 </CardTitle>
                 <CardDescription>
-                  Geographic visualization of Crohn's disease data
+                  {filters.country !== 'all' 
+                    ? `Showing data for: ${filters.country}`
+                    : 'Showing data for all countries'
+                  }
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="h-[600px] rounded-md overflow-hidden">
-                  {mapData ? (
+                  {mapData && mapData.reports.length > 0 ? (
                     <MapView 
                       reports={mapData.reports}
                       incidence={mapData.incidence}
@@ -423,7 +514,16 @@ export default function MapPage() {
                     <div className="flex items-center justify-center h-full bg-muted">
                       <div className="text-center">
                         <MapPin className="h-12 w-12 text-muted-foreground mx-auto mb-2" />
-                        <p className="text-muted-foreground">No map data available</p>
+                        <p className="text-muted-foreground">
+                          {filters.country !== 'all' 
+                            ? `No data available for ${filters.country}`
+                            : 'No map data available'
+                          }
+                        </p>
+                        <Button onClick={loadMapData} className="mt-4">
+                          <Loader2 className="mr-2 h-4 w-4" />
+                          Reload Data
+                        </Button>
                       </div>
                     </div>
                   )}
