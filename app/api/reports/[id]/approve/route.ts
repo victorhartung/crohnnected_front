@@ -116,5 +116,5 @@ export const PATCH = withAuth(
       );
     }
   },
-  [UserRole.DOCTOR] // Only doctors can approve reports
+  [UserRole.DOCTOR, UserRole.ADMIN] // Allow doctors and admins to approve reports
 );

@@ -83,24 +83,21 @@ export default function MapPage() {
     setIsLoading(true)
 
     try {
-      // Build query parameters - Vamos testar diferentes formatos
+      // Build query parameters
       const params = new URLSearchParams()
-      
-      // Formato 1: Enviar como array (se a API espera múltiplos valores)
+
       if (filters.country && filters.country !== 'all') {
-        // Se a API espera countries[]=Germany&countries[]=USA, precisamos usar append múltiplas vezes
-        // Mas para um único país, podemos enviar como string simples
-        params.append('countries', filters.country)
+        params.append('country', filters.country)
       }
-      
+
       if (filters.severity && filters.severity !== 'all') {
         params.append('severity', filters.severity)
       }
-      
+
       if (filters.symptom && filters.symptom !== 'all') {
         params.append('symptoms', filters.symptom)
       }
-      
+
       if (filters.approvedOnly) {
         params.append('approvedOnly', 'true')
       }
@@ -207,7 +204,7 @@ export default function MapPage() {
       const params = new URLSearchParams()
       
       if (filters.country && filters.country !== 'all') {
-        params.append('countries', filters.country)
+        params.append('country', filters.country)
       }
       if (filters.severity && filters.severity !== 'all') {
         params.append('severity', filters.severity)

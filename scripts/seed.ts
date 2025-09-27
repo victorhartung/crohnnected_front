@@ -49,6 +49,11 @@ const cities = {
   'United States': ['Los Angeles', 'New York', 'Chicago', 'Houston', 'Phoenix', 'Philadelphia', 'San Antonio', 'San Diego'],
   'Canada': ['Toronto', 'Montreal', 'Vancouver', 'Calgary', 'Edmonton', 'Ottawa', 'Winnipeg', 'Quebec City'],
   'United Kingdom': ['London', 'Birmingham', 'Manchester', 'Glasgow', 'Leeds', 'Liverpool', 'Newcastle', 'Sheffield'],
+  'Australia': ['Sydney', 'Melbourne', 'Brisbane', 'Perth', 'Adelaide', 'Gold Coast', 'Newcastle', 'Canberra'],
+  'Germany': ['Berlin', 'Hamburg', 'Munich', 'Cologne', 'Frankfurt', 'Stuttgart', 'Düsseldorf', 'Dortmund'],
+  'France': ['Paris', 'Marseille', 'Lyon', 'Toulouse', 'Nice', 'Nantes', 'Strasbourg', 'Montpellier'],
+  'Spain': ['Madrid', 'Barcelona', 'Valencia', 'Seville', 'Zaragoza', 'Málaga', 'Murcia', 'Palma'],
+  'Italy': ['Rome', 'Milan', 'Naples', 'Turin', 'Palermo', 'Genoa', 'Bologna', 'Florence']
 };
 
 function getRandomElement<T>(array: T[]): T {
@@ -61,18 +66,88 @@ function getRandomElements<T>(array: T[], count: number): T[] {
 }
 
 function getCoordinates(country: string, city: string): { lat: number; lng: number } {
-  // Sample coordinates for major cities
+  // Sample coordinates for major cities across various countries
   const coordinates: { [key: string]: { lat: number; lng: number } } = {
+    // United States
     'Los Angeles': { lat: 34.0522, lng: -118.2437 },
     'New York': { lat: 40.7128, lng: -74.0060 },
     'Chicago': { lat: 41.8781, lng: -87.6298 },
     'Houston': { lat: 29.7604, lng: -95.3698 },
+    'Phoenix': { lat: 33.4484, lng: -112.0740 },
+    'Philadelphia': { lat: 39.9526, lng: -75.1652 },
+    'San Antonio': { lat: 29.4241, lng: -98.4936 },
+    'San Diego': { lat: 32.7157, lng: -117.1611 },
+
+    // Canada
     'Toronto': { lat: 43.6532, lng: -79.3832 },
     'Montreal': { lat: 45.5017, lng: -73.5673 },
+    'Vancouver': { lat: 49.2827, lng: -123.1207 },
+    'Calgary': { lat: 51.0447, lng: -114.0719 },
+    'Edmonton': { lat: 53.5461, lng: -113.4938 },
+    'Ottawa': { lat: 45.4215, lng: -75.6972 },
+    'Winnipeg': { lat: 49.8951, lng: -97.1384 },
+    'Quebec City': { lat: 46.8139, lng: -71.2080 },
+
+    // United Kingdom
     'London': { lat: 51.5074, lng: -0.1278 },
     'Birmingham': { lat: 52.4862, lng: -1.8904 },
+    'Manchester': { lat: 53.4808, lng: -2.2426 },
+    'Glasgow': { lat: 55.8642, lng: -4.2518 },
+    'Leeds': { lat: 53.8008, lng: -1.5491 },
+    'Liverpool': { lat: 53.4084, lng: -2.9916 },
+    'Newcastle': { lat: 54.9783, lng: -1.6178 },
+    'Sheffield': { lat: 53.3811, lng: -1.4701 },
+
+    // Australia
+    'Sydney': { lat: -33.8688, lng: 151.2093 },
+    'Melbourne': { lat: -37.8136, lng: 144.9631 },
+    'Brisbane': { lat: -27.4698, lng: 153.0251 },
+    'Perth': { lat: -31.9505, lng: 115.8605 },
+    'Adelaide': { lat: -34.9285, lng: 138.6007 },
+    'Gold Coast': { lat: -28.0167, lng: 153.4000 },
+    'Canberra': { lat: -35.2809, lng: 149.1300 },
+
+    // Germany
+    'Berlin': { lat: 52.5200, lng: 13.4050 },
+    'Hamburg': { lat: 53.5511, lng: 9.9937 },
+    'Munich': { lat: 48.1351, lng: 11.5820 },
+    'Cologne': { lat: 50.9375, lng: 6.9603 },
+    'Frankfurt': { lat: 50.1109, lng: 8.6821 },
+    'Stuttgart': { lat: 48.7758, lng: 9.1829 },
+    'Düsseldorf': { lat: 51.2277, lng: 6.7735 },
+    'Dortmund': { lat: 51.5136, lng: 7.4653 },
+
+    // France
+    'Paris': { lat: 48.8566, lng: 2.3522 },
+    'Marseille': { lat: 43.2965, lng: 5.3698 },
+    'Lyon': { lat: 45.7640, lng: 4.8357 },
+    'Toulouse': { lat: 43.6047, lng: 1.4442 },
+    'Nice': { lat: 43.7102, lng: 7.2620 },
+    'Nantes': { lat: 47.2184, lng: -1.5536 },
+    'Strasbourg': { lat: 48.5734, lng: 7.7521 },
+    'Montpellier': { lat: 43.6110, lng: 3.8767 },
+
+    // Spain
+    'Madrid': { lat: 40.4168, lng: -3.7038 },
+    'Barcelona': { lat: 41.3851, lng: 2.1734 },
+    'Valencia': { lat: 39.4699, lng: -0.3763 },
+    'Seville': { lat: 37.3891, lng: -5.9845 },
+    'Zaragoza': { lat: 41.6488, lng: -0.8891 },
+    'Málaga': { lat: 36.7213, lng: -4.4214 },
+    'Murcia': { lat: 37.9922, lng: -1.1307 },
+    'Palma': { lat: 39.5696, lng: 2.6502 },
+
+    // Italy
+    'Rome': { lat: 41.9028, lng: 12.4964 },
+    'Milan': { lat: 45.4642, lng: 9.1900 },
+    'Naples': { lat: 40.8518, lng: 14.2681 },
+    'Turin': { lat: 45.0703, lng: 7.6869 },
+    'Palermo': { lat: 38.1157, lng: 13.3615 },
+    'Genoa': { lat: 44.4056, lng: 8.9463 },
+    'Bologna': { lat: 44.4949, lng: 11.3426 },
+    'Florence': { lat: 43.7696, lng: 11.2558 }
   };
-  
+
   return coordinates[city] || { lat: 40.7128, lng: -74.0060 }; // Default to NYC
 }
 

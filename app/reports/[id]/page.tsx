@@ -311,7 +311,7 @@ export default function ReportDetailPage() {
             <div className="flex justify-between items-start">
               <div className="space-y-2">
                 <CardTitle className="text-2xl">
-                  Report #{report.id.slice(-8)}
+                  Report #{report.id ? report.id.slice(-8) : 'N/A'}
                 </CardTitle>
                 <div className="flex items-center gap-4 text-sm text-muted-foreground">
                   <div className="flex items-center gap-1">
@@ -436,7 +436,7 @@ export default function ReportDetailPage() {
             <div>
               <span className="text-sm font-medium block mb-2">Symptoms:</span>
               <div className="flex flex-wrap gap-2">
-                {report.symptoms.map((symptom) => (
+                {(report.symptoms || []).map((symptom) => (
                   <Badge key={symptom} variant="outline">
                     {symptom}
                   </Badge>

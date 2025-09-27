@@ -389,14 +389,14 @@ export default function ReportsPage() {
                           <div>
                             <div className="text-sm text-muted-foreground mb-1">Symptoms</div>
                             <div className="flex flex-wrap gap-1">
-                              {report.symptoms.slice(0, 3).map((symptom) => (
+                              {(report.symptoms || []).slice(0, 3).map((symptom) => (
                                 <Badge key={symptom} variant="outline" className="text-xs">
                                   {symptom}
                                 </Badge>
                               ))}
-                              {report.symptoms.length > 3 && (
+                              {(report.symptoms || []).length > 3 && (
                                 <Badge variant="outline" className="text-xs">
-                                  +{report.symptoms.length - 3} more
+                                  +{(report.symptoms || []).length - 3} more
                                 </Badge>
                               )}
                             </div>

@@ -63,7 +63,8 @@ export default function ProfilePage() {
     try {
       const response = await fetch('/api/users/me')
       if (response.ok) {
-        const userData = await response.json()
+        const result = await response.json()
+        const userData = result.data?.user || result
         setProfileData(userData)
         
         // Populate form with existing data

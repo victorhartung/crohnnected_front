@@ -59,7 +59,7 @@ export function MultiSelect({
     }
   }
 
-  const selectedOptions = options.filter((option) => value.includes(option.value))
+  const selectedOptions = options.filter((option) => (value || []).includes(option.value))
 
   return (
     <Popover open={open} onOpenChange={setOpen}>

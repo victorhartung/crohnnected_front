@@ -1,4 +1,4 @@
-// File: C:\Users\beatr\Documents\GitHub\crohnnected_front\app\api\reports\route.ts
+// File: C:\Users\Usuário\codespace\crohnnected\crohnnected_front\app\api\reports\route.ts
 import * as entry from '../../../../../app/api/reports/route.js'
 import type { NextRequest } from 'next/server.js'
 
