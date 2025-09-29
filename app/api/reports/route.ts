@@ -1,13 +1,16 @@
+import { NextRequest } from "next/server";
+import { prisma } from "@/lib/db";
+import { withAuth, checkRateLimit, getRateLimitKey } from "@/lib/auth";
+import {
+  createReportSchema,
+  reportQuerySchema,
+  parsePaginationParams,
+} from "@/lib/validation";
+import { User } from "@/lib/types";
+import { UserRole, ReportStatus } from "@prisma/client";
+import { ZodError } from "zod";
 
-import { NextRequest } from 'next/server';
-import { prisma } from '@/lib/db';
-import { withAuth, checkRateLimit, getRateLimitKey } from '@/lib/auth';
-import { createReportSchema, reportQuerySchema, parsePaginationParams } from '@/lib/validation';
-import { User } from '@/lib/types';
-import { UserRole, ReportStatus } from '@prisma/client';
-import { ZodError } from 'zod';
-
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 
 // CREATE Report
 export const POST = withAuth(async (request: NextRequest, user: User) => {
@@ -15,22 +18,26 @@ export const POST = withAuth(async (request: NextRequest, user: User) => {
     // Only patients can create reports
     if (user.role !== UserRole.PATIENT) {
       return Response.json(
-        { success: false, error: 'Only patients can create reports' },
+        { success: false, error: "Only patients can create reports" },
         { status: 403 }
       );
     }
 
     // Rate limiting for report creation
-    const rateLimitKey = getRateLimitKey(request, 'create-report');
-    if (!checkRateLimit(rateLimitKey, 5, 60 * 60 * 1000)) { // 5 reports per hour
+    const rateLimitKey = getRateLimitKey(request, "create-report");
+    if (!checkRateLimit(rateLimitKey, 5, 60 * 60 * 1000)) {
+      // 5 reports per hour
       return Response.json(
-        { success: false, error: 'Too many report creation attempts. Please try again later.' },
+        {
+          success: false,
+          error: "Too many report creation attempts. Please try again later.",
+        },
         { status: 429 }
       );
     }
 
     const body = await request.json();
-    
+
     // Validate input
     const validatedData = createReportSchema.parse(body);
 
@@ -47,8 +54,8 @@ export const POST = withAuth(async (request: NextRequest, user: User) => {
     await prisma.auditLog.create({
       data: {
         actorId: user.id,
-        action: 'CREATE_REPORT',
-        entity: 'Report',
+        action: "CREATE_REPORT",
+        entity: "Report",
         entityId: report.id,
         meta: {
           reportId: report.id,
@@ -57,34 +64,36 @@ export const POST = withAuth(async (request: NextRequest, user: User) => {
       },
     });
 
-    return Response.json({
-      success: true,
-      data: {
-        report: {
-          ...report,
-          hasDocument: !!report.documentBase64,
-          // Don't return the base64 data in the response
-          documentBase64: undefined,
+    return Response.json(
+      {
+        success: true,
+        data: {
+          report: {
+            ...report,
+            hasDocument: !!report.documentBase64,
+            // Don't return the base64 data in the response
+            documentBase64: undefined,
+          },
         },
       },
-    }, { status: 201 });
-
+      { status: 201 }
+    );
   } catch (error) {
-    console.error('Create report error:', error);
+    console.error("Create report error:", error);
 
     if (error instanceof ZodError) {
       return Response.json(
-        { 
-          success: false, 
-          error: 'Validation failed',
-          details: error.errors
+        {
+          success: false,
+          error: "Validation failed",
+          details: error.errors,
         },
         { status: 400 }
       );
     }
 
     return Response.json(
-      { success: false, error: 'Failed to create report' },
+      { success: false, error: "Failed to create report" },
       { status: 500 }
     );
   }
@@ -95,10 +104,13 @@ export const GET = withAuth(async (request: NextRequest, user: User) => {
   try {
     const url = new URL(request.url);
     const queryParams = Object.fromEntries(url.searchParams.entries());
-    
+
     // Validate query parameters
     const query = reportQuerySchema.parse(queryParams);
-    const { page, limit, skip } = parsePaginationParams({ page: query.page.toString(), limit: query.limit.toString() });
+    const { page, limit, skip } = parsePaginationParams({
+      page: query.page.toString(),
+      limit: query.limit.toString(),
+    });
 
     // Build where conditions based on user role
     let where: any = {};
@@ -115,18 +127,26 @@ export const GET = withAuth(async (request: NextRequest, user: User) => {
     // Apply filters
     if (query.status) {
       // Patients and researchers have restricted status access
-      if (user.role === UserRole.PATIENT || 
-          (user.role === UserRole.RESEARCHER && query.status !== ReportStatus.APPROVED)) {
-        where.status = user.role === UserRole.RESEARCHER ? ReportStatus.APPROVED : query.status;
+      if (
+        user.role === UserRole.PATIENT ||
+        (user.role === UserRole.RESEARCHER &&
+          query.status !== ReportStatus.APPROVED)
+      ) {
+        where.status =
+          user.role === UserRole.RESEARCHER
+            ? ReportStatus.APPROVED
+            : query.status;
       } else {
         where.status = query.status;
       }
     }
 
-    if (query.country) where.country = { contains: query.country, mode: 'insensitive' };
-    if (query.state) where.state = { contains: query.state, mode: 'insensitive' };
-    if (query.city) where.city = { contains: query.city, mode: 'insensitive' };
-    
+    if (query.country)
+      where.country = { contains: query.country, mode: "insensitive" };
+    if (query.state)
+      where.state = { contains: query.state, mode: "insensitive" };
+    if (query.city) where.city = { contains: query.city, mode: "insensitive" };
+
     if (query.minAge || query.maxAge) {
       where.ageAtReport = {};
       if (query.minAge) where.ageAtReport.gte = query.minAge;
@@ -147,7 +167,7 @@ export const GET = withAuth(async (request: NextRequest, user: User) => {
     if (query.period) {
       const year = query.period.match(/^\d{4}$/);
       const quarter = query.period.match(/^(\d{4})Q([1-4])$/);
-      
+
       if (year) {
         const startDate = new Date(`${year[0]}-01-01`);
         const endDate = new Date(`${parseInt(year[0]) + 1}-01-01`);
@@ -197,25 +217,31 @@ export const GET = withAuth(async (request: NextRequest, user: User) => {
           documentMime: true,
           documentSizeBytes: true,
           // Patient info for non-patients (pseudonymized for researchers)
-          patient: user.role === UserRole.PATIENT ? false : {
-            select: user.role === UserRole.RESEARCHER ? {
-              // Pseudonymized data for researchers
-              id: false,
-              email: false,
-              name: false,
-            } : {
-              id: true,
-              email: true,
-              name: true,
-            },
-          },
+          patient:
+            user.role === UserRole.PATIENT
+              ? false
+              : {
+                  select:
+                    user.role === UserRole.RESEARCHER
+                      ? {
+                          // Pseudonymized data for researchers
+                          id: true,
+                          email: false,
+                          name: false,
+                        }
+                      : {
+                          id: true,
+                          email: true,
+                          name: true,
+                        },
+                },
         },
       }),
       prisma.report.count({ where }),
     ]);
 
     // Add hasDocument flag
-    const reportsWithMetadata = reports.map(report => ({
+    const reportsWithMetadata = reports.map((report) => ({
       ...report,
       hasDocument: !!(report.documentOriginalName && report.documentMime),
     }));
@@ -230,23 +256,22 @@ export const GET = withAuth(async (request: NextRequest, user: User) => {
         totalPages: Math.ceil(total / limit),
       },
     });
-
   } catch (error) {
-    console.error('List reports error:', error);
+    console.error("List reports error:", error);
 
     if (error instanceof ZodError) {
       return Response.json(
-        { 
-          success: false, 
-          error: 'Invalid query parameters',
-          details: error.errors
+        {
+          success: false,
+          error: "Invalid query parameters",
+          details: error.errors,
         },
         { status: 400 }
       );
     }
 
     return Response.json(
-      { success: false, error: 'Failed to fetch reports' },
+      { success: false, error: "Failed to fetch reports" },
       { status: 500 }
     );
   }
