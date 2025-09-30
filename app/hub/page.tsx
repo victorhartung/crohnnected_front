@@ -254,11 +254,11 @@ export default function HubPage() {
                   <Card key={item.id} className="hover:shadow-md transition-shadow">
                     <CardHeader>
                       <div className="flex justify-between items-start mb-2">
-                        <CardTitle className="text-lg line-clamp-2">
+                        <CardTitle className="text-lg line-clamp-2 flex-1 min-h-[56px]">
                           {item.title}
                         </CardTitle>
                         {!item.isPublic && (
-                          <Badge variant="secondary" className="ml-2">
+                          <Badge variant="secondary" className="ml-2 flex-shrink-0">
                             Private
                           </Badge>
                         )}
@@ -269,11 +269,11 @@ export default function HubPage() {
                         </CardDescription>
                       )}
                     </CardHeader>
-                    <CardContent>
-                      <div className="space-y-4">
+                    <CardContent className="flex-grow flex flex-col">
+                      <div className="space-y-4 flex-grow">
                         {/* Tags */}
                         {item.tags.length > 0 && (
-                          <div className="flex flex-wrap gap-1">
+                          <div className="flex flex-wrap gap-1 min-h-[32px]">
                             {item.tags.slice(0, 3).map((tag) => (
                               <Badge key={tag} variant="outline" className="text-xs">
                                 <Tag className="h-3 w-3 mr-1" />
@@ -288,24 +288,30 @@ export default function HubPage() {
                           </div>
                         )}
 
+                        <div className="flex-grow"></div>
+
                         {/* Meta information */}
-                        <div className="flex items-center justify-between text-sm text-muted-foreground">
-                          <div className="flex items-center gap-1">
-                            <User className="h-3 w-3" />
-                            {item.createdBy.name || item.createdBy.email}
+                        <div className="flex items-center justify-between text-sm text-muted-foreground min-h-[24px]">
+                          <div className="flex items-center gap-1 flex-1 min-w-0">
+                            <User className="h-3 w-3 flex-shrink-0" />
+                            <span className="truncate">
+                              {item.createdBy.name || item.createdBy.email}
+                            </span>
                           </div>
-                          <div className="flex items-center gap-1">
-                            <Calendar className="h-3 w-3" />
-                            {formatDate(item.createdAt)}
+                          <div className="flex items-center gap-1 flex-shrink-0 ml-2">
+                            <Calendar className="h-3 w-3 flex-shrink-0" />
+                            <span className="whitespace-nowrap">
+                              {formatDate(item.createdAt)}
+                            </span>
                           </div>
                         </div>
-
-                        <Button asChild className="w-full">
-                          <Link href={`/hub/${activeTab}/${item.slug || item.id}`}>
-                            Read More
-                          </Link>
-                        </Button>
                       </div>
+
+                      <Button asChild className="w-full mt-4">
+                        <Link href={`/hub/${activeTab}/${item.slug || item.id}`}>
+                          Read More
+                        </Link>
+                      </Button>
                     </CardContent>
                   </Card>
                 ))}
