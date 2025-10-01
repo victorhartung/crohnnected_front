@@ -58,8 +58,8 @@ export default function ReportsPage() {
   const [filteredReports, setFilteredReports] = useState<Report[]>([])
   const [activeTab, setActiveTab] = useState('all')
   const [searchQuery, setSearchQuery] = useState('')
-  const [selectedCountry, setSelectedCountry] = useState('')
-  const [selectedSeverity, setSelectedSeverity] = useState('')
+  const [selectedCountry, setSelectedCountry] = useState('all')
+  const [selectedSeverity, setSelectedSeverity] = useState('all')
 
   const isPatient = session?.user?.role === 'PATIENT'
   const isDoctor = session?.user?.role === 'DOCTOR'
@@ -118,12 +118,12 @@ export default function ReportsPage() {
     }
 
     // Filter by country
-    if (selectedCountry) {
+    if (selectedCountry && selectedCountry !== 'all') {
       filtered = filtered.filter(report => report.country === selectedCountry)
     }
 
     // Filter by severity
-    if (selectedSeverity) {
+    if (selectedSeverity && selectedSeverity !== 'all') {
       filtered = filtered.filter(report => report.symptomSeverity === selectedSeverity)
     }
 
@@ -185,10 +185,10 @@ export default function ReportsPage() {
 
   const getStatusCounts = () => {
     return {
-      all: reports.length,
-      pending: reports.filter(r => r.status === 'PENDING').length,
-      approved: reports.filter(r => r.status === 'APPROVED').length,
-      rejected: reports.filter(r => r.status === 'REJECTED').length,
+      all: filteredReports.length,
+      pending: filteredReports.filter(r => r.status === 'PENDING').length,
+      approved: filteredReports.filter(r => r.status === 'APPROVED').length,
+      rejected: filteredReports.filter(r => r.status === 'REJECTED').length,
     }
   }
 
@@ -293,8 +293,8 @@ export default function ReportsPage() {
                 variant="outline" 
                 onClick={() => {
                   setSearchQuery('')
-                  setSelectedCountry('')
-                  setSelectedSeverity('')
+                  setSelectedCountry('all')
+                  setSelectedSeverity('all')
                 }}
               >
                 Clear Filters
@@ -346,8 +346,6 @@ export default function ReportsPage() {
               <div className="space-y-4">
                 {filteredReports.map((report) => (
                   <Card key={report.id}>
-                   {report.id.slice(-8)}
-      
                     <CardHeader>
                       <div className="flex justify-between items-start">
                         <div className="space-y-1">
