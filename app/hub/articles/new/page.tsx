@@ -13,15 +13,14 @@ import { Textarea } from '@/components/ui/textarea'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Switch } from '@/components/ui/switch'
 import { Alert, AlertDescription } from '@/components/ui/alert'
-import { Loader2, AlertCircle, ArrowLeft, BookOpen } from 'lucide-react'
+import { Loader2, AlertCircle, ArrowLeft, BookOpen, X } from 'lucide-react'
 import { createArticleSchema, type CreateArticleInput } from '@/lib/validation'
-import { MultiSelect } from '@/components/multi-select'
 import { toast } from 'sonner'
 
 const COMMON_TAGS = [
   'Treatment', 'Symptoms', 'Diet', 'Medication', 'Surgery', 
   'Research', 'Lifestyle', 'Mental Health', 'Pediatric', 'Women\'s Health'
-].map(tag => ({ label: tag, value: tag }))
+]
 
 export default function NewArticlePage() {
   const { data: session, status } = useSession()
@@ -29,6 +28,7 @@ export default function NewArticlePage() {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
   const [selectedTags, setSelectedTags] = useState<string[]>([])
+  const [tagInput, setTagInput] = useState('')
 
   const form = useForm<CreateArticleInput>({
     resolver: zodResolver(createArticleSchema),
@@ -43,6 +43,31 @@ export default function NewArticlePage() {
   })
 
   const canCreate = ['MODERATOR', 'ADMIN', 'DOCTOR'].includes(session?.user?.role || '')
+
+  const addTag = (tag: string) => {
+    const trimmedTag = tag.trim()
+    if (trimmedTag && !selectedTags.includes(trimmedTag)) {
+      setSelectedTags([...selectedTags, trimmedTag])
+      setTagInput('')
+    }
+  }
+
+  const removeTag = (tagToRemove: string) => {
+    setSelectedTags(selectedTags.filter(tag => tag !== tagToRemove))
+  }
+
+  const handleTagInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      e.preventDefault()
+      addTag(tagInput)
+    }
+  }
+
+  const addCommonTag = (tag: string) => {
+    if (!selectedTags.includes(tag)) {
+      setSelectedTags([...selectedTags, tag])
+    }
+  }
 
   const onSubmit = async (data: CreateArticleInput) => {
     if (!canCreate) {
@@ -181,17 +206,48 @@ export default function NewArticlePage() {
                 />
               </div>
 
-              <div className="space-y-2">
+              <div className="space-y-4">
                 <Label>Tags</Label>
-                <MultiSelect
-                  options={COMMON_TAGS}
-                  value={selectedTags}
-                  onChange={setSelectedTags}
-                  placeholder="Select tags..."
-                  searchPlaceholder="Search tags..."
-                  emptyText="No tags found"
-                  disabled={isLoading}
-                />
+                
+                <div className="space-y-2">
+                  <Input
+                    placeholder="Type a tag and press Enter..."
+                    value={tagInput}
+                    onChange={(e) => setTagInput(e.target.value)}
+                    onKeyDown={handleTagInputKeyDown}
+                    disabled={isLoading}
+                  />
+                  <p className="text-sm text-muted-foreground">
+                    Type a tag and press Enter to add it
+                  </p>
+                </div>
+
+                <div className="space-y-2">
+                  <p className="text-sm text-muted-foreground">Common tags:</p>
+                  <div className="flex flex-wrap gap-2">
+                    {COMMON_TAGS.map(tag => (
+                      <Button key={tag} type="button" variant="outline" size="sm" onClick={() => addCommonTag(tag)} disabled={isLoading || selectedTags.includes(tag)} className="text-xs">
+                        {tag}
+                      </Button>
+                    ))}
+                  </div>
+                </div>
+
+                {selectedTags.length > 0 && (
+                  <div className="space-y-2">
+                    <p className="text-sm text-muted-foreground">Selected tags:</p>
+                    <div className="flex flex-wrap gap-2">
+                      {selectedTags.map(tag => (
+                        <div key={tag} className="flex items-center gap-1 bg-secondary text-secondary-foreground px-3 py-1 rounded-full text-sm">
+                          {tag}
+                          <button type="button" onClick={() => removeTag(tag)} disabled={isLoading} className="hover:bg-destructive hover:text-destructive-foreground rounded-full p-0.5">
+                            <X className="h-3 w-3" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
 
               <div className="space-y-2">
