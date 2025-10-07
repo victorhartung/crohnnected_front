@@ -151,6 +151,7 @@ export const exportQuerySchema = z.object({
   symptoms: z.string().transform((val) => val.split(',').filter(Boolean)).optional(),
   severity: z.nativeEnum(SymptomSeverity).optional(),
   period: z.string().optional(),
+  fields: z.string().optional(),
 });
 
 // Hub content schemas

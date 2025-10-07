@@ -1,16 +1,9 @@
 
-'use client'
+"use client"
 
 import * as React from "react"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-} from "@/components/ui/command"
 import {
   Popover,
   PopoverContent,
@@ -46,6 +39,7 @@ export function MultiSelect({
   maxItems,
 }: MultiSelectProps) {
   const [open, setOpen] = React.useState(false)
+  const [search, setSearch] = React.useState('')
 
   const handleUnselect = (item: string) => {
     onChange(value.filter((i) => i !== item))
@@ -98,36 +92,48 @@ export function MultiSelect({
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-full p-0">
-        <Command>
-          <CommandInput placeholder={searchPlaceholder} />
-          <CommandEmpty>{emptyText}</CommandEmpty>
-          <CommandGroup>
-            {options.map((option) => (
-              <CommandItem
-                key={option.value}
-                value={option.label}
-                onSelect={() => handleSelect(option.value)}
-              >
-                <Check
-                  className={cn(
-                    "mr-2 h-4 w-4",
-                    value.includes(option.value) ? "opacity-100" : "opacity-0"
-                  )}
-                />
-                {option.label}
-                {maxItems && value.includes(option.value) && (
-                  <X
-                    className="ml-auto h-4 w-4 text-muted-foreground hover:text-foreground"
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      handleUnselect(option.value)
-                    }}
-                  />
-                )}
-              </CommandItem>
-            ))}
-          </CommandGroup>
-        </Command>
+        <div className="p-2">
+          <input
+            className="w-full rounded-md border px-3 py-2 text-sm outline-none"
+            placeholder={searchPlaceholder}
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+        </div>
+        <div className="max-h-60 overflow-y-auto">
+          {options.filter(opt => opt.label.toLowerCase().includes(search.toLowerCase())).length === 0 ? (
+            <div className="p-3 text-sm text-muted-foreground">{emptyText}</div>
+          ) : (
+            <div className="p-1">
+              {options.filter(opt => opt.label.toLowerCase().includes(search.toLowerCase())).map((option) => {
+                const selected = value.includes(option.value)
+                return (
+                  <button
+                    key={option.value}
+                    type="button"
+                    onClick={() => handleSelect(option.value)}
+                    className={cn(
+                      "w-full flex items-center justify-start gap-2 px-3 py-2 text-sm rounded-md hover:bg-accent",
+                      selected ? 'bg-accent/20' : ''
+                    )}
+                  >
+                    <Check className={cn('h-4 w-4', selected ? 'opacity-100' : 'opacity-0')} />
+                    <span className="flex-1 text-left">{option.label}</span>
+                    {maxItems && selected && (
+                      <X
+                        className="ml-2 h-4 w-4 text-muted-foreground hover:text-foreground"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          handleUnselect(option.value)
+                        }}
+                      />
+                    )}
+                  </button>
+                )
+              })}
+            </div>
+          )}
+        </div>
       </PopoverContent>
     </Popover>
   )

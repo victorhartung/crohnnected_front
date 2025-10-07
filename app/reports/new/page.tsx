@@ -1,7 +1,7 @@
 
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
 import { useForm } from 'react-hook-form'
@@ -53,6 +53,27 @@ export default function NewReportPage() {
     },
   })
 
+  // Prevent patients from creating more than one report: if they already have one,
+  // redirect back to /reports.
+  useEffect(() => {
+    const checkExisting = async () => {
+      if (session?.user?.role !== 'PATIENT') return
+      try {
+        const res = await fetch('/api/reports?limit=1')
+        if (!res.ok) return
+        const data = await res.json()
+        if (data?.data?.total && data.data.total > 0) {
+          // Patient already has a report, redirect
+          router.push('/reports')
+        }
+      } catch (e) {
+        // ignore
+      }
+    }
+
+    checkExisting()
+  }, [session, router])
+
   const symptomOptions: Option[] = COMMON_SYMPTOMS.map(symptom => ({
     label: symptom,
     value: symptom,
@@ -65,6 +86,12 @@ export default function NewReportPage() {
 
   const watchedSymptoms = form.watch('symptoms') || []
   const watchedMedications = form.watch('medications') || []
+
+  useEffect(() => {
+    // Ensure RHF knows about these array fields so setValue and validation work reliably
+    form.register('symptoms')
+    form.register('medications')
+  }, [form])
 
   const onSubmit = async (data: ReportInput) => {
     if (session?.user?.role !== 'PATIENT') {
@@ -282,7 +309,7 @@ export default function NewReportPage() {
                 <MultiSelect
                   options={symptomOptions}
                   value={watchedSymptoms}
-                  onChange={(value) => form.setValue('symptoms', value)}
+                  onChange={(value) => form.setValue('symptoms', value, { shouldValidate: true, shouldDirty: true })}
                   placeholder="Select symptoms..."
                   searchPlaceholder="Search symptoms..."
                   emptyText="No symptoms found"
@@ -323,7 +350,7 @@ export default function NewReportPage() {
                 <MultiSelect
                   options={medicationOptions}
                   value={watchedMedications}
-                  onChange={(value) => form.setValue('medications', value)}
+                  onChange={(value) => form.setValue('medications', value, { shouldValidate: true, shouldDirty: true })}
                   placeholder="Select medications..."
                   searchPlaceholder="Search medications..."
                   emptyText="No medications found"

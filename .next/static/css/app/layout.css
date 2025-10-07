@@ -863,6 +863,9 @@ video {
 .h-px {
   height: 1px;
 }
+.max-h-60 {
+  max-height: 15rem;
+}
 .max-h-96 {
   max-height: 24rem;
 }
@@ -872,11 +875,20 @@ video {
 .max-h-screen {
   max-height: 100vh;
 }
+.min-h-\[24px\] {
+  min-height: 24px;
+}
 .min-h-\[300px\] {
   min-height: 300px;
 }
+.min-h-\[32px\] {
+  min-height: 32px;
+}
 .min-h-\[400px\] {
   min-height: 400px;
+}
+.min-h-\[56px\] {
+  min-height: 56px;
 }
 .min-h-\[80px\] {
   min-height: 80px;
@@ -1008,6 +1020,9 @@ video {
 }
 .shrink-0 {
   flex-shrink: 0;
+}
+.flex-grow {
+  flex-grow: 1;
 }
 .grow {
   flex-grow: 1;
@@ -1226,6 +1241,11 @@ video {
 .overflow-x-hidden {
   overflow-x: hidden;
 }
+.truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 .whitespace-nowrap {
   white-space: nowrap;
 }
@@ -1306,6 +1326,9 @@ video {
 .bg-accent {
   background-color: hsl(var(--accent));
 }
+.bg-accent\/20 {
+  background-color: hsl(var(--accent) / 0.2);
+}
 .bg-background {
   background-color: hsl(var(--background));
 }
@@ -1361,8 +1384,14 @@ video {
 .p-0 {
   padding: 0px;
 }
+.p-0\.5 {
+  padding: 0.125rem;
+}
 .p-1 {
   padding: 0.25rem;
+}
+.p-2 {
+  padding: 0.5rem;
 }
 .p-3 {
   padding: 0.75rem;
@@ -1647,6 +1676,10 @@ video {
 .ring-offset-background {
   --tw-ring-offset-color: hsl(var(--background));
 }
+.blur {
+  --tw-blur: blur(8px);
+  filter: var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow);
+}
 .filter {
   filter: var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow);
 }
@@ -1820,6 +1853,10 @@ video {
   background-color: hsl(var(--accent));
 }
  
+.hover\:bg-destructive:hover {
+  background-color: hsl(var(--destructive));
+}
+ 
 .hover\:bg-destructive\/80:hover {
   background-color: hsl(var(--destructive) / 0.8);
 }
@@ -1858,6 +1895,10 @@ video {
  
 .hover\:text-accent-foreground:hover {
   color: hsl(var(--accent-foreground));
+}
+ 
+.hover\:text-destructive-foreground:hover {
+  color: hsl(var(--destructive-foreground));
 }
  
 .hover\:text-foreground:hover {

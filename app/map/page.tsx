@@ -32,6 +32,7 @@ import {
 import { useSession } from "next-auth/react";
 import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
+import { MultiSelect, Option } from "@/components/multi-select";
 import { toast } from "sonner";
 
 // Dynamically import the map component to avoid SSR issues
@@ -72,6 +73,31 @@ export default function MapPage() {
   const [mapData, setMapData] = useState<MapData | null>(null);
   const [availableCountries, setAvailableCountries] = useState<string[]>([]);
   const [availableSymptoms, setAvailableSymptoms] = useState<string[]>([]);
+  // Fields that can be exported (keep in sync with backend allowedFields)
+  const availableExportFields: Option[] = [
+    { label: "ID", value: "id" },
+    { label: "Age", value: "ageAtReport" },
+    { label: "Sex", value: "sex" },
+    { label: "Country", value: "country" },
+    { label: "State", value: "state" },
+    { label: "City", value: "city" },
+    { label: "Symptoms", value: "symptoms" },
+    { label: "Symptom severity", value: "symptomSeverity" },
+    { label: "Medications", value: "medications" },
+    { label: "Flare frequency", value: "flareFrequencyPerYear" },
+    { label: "Surgery history", value: "surgeryHistory" },
+    { label: "Diagnosis date", value: "diagnosisDate" },
+    { label: "Status", value: "status" },
+    { label: "Approved at", value: "approvedAt" },
+    { label: "Created at", value: "createdAt" },
+  ];
+  const [selectedExportFields, setSelectedExportFields] = useState<string[]>([
+    // Seleção padrão
+    'id',
+    'ageAtReport',
+    'sex',
+    'country',
+  ]);
   const [filters, setFilters] = useState<MapFilters>({
     country: "all",
     severity: "all",
@@ -259,6 +285,10 @@ export default function MapPage() {
         params.append("approvedOnly", "true");
       }
       params.append("format", "csv");
+      
+      if (selectedExportFields && selectedExportFields.length > 0) {
+        params.append('fields', selectedExportFields.join(','));
+      }
 
       const response = await fetch(`/api/reports/export?${params.toString()}`);
 
@@ -478,6 +508,20 @@ export default function MapPage() {
                     ))}
                   </SelectContent>
                 </Select>
+              </div>
+
+              {/* Export fields selector */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Export fields</label>
+                <MultiSelect
+                  options={availableExportFields}
+                  value={selectedExportFields}
+                  onChange={(v) => setSelectedExportFields(v)}
+                  placeholder="Select fields to export"
+                  searchPlaceholder="Search fields..."
+                  emptyText="No fields"
+                />
+                <p className="text-xs text-muted-foreground">Pick which columns appear in the CSV. Leave empty to use the server defaults.</p>
               </div>
 
               <Separator />

@@ -2,6 +2,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { useSession } from 'next-auth/react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
@@ -63,9 +64,18 @@ export default function ReportsPage() {
 
   const isPatient = session?.user?.role === 'PATIENT'
   const isDoctor = session?.user?.role === 'DOCTOR'
-  const canApprove = isDoctor || session?.user?.role === 'MODERATOR' || session?.user?.role === 'ADMIN'
+  const canApprove = isDoctor || session?.user?.role === 'ADMIN'
+  const params = useSearchParams()
   
   useEffect(() => {
+    const statusParam = params?.get('status')
+    if (statusParam) {
+      const normalized = statusParam.toLowerCase()
+      if (['all', 'pending', 'approved', 'rejected'].includes(normalized)) {
+        setActiveTab(normalized)
+      }
+    }
+
     if (session?.user) {
       loadReports()
     }
@@ -185,10 +195,10 @@ export default function ReportsPage() {
 
   const getStatusCounts = () => {
     return {
-      all: filteredReports.length,
-      pending: filteredReports.filter(r => r.status === 'PENDING').length,
-      approved: filteredReports.filter(r => r.status === 'APPROVED').length,
-      rejected: filteredReports.filter(r => r.status === 'REJECTED').length,
+      all: reports.length,
+      pending: reports.filter(r => r.status === 'PENDING').length,
+      approved: reports.filter(r => r.status === 'APPROVED').length,
+      rejected: reports.filter(r => r.status === 'REJECTED').length,
     }
   }
 
@@ -231,7 +241,7 @@ export default function ReportsPage() {
             </p>
           </div>
           
-          {isPatient && (
+          {isPatient && reports.length === 0 && (
             <Button asChild>
               <Link href="/reports/new">
                 <Plus className="mr-2 h-4 w-4" />
@@ -335,11 +345,11 @@ export default function ReportsPage() {
                 <CardContent className="py-8 text-center">
                   <FileText className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
                   <p className="text-muted-foreground">No reports found.</p>
-                  {isPatient && (
-                    <Button asChild className="mt-4">
-                      <Link href="/reports/new">Submit your first report</Link>
-                    </Button>
-                  )}
+                      {isPatient && reports.length === 0 && (
+                        <Button asChild className="mt-4">
+                          <Link href="/reports/new">Submit your first report</Link>
+                        </Button>
+                      )}
                 </CardContent>
               </Card>
             ) : (

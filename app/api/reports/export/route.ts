@@ -123,8 +123,16 @@ export const GET = withAuth(
       });
 
       if (query.format === 'csv') {
-        // Generate CSV
-        const headers = [
+    
+          let requestedFields: string[] = [];
+          if (Array.isArray((query as any).fields)) {
+            requestedFields = (query as any).fields as string[];
+          } else if (typeof (query as any).fields === 'string' && (query as any).fields.length > 0) {
+            requestedFields = (query as any).fields.split(',').map((s: string) => s.trim()).filter(Boolean);
+          }
+
+       // Definir colunas
+        const allowedFields = [
           'id',
           'ageAtReport',
           'sex',
@@ -139,35 +147,62 @@ export const GET = withAuth(
           'diagnosisDate',
           'status',
           'approvedAt',
-          'createdAt'
+          'createdAt',
         ];
+
+        const selectedFields: string[] = requestedFields.length > 0
+          ? requestedFields.filter((f: string) => allowedFields.includes(f))
+          : allowedFields.slice();
+
+
+        if (selectedFields.length === 0) selectedFields.push('id');
+
+        const formatters: Record<string, (r: any) => string> = {
+          id: (r) => `${r.id ?? ''}`,
+          ageAtReport: (r) => `${r.ageAtReport ?? ''}`,
+          sex: (r) => `${r.sex ?? ''}`,
+          country: (r) => `${r.country ?? ''}`,
+          state: (r) => `${r.state ?? ''}`,
+          city: (r) => `${r.city ?? ''}`,
+          symptoms: (r) => {
+            if (!r.symptoms) return '';
+            return `"${Array.isArray(r.symptoms) ? (r.symptoms as string[]).join('; ') : String(r.symptoms)}"`;
+          },
+          symptomSeverity: (r) => `${r.symptomSeverity ?? ''}`,
+          medications: (r) => {
+            if (!r.medications) return '';
+            return `"${Array.isArray(r.medications) ? (r.medications as string[]).join('; ') : String(r.medications)}"`;
+          },
+          flareFrequencyPerYear: (r) => `${r.flareFrequencyPerYear ?? ''}`,
+          surgeryHistory: (r) => {
+            if (!r.surgeryHistory) return '';
+            return `"${Array.isArray(r.surgeryHistory) ? JSON.stringify(r.surgeryHistory) : String(r.surgeryHistory)}"`;
+          },
+          diagnosisDate: (r) => r.diagnosisDate ? new Date(r.diagnosisDate).toISOString().split('T')[0] : '',
+          status: (r) => `${r.status ?? ''}`,
+          approvedAt: (r) => r.approvedAt ? new Date(r.approvedAt).toISOString() : '',
+          createdAt: (r) => r.createdAt ? new Date(r.createdAt).toISOString() : '',
+        };
+
+        const headers = selectedFields;
 
         const csvRows = [
           headers.join(','),
-          ...reports.map(report => {
-            return [
-              report.id,
-              report.ageAtReport || '',
-              report.sex || '',
-              report.country || '',
-              report.state || '',
-              report.city || '',
-              `"${Array.isArray(report.symptoms) ? (report.symptoms as string[]).join('; ') : ''}"`,
-              report.symptomSeverity,
-              `"${Array.isArray(report.medications) ? (report.medications as string[]).join('; ') : ''}"`,
-              report.flareFrequencyPerYear || '',
-              `"${Array.isArray(report.surgeryHistory) ? JSON.stringify(report.surgeryHistory) : ''}"`,
-              report.diagnosisDate ? new Date(report.diagnosisDate).toISOString().split('T')[0] : '',
-              report.status,
-              report.approvedAt ? new Date(report.approvedAt).toISOString() : '',
-              new Date(report.createdAt).toISOString()
-            ].join(',');
+          ...reports.map((report) => {
+            return selectedFields.map((field) => {
+              const fn = formatters[field];
+              try {
+                return fn ? fn(report) : '';
+              } catch (e) {
+                return '';
+              }
+            }).join(',');
           })
         ];
 
         const csvContent = csvRows.join('\n');
         const timestamp = new Date().toISOString().split('T')[0];
-        
+
         return new Response(csvContent, {
           status: 200,
           headers: {

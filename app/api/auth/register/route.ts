@@ -36,20 +36,17 @@ export async function POST(request: NextRequest) {
         { status: 409 }
       );
     }
-
-    // Role assignment logic
+    // Determinar roles
     let assignedRole: UserRole = UserRole.PATIENT; // Default role
 
     if (role && role !== UserRole.PATIENT) {
-      // Check if this is the first user (becomes admin) or if current request is from an admin
       const userCount = await prisma.user.count();
-      
-      if (userCount === 0) {
-        // First user becomes admin
+
+      if (userCount === 0 && role === UserRole.ADMIN) {
         assignedRole = UserRole.ADMIN;
+      } else if (role === UserRole.RESEARCHER) {
+        assignedRole = UserRole.RESEARCHER;
       } else {
-        // For now, only allow PATIENT role unless it's the first user
-        // In a full implementation, this would check if the requesting user is an admin
         assignedRole = UserRole.PATIENT;
       }
     }
@@ -75,9 +72,6 @@ export async function POST(request: NextRequest) {
             userId: newUser.id,
           },
         });
-      } else if (assignedRole === UserRole.DOCTOR) {
-        // Note: Doctor profiles need license number, so they would need to be created through admin interface
-        // For now, we don't auto-create doctor profiles during registration
       }
 
       return newUser;

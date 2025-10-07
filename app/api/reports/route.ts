@@ -23,6 +23,14 @@ export const POST = withAuth(async (request: NextRequest, user: User) => {
       );
     }
 
+    const existing = await prisma.report.findFirst({ where: { patientId: user.id } });
+    if (existing) {
+      return Response.json(
+        { success: false, error: 'Patient already has a report' },
+        { status: 400 }
+      );
+    }
+
     // Rate limiting for report creation
     const rateLimitKey = getRateLimitKey(request, "create-report");
     if (!checkRateLimit(rateLimitKey, 5, 60 * 60 * 1000)) {

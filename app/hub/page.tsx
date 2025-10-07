@@ -2,6 +2,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { useSession } from 'next-auth/react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
@@ -44,6 +45,7 @@ interface HubContent {
 export default function HubPage() {
   const { data: session, status } = useSession()
   const [activeTab, setActiveTab] = useState('articles')
+  const params = useSearchParams()
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedTag, setSelectedTag] = useState('')
   const [isLoading, setIsLoading] = useState(false)
@@ -55,6 +57,10 @@ export default function HubPage() {
   const canCreateContent = session?.user?.role === 'MODERATOR' || session?.user?.role === 'ADMIN' || session?.user?.role === 'DOCTOR'
 
   useEffect(() => {
+    const tabParam = params?.get('tab')
+    if (tabParam && ['articles','protocols','stories'].includes(tabParam)) {
+      setActiveTab(tabParam)
+    }
     loadContent()
   }, [])
 

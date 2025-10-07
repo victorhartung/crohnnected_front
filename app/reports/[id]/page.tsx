@@ -80,7 +80,7 @@ export default function ReportDetailPage() {
   const reportId = params?.id as string
 
   const isPatient = session?.user?.role === 'PATIENT'
-  const canApprove = session?.user?.role === 'DOCTOR' || session?.user?.role === 'MODERATOR' || session?.user?.role === 'ADMIN'
+  const canApprove = session?.user?.role === 'DOCTOR' || session?.user?.role === 'ADMIN'
   const canViewDocument = session?.user?.role !== 'RESEARCHER' // Researchers can't access PDFs
 
   const rejectForm = useForm<RejectReportInput>({
@@ -114,8 +114,9 @@ export default function ReportDetailPage() {
         return
       }
 
-      const data = await response.json()
-      setReport(data)
+  const data = await response.json()
+  // API retorna { success: true, data: { report } }
+  setReport(data?.data?.report ?? null)
     } catch (error) {
       setError('An unexpected error occurred')
       console.error('Failed to load report:', error)
@@ -187,12 +188,13 @@ export default function ReportDetailPage() {
       const response = await fetch(`/api/reports/${report.id}/document`)
       if (!response.ok) {
         const errorData = await response.json()
-        toast.error(errorData.message || 'Failed to download document')
+        toast.error(errorData.error || 'Failed to download document')
         return
       }
 
       const data = await response.json()
-      downloadPDFFromBase64(data.documentBase64, data.documentOriginalName)
+      const doc = data?.data ?? {}
+      downloadPDFFromBase64(doc.documentBase64, doc.documentOriginalName)
       toast.success('Document downloaded successfully')
     } catch (error) {
       toast.error('Failed to download document')
