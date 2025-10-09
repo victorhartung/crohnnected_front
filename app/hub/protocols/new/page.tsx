@@ -72,7 +72,7 @@ export default function NewProtocolPage() {
       }
 
       toast.success('Protocol created successfully!')
-      router.push('/hub')
+      router.push('/hub?tab=protocols')
     } catch (error) {
       setError('An unexpected error occurred')
       console.error('Protocol creation error:', error)

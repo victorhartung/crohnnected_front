@@ -10,11 +10,10 @@ export const dynamic = 'force-dynamic'
 // GET /api/hub/articles - List articles
 export const GET = async (request: NextRequest) => {
   try {
-    const url = new URL(request.url)
-    const isPublicOnly = !await isAuthenticated(request)
-    
+    const isAuthenticated = await checkAuthentication(request)
+
     const articles = await prisma.article.findMany({
-      where: isPublicOnly ? { isPublic: true } : {},
+      where: isAuthenticated ? {} : { isPublic: true },
       include: {
         createdBy: {
           select: {
@@ -93,11 +92,12 @@ export const POST = withAuth(async (request: NextRequest, user: any) => {
   }
 }, ['MODERATOR', 'ADMIN', 'DOCTOR'])
 
-async function isAuthenticated(request: NextRequest): Promise<boolean> {
+async function checkAuthentication(request: NextRequest): Promise<boolean> {
   try {
-    // Simple check for authentication - in a real app you'd verify the session
     const authHeader = request.headers.get('authorization')
-    return !!authHeader
+    const cookieHeader = request.headers.get('cookie')
+    
+    return !!(authHeader || (cookieHeader && cookieHeader.includes('next-auth.session-token')))
   } catch {
     return false
   }

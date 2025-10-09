@@ -47,6 +47,7 @@ export default function ProtocolDetailPage() {
   const canEdit = session?.user?.role === 'MODERATOR' || session?.user?.role === 'ADMIN' || session?.user?.role === 'DOCTOR'
 
   useEffect(() => {
+    console.log('Slug from params:', slug)
     if (slug) {
       loadProtocol()
     }
@@ -57,13 +58,16 @@ export default function ProtocolDetailPage() {
     setError('')
 
     try {
+      
       const response = await fetch(`/api/hub/protocols/${slug}`)
       
       if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}))
+
         if (response.status === 404) {
           setError('Protocol not found')
         } else {
-          setError('Failed to load protocol')
+          setError(`Failed to load protocol: ${response.status}`)
         }
         return
       }
@@ -71,8 +75,8 @@ export default function ProtocolDetailPage() {
       const data = await response.json()
       setProtocol(data)
     } catch (error) {
-      setError('An unexpected error occurred')
       console.error('Failed to load protocol:', error)
+      setError('An unexpected error occurred')
     } finally {
       setIsLoading(false)
     }
@@ -91,10 +95,32 @@ export default function ProtocolDetailPage() {
   if (error) {
     return (
       <div className="container mx-auto px-4 py-8">
-        <Alert>
-          <AlertCircle className="h-4 w-4" />
-          <AlertDescription>{error}</AlertDescription>
-        </Alert>
+        <div className="max-w-4xl mx-auto space-y-6">
+          <Button variant="outline" onClick={() => router.back()}>
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Back
+          </Button>
+          
+          <Alert variant="destructive">
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+          
+          {error.includes('not found') && (
+            <Card>
+              <CardContent className="pt-6">
+                <p className="text-muted-foreground mb-4">
+                  The protocol you're looking for might have been moved or deleted.
+                </p>
+                <Button asChild>
+                  <Link href="/hub?tab=protocols">
+                    Return to Protocols
+                  </Link>
+                </Button>
+              </CardContent>
+            </Card>
+          )}
+        </div>
       </div>
     )
   }
@@ -115,9 +141,11 @@ export default function ProtocolDetailPage() {
       <div className="max-w-4xl mx-auto space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
-          <Button variant="outline" onClick={() => router.back()}>
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Back
+          <Button asChild variant="outline">
+            <Link href="/hub?tab=protocols">
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Back to Protocols
+            </Link>
           </Button>
           
           {canEdit && (

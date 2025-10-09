@@ -47,6 +47,7 @@ export default function ArticleDetailPage() {
   const canEdit = session?.user?.role === 'MODERATOR' || session?.user?.role === 'ADMIN' || session?.user?.role === 'DOCTOR'
 
   useEffect(() => {
+    console.log('Slug from params:', slug)
     if (slug) {
       loadArticle()
     }
@@ -57,18 +58,20 @@ export default function ArticleDetailPage() {
     setError('')
 
     try {
+      console.log('Loading article with slug:', slug)
       const response = await fetch(`/api/hub/articles/${slug}`)
       
       if (!response.ok) {
         if (response.status === 404) {
           setError('Article not found')
         } else {
-          setError('Failed to load article')
+          setError(`Failed to load article: ${response.status}`)
         }
         return
       }
 
       const data = await response.json()
+      console.log('Article data loaded:', data)
       setArticle(data)
     } catch (error) {
       setError('An unexpected error occurred')
@@ -91,10 +94,32 @@ export default function ArticleDetailPage() {
   if (error) {
     return (
       <div className="container mx-auto px-4 py-8">
-        <Alert>
-          <AlertCircle className="h-4 w-4" />
-          <AlertDescription>{error}</AlertDescription>
-        </Alert>
+        <div className="max-w-4xl mx-auto space-y-6">
+          <Button variant="outline" onClick={() => router.back()}>
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Back
+          </Button>
+          
+          <Alert variant="destructive">
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+          
+          {error.includes('not found') && (
+            <Card>
+              <CardContent className="pt-6">
+                <p className="text-muted-foreground mb-4">
+                  The article you're looking for might have been moved or deleted.
+                </p>
+                <Button asChild>
+                  <Link href="/hub">
+                    Return to Information Hub
+                  </Link>
+                </Button>
+              </CardContent>
+            </Card>
+          )}
+        </div>
       </div>
     )
   }
