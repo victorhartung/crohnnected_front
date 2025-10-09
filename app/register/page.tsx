@@ -113,7 +113,7 @@ export default function RegisterPage() {
               <Label htmlFor="role">Role</Label>
               <Select
                 value={form.watch('role')}
-                onValueChange={(value) => form.setValue('role', value as 'PATIENT' | 'DOCTOR' | 'RESEARCHER')}
+                onValueChange={(value) => form.setValue('role', value as 'PATIENT' | 'RESEARCHER')}
                 disabled={isLoading}
               >
                 <SelectTrigger>
@@ -121,7 +121,6 @@ export default function RegisterPage() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="PATIENT">Patient</SelectItem>
-                  <SelectItem value="DOCTOR">Doctor</SelectItem>
                   <SelectItem value="RESEARCHER">Researcher</SelectItem>
                 </SelectContent>
               </Select>
