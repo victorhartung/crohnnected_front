@@ -28,6 +28,7 @@ export function Footer() {
               <li><Link href="/reports" className="hover:underline">Review Reports</Link></li>
               <li><Link href="/hub" className="hover:underline">Clinical Resources</Link></li>
               <li><Link href="/map" className="hover:underline">Geographic Data</Link></li>
+              <li><Link href="/contact/doctor" className="hover:underline">Contact for Doctors</Link></li>
             </ul>
           </div>
           
