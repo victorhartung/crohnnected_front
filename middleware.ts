@@ -7,8 +7,16 @@ export default withAuth(
     const { token } = req.nextauth
     const { pathname } = req.nextUrl
 
-    // Allow access to auth pages for everyone
-    if (pathname.startsWith('/login') || pathname.startsWith('/register') || pathname === '/') {
+    // Allow access to auth and public pages for everyone
+    if (
+      pathname === '/' ||
+      pathname.startsWith('/login') ||
+      pathname.startsWith('/register') ||
+      pathname.startsWith('/privacy') ||
+      pathname.startsWith('/terms') ||
+      pathname.startsWith('/contact') ||
+      pathname.startsWith('/buy-me-coffee')
+    ) {
       return NextResponse.next()
     }
 
@@ -25,7 +33,15 @@ export default withAuth(
         const { pathname } = req.nextUrl
         
         // Allow access to public pages
-        if (pathname === '/' || pathname.startsWith('/login') || pathname.startsWith('/register')) {
+        if (
+          pathname === '/' ||
+          pathname.startsWith('/login') ||
+          pathname.startsWith('/register') ||
+          pathname.startsWith('/privacy') ||
+          pathname.startsWith('/terms') ||
+          pathname.startsWith('/contact') ||
+          pathname.startsWith('/buy-me-coffee')
+        ) {
           return true
         }
 
