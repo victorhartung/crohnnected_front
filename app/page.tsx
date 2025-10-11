@@ -17,11 +17,11 @@ export default function HomePage() {
 
     if (status === 'unauthenticated') {
       return (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="div-cards">
           <Card className="p-6">
-            <FileText className="h-12 w-12 text-primary mb-4" />
-            <h3 className="text-xl font-semibold mb-2">For Patients</h3>
-            <p className="text-muted-foreground mb-4">
+            <FileText className="card-icons" />
+            <h3 className="card-title">For Patients</h3>
+            <p className="card-text">
               Submit reports, manage your health data, and access educational resources.
             </p>
             <Button asChild>
@@ -29,9 +29,9 @@ export default function HomePage() {
             </Button>
           </Card>
           <Card className="p-6">
-            <Users className="h-12 w-12 text-primary mb-4" />
-            <h3 className="text-xl font-semibold mb-2">For Doctors</h3>
-            <p className="text-muted-foreground mb-4">
+            <Users className="card-icons" />
+            <h3 className="card-title">For Doctors</h3>
+            <p className="card-text">
               Review patient reports, approve submissions, and access clinical protocols.
             </p>
             <Button asChild>
@@ -39,9 +39,9 @@ export default function HomePage() {
             </Button>
           </Card>
           <Card className="p-6">
-            <BarChart3 className="h-12 w-12 text-primary mb-4" />
-            <h3 className="text-xl font-semibold mb-2">For Researchers</h3>
-            <p className="text-muted-foreground mb-4">
+            <BarChart3 className="card-icons" />
+            <h3 className="card-title">For Researchers</h3>
+            <p className="card-text">
               Access anonymized data, export reports, and analyze trends.
             </p>
             <Button asChild>
@@ -57,11 +57,11 @@ export default function HomePage() {
     switch (role) {
       case 'PATIENT':
         return (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="div-cards">
             <Card className="p-6">
-              <Plus className="h-12 w-12 text-primary mb-4" />
-              <h3 className="text-xl font-semibold mb-2">Submit New Report</h3>
-              <p className="text-muted-foreground mb-4">
+              <Plus className="card-icons" />
+              <h3 className="card-title">Submit New Report</h3>
+              <p className="card-text">
                 Share your health information and attach supporting documents.
               </p>
               <Button asChild>
@@ -69,12 +69,12 @@ export default function HomePage() {
               </Button>
             </Card>
             <Card className="p-6">
-              <FileText className="h-12 w-12 text-primary mb-4" />
-              <h3 className="text-xl font-semibold mb-2">My Reports</h3>
-              <p className="text-muted-foreground mb-4">
+              <FileText className="card-icons" />
+              <h3 className="card-title">My Reports</h3>
+              <p className="card-text">
                 View and manage your submitted reports and their status.
               </p>
-              <Button variant="outline" asChild>
+              <Button variant="default" asChild>
                 <Link href="/reports">View Reports</Link>
               </Button>
             </Card>
@@ -83,11 +83,11 @@ export default function HomePage() {
         
       case 'DOCTOR':
         return (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="div-cards">
             <Card className="p-6">
-              <FileText className="h-12 w-12 text-primary mb-4" />
-              <h3 className="text-xl font-semibold mb-2">Review Reports</h3>
-              <p className="text-muted-foreground mb-4">
+              <FileText className="card-icons" />
+              <h3 className="card-title">Review Reports</h3>
+              <p className="card-text">
                 Review patient submissions and approve or reject reports.
               </p>
               <Button asChild>
@@ -95,12 +95,12 @@ export default function HomePage() {
               </Button>
             </Card>
             <Card className="p-6">
-              <MapPin className="h-12 w-12 text-primary mb-4" />
-              <h3 className="text-xl font-semibold mb-2">Geographic Data</h3>
-              <p className="text-muted-foreground mb-4">
+              <MapPin className="card-icons" />
+              <h3 className="card-title">Geographic Data</h3>
+              <p className="card-text">
                 Explore geographic patterns and patient distribution.
               </p>
-              <Button variant="outline" asChild>
+              <Button variant="default" asChild>
                 <Link href="/map">View Map</Link>
               </Button>
             </Card>
@@ -109,11 +109,11 @@ export default function HomePage() {
         
       case 'RESEARCHER':
         return (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="div-cards">
             <Card className="p-6">
-              <BarChart3 className="h-12 w-12 text-primary mb-4" />
-              <h3 className="text-xl font-semibold mb-2">Analyze Data</h3>
-              <p className="text-muted-foreground mb-4">
+              <BarChart3 className="card-icons" />
+              <h3 className="card-title">Analyze Data</h3>
+              <p className="card-text">
                 Access approved reports and export data for research.
               </p>
               <Button asChild>
@@ -121,9 +121,9 @@ export default function HomePage() {
               </Button>
             </Card>
             <Card className="p-6">
-              <MapPin className="h-12 w-12 text-primary mb-4" />
-              <h3 className="text-xl font-semibold mb-2">Geographic Insights</h3>
-              <p className="text-muted-foreground mb-4">
+              <MapPin className="card-icons" />
+              <h3 className="card-title">Geographic Insights</h3>
+              <p className="card-text">
                 Explore disease patterns and incidence data by location.
               </p>
               <Button variant="outline" asChild>
@@ -135,34 +135,34 @@ export default function HomePage() {
         
       default:
         return (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="div-cards">
             <Card className="p-6">
-              <FileText className="h-12 w-12 text-primary mb-4" />
-              <h3 className="text-xl font-semibold mb-2">Manage Reports</h3>
-              <p className="text-muted-foreground mb-4">
+              <FileText className="card-icons" />
+              <h3 className="card-title">Manage Reports</h3>
+              <p className="card-text">
                 Oversee all reports and manage platform content.
               </p>
-              <Button asChild>
+              <Button variant="default" asChild>
                 <Link href="/reports">Manage Reports</Link>
               </Button>
             </Card>
             <Card className="p-6">
-              <Users className="h-12 w-12 text-primary mb-4" />
-              <h3 className="text-xl font-semibold mb-2">Hub Management</h3>
-              <p className="text-muted-foreground mb-4">
+              <Users className="card-icons" />
+              <h3 className="card-title">Hub Management</h3>
+              <p className="card-text">
                 Manage educational content and community resources.
               </p>
-              <Button variant="outline" asChild>
+              <Button variant="default" asChild>
                 <Link href="/hub">Manage Hub</Link>
               </Button>
             </Card>
             <Card className="p-6">
-              <MapPin className="h-12 w-12 text-primary mb-4" />
-              <h3 className="text-xl font-semibold mb-2">Analytics</h3>
-              <p className="text-muted-foreground mb-4">
+              <MapPin className="card-icons" />
+              <h3 className="card-title">Analytics</h3>
+              <p className="card-text">
                 View platform analytics and geographic insights.
               </p>
-              <Button variant="outline" asChild>
+              <Button variant="default" asChild>
                 <Link href="/map">View Analytics</Link>
               </Button>
             </Card>
@@ -172,22 +172,22 @@ export default function HomePage() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="text-center space-y-4 mb-12">
-        <h1 className="text-4xl font-bold">
+    <div className="main-container">
+      <div className="main-alignment">
+        <h1 className="main-title">
           Welcome to Crohnnected
           {session?.user && (
-            <span className="block text-2xl text-muted-foreground mt-2">
+            <span className="main-subtitle">
               Hello, {session.user.name || session.user.email}
             </span>
           )}
         </h1>
-        <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+        <p className="main-text">
           A comprehensive healthcare platform connecting Crohn's disease patients, 
           doctors, and researchers to improve treatment outcomes and advance research.
         </p>
         {session?.user && (
-          <Badge variant="outline" className="text-sm">
+          <Badge variant="account" className="text-sm">
             {session.user.role} Account
           </Badge>
         )}
@@ -198,23 +198,23 @@ export default function HomePage() {
       </div>
       
       {/* Statistics or additional info */}
-      <div className="max-w-4xl mx-auto mt-12 pt-8 border-t">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+      <div className="stats-alignment">
+        <div className="stats">
           <div>
-            <h4 className="text-2xl font-bold text-primary">Secure</h4>
-            <p className="text-muted-foreground">
+            <h4 className="stat-title">Secure</h4>
+            <p className="stat-text">
               HIPAA-compliant platform with end-to-end encryption
             </p>
           </div>
           <div>
-            <h4 className="text-2xl font-bold text-primary">Collaborative</h4>
-            <p className="text-muted-foreground">
+            <h4 className="stat-title">Collaborative</h4>
+            <p className="stat-text">
               Connecting patients, doctors, and researchers worldwide
             </p>
           </div>
           <div>
-            <h4 className="text-2xl font-bold text-primary">Impactful</h4>
-            <p className="text-muted-foreground">
+            <h4 className="stat-title">Impactful</h4>
+            <p className="stat-text">
               Contributing to better understanding of Crohn's disease
             </p>
           </div>

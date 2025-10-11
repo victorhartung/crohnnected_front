@@ -9,21 +9,21 @@ export default function ContactPage() {
       <form className="max-w-xl space-y-4">
         <div>
           <label className="block text-sm font-medium">Name</label>
-          <input className="mt-1 block w-full rounded-md border bg-background px-3 py-2 text-sm" placeholder="Your name" />
+          <input className="mt-1 block w-full rounded-md border px-3 py-2 text-sm bg-header backdrop-blur supports-[backdrop-filter]:bg-white/60" placeholder="Your name" />
         </div>
 
         <div>
           <label className="block text-sm font-medium">Email</label>
-          <input className="mt-1 block w-full rounded-md border bg-background px-3 py-2 text-sm" placeholder="you@example.com" />
+          <input className="mt-1 block w-full rounded-md border px-3 py-2 text-sm bg-header backdrop-blur supports-[backdrop-filter]:bg-white/60" placeholder="you@example.com" />
         </div>
 
         <div>
           <label className="block text-sm font-medium">Message</label>
-          <textarea className="mt-1 block w-full rounded-md border bg-background px-3 py-2 text-sm" rows={6} placeholder="Write your message here" />
+          <textarea className="mt-1 block w-full rounded-md border px-3 py-2 text-sm bg-header backdrop-blur supports-[backdrop-filter]:bg-white/60" rows={6} placeholder="Write your message here" />
         </div>
 
         <div>
-          <button type="button" className="inline-flex items-center rounded-md bg-primary px-4 py-2 text-white">Send Message</button>
+          <button type="button" className="inline-flex items-center rounded-md bg-primary px-4 py-2 text-primary-foreground hover:bg-primary/90">Send Message</button>
         </div>
       </form>
 

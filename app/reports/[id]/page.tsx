@@ -315,7 +315,7 @@ export default function ReportDetailPage() {
                 <CardTitle className="text-2xl">
                   Report #{report.id ? report.id.slice(-8) : 'N/A'}
                 </CardTitle>
-                <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                <div className="flex items-center gap-4 text-sm text-muted-foreground font-semibold">
                   <div className="flex items-center gap-1">
                     <Calendar className="h-4 w-4" />
                     Submitted {formatDate(report.createdAt)}
@@ -329,10 +329,10 @@ export default function ReportDetailPage() {
                 </div>
               </div>
               <div className="flex items-center gap-2">
-                <Badge className={getStatusColor(report.status)}>
+                <Badge variant={'none'} className={getStatusColor(report.status)}>
                   {report.status}
                 </Badge>
-                <Badge className={getSeverityColor(report.symptomSeverity)}>
+                <Badge variant={'none'} className={getSeverityColor(report.symptomSeverity)}>
                   {report.symptomSeverity} Severity
                 </Badge>
               </div>
@@ -352,12 +352,12 @@ export default function ReportDetailPage() {
             <CardContent>
               {report.status === 'APPROVED' && (
                 <div className="space-y-2">
-                  <p className="text-sm">
-                    <span className="font-medium">Approved by:</span>{' '}
+                  <p className="text-sm text-muted-foreground">
+                    <span className="font-medium text-black">Approved by:</span>{' '}
                     {report.approvedBy?.name || report.approvedBy?.email}
                   </p>
-                  <p className="text-sm">
-                    <span className="font-medium">Approved on:</span>{' '}
+                  <p className="text-sm text-muted-foreground">
+                    <span className="font-medium text-black">Approved on:</span>{' '}
                     {report.approvedAt && formatDateTime(report.approvedAt)}
                   </p>
                 </div>
@@ -520,7 +520,7 @@ export default function ReportDetailPage() {
                 </div>
                 {canViewDocument ? (
                   <Button 
-                    variant="outline"
+                    variant="default"
                     onClick={handleDownloadPDF}
                     disabled={isDownloading}
                   >

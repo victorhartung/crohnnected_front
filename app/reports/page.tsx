@@ -263,7 +263,7 @@ export default function ReportsPage() {
             <div className="flex flex-wrap gap-4">
               <div className="flex-1 min-w-[200px]">
                 <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Search className="search-alignment" />
                   <Input
                     placeholder="Search by location, symptoms, medications..."
                     value={searchQuery}
@@ -300,7 +300,7 @@ export default function ReportsPage() {
               </Select>
 
               <Button 
-                variant="outline" 
+                variant="default" 
                 onClick={() => {
                   setSearchQuery('')
                   setSelectedCountry('all')
@@ -357,7 +357,7 @@ export default function ReportsPage() {
                 {filteredReports.map((report) => (
                   <Card key={report.id}>
                     <CardHeader>
-                      <div className="flex justify-between items-start">
+                      <div className="flex justify-between items-start font-semibold">
                         <div className="space-y-1">
                           <CardTitle className="text-lg">
                             Report #{report.id ? report.id.slice(-8) : 'N/A'}
@@ -373,10 +373,10 @@ export default function ReportsPage() {
                           </div>
                         </div>
                         <div className="flex items-center gap-2">
-                          <Badge className={getStatusColor(report.status)}>
+                          <Badge variant={'none'} className={getStatusColor(report.status)}>
                             {report.status}
                           </Badge>
-                          <Badge className={getSeverityColor(report.symptomSeverity)}>
+                          <Badge variant={'none'} className={getSeverityColor(report.symptomSeverity)}>
                             {report.symptomSeverity}
                           </Badge>
                         </div>
@@ -386,7 +386,7 @@ export default function ReportsPage() {
                       <div className="space-y-4">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           <div>
-                            <div className="flex items-center gap-2 text-sm text-muted-foreground mb-1">
+                            <div className="flex items-center gap-2 text-sm text-muted-foreground mb-1 font-semibold">
                               <MapPin className="h-4 w-4" />
                               Location
                             </div>
@@ -395,7 +395,7 @@ export default function ReportsPage() {
                             </p>
                           </div>
                           <div>
-                            <div className="text-sm text-muted-foreground mb-1">Symptoms</div>
+                            <div className="text-sm text-muted-foreground mb-1 font-semibold">Symptoms</div>
                             <div className="flex flex-wrap gap-1">
                               {(report.symptoms || []).slice(0, 3).map((symptom) => (
                                 <Badge key={symptom} variant="outline" className="text-xs">
@@ -420,7 +420,7 @@ export default function ReportsPage() {
 
                         <div className="flex justify-between items-center pt-4 border-t">
                           <div className="flex gap-2">
-                            <Button variant="outline" size="sm" asChild>
+                            <Button variant="secondary" size="sm" asChild>
                               <Link href={`/reports/${report.id}`}>
                                 View Details
                               </Link>

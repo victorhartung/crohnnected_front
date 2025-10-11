@@ -7,6 +7,12 @@ const config: Config = {
     './components/**/*.{js,ts,jsx,tsx,mdx}',
     './app/**/*.{js,ts,jsx,tsx,mdx}',
   ],
+  safelist: [
+    'bg-green-100', 'text-green-800', 'border-green-200',
+    'bg-red-100', 'text-red-800', 'border-red-200',
+    'bg-yellow-100', 'text-yellow-800', 'border-yellow-200',
+    'bg-gray-100', 'text-gray-800', 'border-gray-200'
+  ],  
   theme: {
     extend: {
       backgroundImage: {
@@ -22,9 +28,21 @@ const config: Config = {
       colors: {
         background: 'hsl(var(--background))',
         foreground: 'hsl(var(--foreground))',
+        icons: {
+          DEFAULT: 'hsl(var(--icons))',
+          foreground: 'hsl(var(--icons-foreground))',
+        },
+        header: {
+          DEFAULT: 'hsl(var(--header))',
+          foreground: 'hsl(var(--header-foreground))', 
+        },
         card: {
           DEFAULT: 'hsl(var(--card))',
           foreground: 'hsl(var(--card-foreground))',
+        },
+        avatar: {
+          DEFAULT: 'hsl(var(--avatar))',
+          foreground: 'hsl(var(--avatar-foreground))',
         },
         popover: {
           DEFAULT: 'hsl(var(--popover))',
@@ -59,7 +77,7 @@ const config: Config = {
           '3': 'hsl(var(--chart-3))',
           '4': 'hsl(var(--chart-4))',
           '5': 'hsl(var(--chart-5))',
-        },
+        },        
       },
       keyframes: {
         'accordion-down': {

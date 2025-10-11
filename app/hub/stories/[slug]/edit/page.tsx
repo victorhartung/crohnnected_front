@@ -168,7 +168,7 @@ export default function EditStoryPage() {
 
               <div className="flex gap-4">
                 <Button type="submit">Save changes</Button>
-                <Button variant="outline" onClick={() => router.push('/hub')}>Cancel</Button>
+                <Button variant="destructive" onClick={() => router.push('/hub')}>Cancel</Button>
               </div>
             </form>
           </CardContent>

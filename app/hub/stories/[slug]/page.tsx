@@ -115,7 +115,7 @@ export default function StoryDetailPage() {
       <div className="max-w-4xl mx-auto space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
-          <Button variant="outline" onClick={() => router.back()}>
+          <Button variant="ghost" onClick={() => router.back()}>
             <ArrowLeft className="mr-2 h-4 w-4" />
             Back
           </Button>
@@ -154,7 +154,7 @@ export default function StoryDetailPage() {
             {story.tags && story.tags.length > 0 && (
               <div className="flex flex-wrap gap-2 pt-4">
                 {story.tags.map((tag) => (
-                  <Badge key={tag} variant="secondary">
+                  <Badge key={tag} variant="none">
                     <Tag className="mr-1 h-3 w-3" />
                     {tag}
                   </Badge>

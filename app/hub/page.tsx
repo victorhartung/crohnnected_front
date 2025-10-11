@@ -143,7 +143,7 @@ export default function HubPage() {
       case 'protocols':
         return <FileText className="h-4 w-4" />
       case 'stories':
-        return <Heart className="h-4 w-4" />
+        return <Heart className="h-4 w-4" />     
       default:
         return null
     }
@@ -193,7 +193,7 @@ export default function HubPage() {
               
               <div className="flex flex-wrap gap-2">
                 <Button
-                  variant={selectedTag === '' ? 'default' : 'outline'}
+                  variant={selectedTag === '' ? 'default' : 'whiteline'}
                   size="sm"
                   onClick={() => setSelectedTag('')}
                 >
@@ -202,7 +202,7 @@ export default function HubPage() {
                 {allTags.slice(0, 6).map((tag) => (
                   <Button
                     key={tag}
-                    variant={selectedTag === tag ? 'default' : 'outline'}
+                    variant={selectedTag === tag ? 'default' : 'whiteline'}
                     size="sm"
                     onClick={() => setSelectedTag(tag)}
                   >
@@ -239,7 +239,7 @@ export default function HubPage() {
             ) : filteredContent.length === 0 ? (
               <Card>
                 <CardContent className="py-8 text-center">
-                  <div className="mx-auto mb-4 h-12 w-12 text-muted-foreground flex items-center justify-center">
+                  <div className="mx-auto mb-4 h-12 w-12 text-muted-foreground flex items-center justify-center ">
                     {getTabIcon(activeTab)}
                   </div>
                   <p className="text-muted-foreground">
@@ -262,7 +262,7 @@ export default function HubPage() {
                   <Card key={item.id} className="hover:shadow-md transition-shadow flex flex-col justify-between h-[360px]">
                     <CardHeader className="pb-2 flex flex-col justify-between flex-grow">
                       <div>
-                        <CardTitle className="text-lg line-clamp-2 h-[48px] flex items-start">
+                        <CardTitle className="text-lg line-clamp-2 h-[48px] flex items-start mb-4">
                           {item.title}
                         </CardTitle>
 
@@ -288,7 +288,7 @@ export default function HubPage() {
                     </CardHeader>
 
                     <CardContent className="flex flex-col justify-between flex-grow">
-                      <div className="h-[40px] flex flex-wrap gap-1 overflow-hidden">
+                      <div className="flex flex-wrap gap-2 overflow-hidden">
                         {item.tags?.slice(0, 3).map((tag) => (
                           <Badge key={tag} variant="outline" className="text-xs">
                             <Tag className="h-3 w-3 mr-1" />

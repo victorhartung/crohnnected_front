@@ -226,7 +226,7 @@ export default function NewArticlePage() {
                   <p className="text-sm text-muted-foreground">Common tags:</p>
                   <div className="flex flex-wrap gap-2">
                     {COMMON_TAGS.map(tag => (
-                      <Button key={tag} type="button" variant="outline" size="sm" onClick={() => addCommonTag(tag)} disabled={isLoading || selectedTags.includes(tag)} className="text-xs">
+                      <Button key={tag} type="button" variant="whiteline" size="sm" onClick={() => addCommonTag(tag)} disabled={isLoading || selectedTags.includes(tag)} className="text-xs">
                         {tag}
                       </Button>
                     ))}
@@ -238,7 +238,7 @@ export default function NewArticlePage() {
                     <p className="text-sm text-muted-foreground">Selected tags:</p>
                     <div className="flex flex-wrap gap-2">
                       {selectedTags.map(tag => (
-                        <div key={tag} className="flex items-center gap-1 bg-secondary text-secondary-foreground px-3 py-1 rounded-full text-sm">
+                        <div key={tag} className="flex items-center gap-1 bg-secondary text-secondary-foreground px-3 py-1 rounded-full text-sm border">
                           {tag}
                           <button type="button" onClick={() => removeTag(tag)} disabled={isLoading} className="hover:bg-destructive hover:text-destructive-foreground rounded-full p-0.5">
                             <X className="h-3 w-3" />
@@ -291,7 +291,7 @@ export default function NewArticlePage() {
                 </Button>
                 <Button
                   type="button"
-                  variant="outline"
+                  variant="destructive"
                   onClick={() => router.push('/hub')}
                   disabled={isLoading}
                 >

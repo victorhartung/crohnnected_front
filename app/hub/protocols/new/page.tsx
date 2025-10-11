@@ -235,7 +235,7 @@ export default function NewProtocolPage() {
                 </Button>
                 <Button
                   type="button"
-                  variant="outline"
+                  variant="destructive"
                   onClick={() => router.push('/hub')}
                   disabled={isLoading}
                 >

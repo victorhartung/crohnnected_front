@@ -212,7 +212,7 @@ export default function EditArticlePage() {
     return (
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto space-y-6">
-          <Button asChild variant="outline">
+          <Button asChild variant="ghost">
             <Link href="/hub">
               <ArrowLeft className="mr-2 h-4 w-4" />
               Back to Hub
@@ -231,7 +231,7 @@ export default function EditArticlePage() {
   if (!article) {
     return (
       <div className="container mx-auto px-4 py-8">
-        <Button asChild variant="outline" className="mb-4">
+        <Button asChild variant="ghost" className="mb-4">
           <Link href="/hub">
             <ArrowLeft className="mr-2 h-4 w-4" />
             Back to Hub
@@ -250,7 +250,7 @@ export default function EditArticlePage() {
       <div className="max-w-4xl mx-auto space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
-          <Button asChild variant="outline">
+          <Button asChild variant="ghost">
             <Link href="/hub">
               <ArrowLeft className="mr-2 h-4 w-4" />
               Back to Hub
@@ -304,7 +304,7 @@ export default function EditArticlePage() {
                   </label>
                   <Button
                     type="button"
-                    variant="outline"
+                    variant="secondary"
                     size="sm"
                     onClick={generateSlugFromTitle}
                   >
@@ -375,7 +375,7 @@ export default function EditArticlePage() {
                 {tags.length > 0 && (
                   <div className="flex flex-wrap gap-2 mt-2">
                     {tags.map((tag) => (
-                      <Badge key={tag} variant="secondary" className="flex items-center gap-1">
+                      <Badge key={tag} variant="default" className="flex items-center gap-1">
                         <Tag className="h-3 w-3" />
                         {tag}
                         <button

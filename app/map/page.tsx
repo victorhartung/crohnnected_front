@@ -382,7 +382,7 @@ export default function MapPage() {
             <Card>
               <CardContent className="pt-6">
                 <div className="flex items-center space-x-2">
-                  <MapPin className="h-4 w-4 text-muted-foreground" />
+                  <MapPin className="h-6 w-6 text-muted-foreground" />
                   <div className="space-y-1">
                     <p className="text-sm text-muted-foreground">
                       Total Reports
@@ -397,7 +397,7 @@ export default function MapPage() {
             <Card>
               <CardContent className="pt-6">
                 <div className="flex items-center space-x-2">
-                  <BarChart3 className="h-4 w-4 text-muted-foreground" />
+                  <BarChart3 className="h-6 w-6 text-muted-foreground" />
                   <div className="space-y-1">
                     <p className="text-sm text-muted-foreground">Approved</p>
                     <p className="text-2xl font-bold">
@@ -410,7 +410,7 @@ export default function MapPage() {
             <Card>
               <CardContent className="pt-6">
                 <div className="flex items-center space-x-2">
-                  <MapPin className="h-4 w-4 text-muted-foreground" />
+                  <MapPin className="h-6 w-6 text-muted-foreground" />
                   <div className="space-y-1">
                     <p className="text-sm text-muted-foreground">Countries</p>
                     <p className="text-2xl font-bold">
@@ -423,7 +423,7 @@ export default function MapPage() {
             <Card>
               <CardContent className="pt-6">
                 <div className="flex items-center space-x-2">
-                  <Info className="h-4 w-4 text-muted-foreground" />
+                  <Info className="h-6 w-6 text-muted-foreground" />
                   <div className="space-y-1">
                     <p className="text-sm text-muted-foreground">Avg Age</p>
                     <p className="text-2xl font-bold">

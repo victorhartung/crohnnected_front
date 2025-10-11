@@ -145,11 +145,11 @@ export default function AdminPage() {
             <p className="text-muted-foreground">
               Manage platform content and oversee system operations.
             </p>
-            <Badge className="mt-2">{session?.user?.role}</Badge>
+            <Badge variant={'account'} className="mt-2">{session?.user?.role}</Badge>
           </div>
           
           <div className="flex items-center gap-2">
-            <Button variant="outline" asChild>
+            <Button variant="white" asChild>
               <Link href="/reports">
                 <FileText className="mr-2 h-4 w-4" />
                 Review Reports
@@ -174,7 +174,7 @@ export default function AdminPage() {
                     <p className="text-sm font-medium leading-none">Total Users</p>
                     <p className="text-2xl font-bold">{stats.users.total}</p>
                   </div>
-                  <Users className="h-4 w-4 text-muted-foreground" />
+                  <Users className="h-6 w-6 text-muted-foreground" />
                 </div>
                 <div className="text-xs text-muted-foreground">
                   +{stats.activity.newUsersThisWeek} this week
@@ -189,7 +189,7 @@ export default function AdminPage() {
                     <p className="text-sm font-medium leading-none">Total Reports</p>
                     <p className="text-2xl font-bold">{stats.reports.total}</p>
                   </div>
-                  <FileText className="h-4 w-4 text-muted-foreground" />
+                  <FileText className="h-6 w-6 text-muted-foreground" />
                 </div>
                 <div className="text-xs text-muted-foreground">
                   +{stats.activity.reportsThisWeek} this week
@@ -204,7 +204,7 @@ export default function AdminPage() {
                     <p className="text-sm font-medium leading-none">Pending Reports</p>
                     <p className="text-2xl font-bold">{stats.reports.pending}</p>
                   </div>
-                  <Activity className="h-4 w-4 text-muted-foreground" />
+                  <Activity className="h-6 w-6 text-muted-foreground" />
                 </div>
                 <div className="text-xs text-muted-foreground">
                   Require attention
@@ -221,7 +221,7 @@ export default function AdminPage() {
                       {stats.hubContent.articles + stats.hubContent.protocols + stats.hubContent.stories}
                     </p>
                   </div>
-                  <BarChart3 className="h-4 w-4 text-muted-foreground" />
+                  <BarChart3 className="h-6 w-6 text-muted-foreground" />
                 </div>
                 <div className="text-xs text-muted-foreground">
                   +{stats.activity.contentThisWeek} this week
@@ -290,7 +290,7 @@ export default function AdminPage() {
                 </CardHeader>
                 <CardContent>
                   <div className="grid grid-cols-1 gap-3">
-                    <Button variant="outline" className="justify-start" asChild>
+                    <Button variant="whiteline" className="justify-start" asChild>
                       <Link href="/reports?status=pending">
                         <Eye className="mr-2 h-4 w-4" />
                         Review Pending Reports
@@ -302,21 +302,21 @@ export default function AdminPage() {
                       </Link>
                     </Button>
                     
-                    <Button variant="outline" className="justify-start" asChild>
+                    <Button variant="whiteline" className="justify-start" asChild>
                       <Link href="/hub/articles/new">
                         <Plus className="mr-2 h-4 w-4" />
                         Create New Article
                       </Link>
                     </Button>
                     
-                    <Button variant="outline" className="justify-start" asChild>
+                    <Button variant="whiteline" className="justify-start" asChild>
                       <Link href="/hub/protocols/new">
                         <Plus className="mr-2 h-4 w-4" />
                         Create New Protocol
                       </Link>
                     </Button>
                     
-                    <Button variant="outline" className="justify-start" asChild>
+                    <Button variant="whiteline" className="justify-start" asChild>
                       <Link href="/map">
                         <MapPin className="mr-2 h-4 w-4" />
                         View Geographic Data
@@ -364,7 +364,7 @@ export default function AdminPage() {
                           New Article
                         </Link>
                       </Button>
-                      <Button size="sm" variant="outline" asChild className="w-full">
+                      <Button size="sm" variant="whiteline" asChild className="w-full">
                         <Link href="/hub?tab=articles">
                           <Eye className="mr-2 h-4 w-4" />
                           Manage Articles
@@ -392,7 +392,7 @@ export default function AdminPage() {
                           New Protocol
                         </Link>
                       </Button>
-                      <Button size="sm" variant="outline" asChild className="w-full">
+                      <Button size="sm" variant="whiteline" asChild className="w-full">
                         <Link href="/hub?tab=protocols">
                           <Eye className="mr-2 h-4 w-4" />
                           Manage Protocols
@@ -420,7 +420,7 @@ export default function AdminPage() {
                           New Story
                         </Link>
                       </Button>
-                      <Button size="sm" variant="outline" asChild className="w-full">
+                      <Button size="sm" variant="whiteline" asChild className="w-full">
                         <Link href="/hub?tab=stories">
                           <Eye className="mr-2 h-4 w-4" />
                           Manage Stories
@@ -443,7 +443,7 @@ export default function AdminPage() {
                       <p className="text-sm text-muted-foreground capitalize">{status}</p>
                     </div>
                     {status !== 'total' && (
-                      <Button size="sm" variant="outline" asChild className="w-full mt-3">
+                      <Button size="sm" variant="whiteline" asChild className="w-full mt-3">
                         <Link href={`/reports${status !== 'total' ? `?status=${status}` : ''}`}>
                           View {status} Reports
                         </Link>

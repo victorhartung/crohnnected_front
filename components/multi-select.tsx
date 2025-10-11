@@ -59,42 +59,45 @@ export function MultiSelect({
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <Button
-          variant="outline"
+          variant="whiteline"
           role="combobox"
           aria-expanded={open}
           className={cn(
-            "w-full justify-between",
+            "w-full relative flex flex-col items-stretch text-left min-h-10 px-3 py-2",
             !value.length && "text-muted-foreground"
           )}
           disabled={disabled}
         >
-          {value.length > 0 ? (
-            <div className="flex gap-1 flex-wrap">
-              {selectedOptions.slice(0, 2).map((option) => (
-                <Badge
-                  variant="secondary"
-                  key={option.value}
-                  className="mr-1 mb-1"
-                >
-                  {option.label}
-                </Badge>
-              ))}
-              {value.length > 2 && (
-                <Badge variant="secondary" className="mr-1 mb-1">
-                  +{value.length - 2} more
-                </Badge>
+          <div className="flex w-full items-start justify-between">
+            <div className="flex flex-wrap gap-1 flex-1 pr-6">
+              {value.length > 0 ? (
+                <>
+                  {selectedOptions.slice(0, 2).map((option) => (
+                    <Badge variant="outwhite" key={option.value}>
+                      {option.label}
+                    </Badge>
+                  ))}
+                  {value.length > 2 && (
+                    <Badge variant="outwhite">
+                      +{value.length - 2} more
+                    </Badge>
+                  )}
+                </>
+              ) : (
+                placeholder
               )}
             </div>
-          ) : (
-            placeholder
-          )}
-          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+
+            <div className="absolute right-3 top-1/2 -translate-y-1/2">
+              <ChevronsUpDown className="h-4 w-4 shrink-0 opacity-50" />
+            </div>
+            </div>
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-full p-0">
         <div className="p-2">
           <input
-            className="w-full rounded-md border px-3 py-2 text-sm outline-none"
+            className="w-full rounded-md border px-3 py-2 text-sm outline-none bg-slate-100"
             placeholder={searchPlaceholder}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
