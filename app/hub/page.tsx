@@ -303,7 +303,7 @@ export default function HubPage() {
                       </div>
 
                       <Button asChild className="mt-auto w-full">
-                        <Link href={`/hub/${activeTab}/${item.slug || item.id}`}>Read More</Link>
+                        <Link href={`/hub/${activeTab}/${item.id}`}>Read More</Link>
                       </Button>
                     </CardContent>
                   </Card>

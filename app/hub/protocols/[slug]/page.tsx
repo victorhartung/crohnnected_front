@@ -150,7 +150,7 @@ export default function ProtocolDetailPage() {
           
           {canEdit && (
             <Button asChild>
-              <Link href={`/hub/protocols/${protocol.slug || protocol.id}/edit`}>
+              <Link href={`/hub/protocols/${protocol.id}/edit`}>
                 <Edit className="mr-2 h-4 w-4" />
                 Edit Protocol
               </Link>

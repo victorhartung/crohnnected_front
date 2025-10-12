@@ -251,9 +251,9 @@ export default function EditArticlePage() {
         {/* Header */}
         <div className="flex items-center justify-between">
           <Button asChild variant="outline">
-            <Link href="/hub">
+            <Link href={`/hub/articles/${article.id}`}>
               <ArrowLeft className="mr-2 h-4 w-4" />
-              Back to Hub
+              Back to Article
             </Link>
           </Button>
           

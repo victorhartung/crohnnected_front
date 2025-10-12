@@ -140,14 +140,16 @@ export default function ArticleDetailPage() {
       <div className="max-w-4xl mx-auto space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
-          <Button variant="outline" onClick={() => router.back()}>
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Back
+          <Button asChild variant="ghost" className="mb-4">
+            <Link href="/hub?tab=articles">
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Back to Articles
+            </Link>
           </Button>
           
           {canEdit && (
             <Button asChild>
-              <Link href={`/hub/articles/${article.slug || article.id}/edit`}>
+              <Link href={`/hub/articles/${article.id}/edit`}>
                 <Edit className="mr-2 h-4 w-4" />
                 Edit Article
               </Link>

@@ -39,7 +39,6 @@ export const GET = async (request: NextRequest) => {
 
 // POST /api/hub/articles - Create article
 export const POST = withAuth(async (request: NextRequest, user: any) => {
-  // Only moderators, admins, and doctors can create articles
   if (!['MODERATOR', 'ADMIN', 'DOCTOR'].includes(user.role)) {
     return Response.json(
       { success: false, error: 'Insufficient permissions' },
@@ -51,19 +50,13 @@ export const POST = withAuth(async (request: NextRequest, user: any) => {
     const body = await request.json()
     const validatedData = createArticleSchema.parse(body)
 
-    // Generate slug from title if not provided
-    const slug = validatedData.slug || generateSlug(validatedData.title)
+    let baseSlug = validatedData.slug || generateSlug(validatedData.title)
+    let slug = baseSlug
 
-    // Check if slug already exists
-    const existingArticle = await prisma.article.findUnique({
-      where: { slug },
-    })
-
-    if (existingArticle) {
-      return Response.json(
-        { success: false, error: 'Article with this slug already exists' },
-        { status: 400 }
-      )
+    let counter = 2
+    while (await prisma.article.findUnique({ where: { slug } })) {
+      slug = `${baseSlug}-${counter}`
+      counter++
     }
 
     const article = await prisma.article.create({
