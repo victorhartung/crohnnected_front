@@ -76,6 +76,9 @@ export default function ReportsPage() {
     session?.user?.role === "MODERATOR" ||
     session?.user?.role === "ADMIN";
 
+  const [hasActiveReport, setHasActiveReport] = useState(false);
+  const [isCheckingReport, setIsCheckingReport] = useState(true);
+
   const [activeTab, setActiveTab] = useState<TabKey>("all");
   const [tabs, setTabs] = useState<Record<TabKey, TabState>>({
     all: {
@@ -122,6 +125,34 @@ export default function ReportsPage() {
 
   const [countsLoading, setCountsLoading] = useState(false);
   const [countsError, setCountsError] = useState("");
+
+  useEffect(() => {
+    const checkActiveReport = async () => {
+      if (session?.user?.role !== 'PATIENT') {
+        setIsCheckingReport(false);
+        return;
+      }
+
+      try {
+        const res = await fetch('/api/reports?limit=1');
+        if (res.ok) {
+          const data = await res.json();
+          const activeReport = data?.data?.reports?.find(
+            (report: Report) => report.status !== 'REJECTED'
+          );
+          setHasActiveReport(!!activeReport);
+        }
+      } catch (error) {
+        console.error('Error checking active report:', error);
+      } finally {
+        setIsCheckingReport(false);
+      }
+    };
+
+    if (status === 'authenticated') {
+      checkActiveReport();
+    }
+  }, [session, status]);
 
   const uniqueCountries = useMemo(() => {
     const countries = new Set<string>();
@@ -431,7 +462,8 @@ export default function ReportsPage() {
             </p>
           </div>
 
-          {isPatient && (
+          {/* Mostra botão apenas se não tiver report ATIVO (PENDING ou APPROVED) */}
+          {isPatient && !hasActiveReport && (
             <Button asChild>
               <Link href="/reports/new">
                 <Plus className="mr-2 h-4 w-4" />
@@ -561,11 +593,26 @@ export default function ReportsPage() {
               <Card>
                 <CardContent className="py-8 text-center">
                   <FileText className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                  <p className="text-muted-foreground">No reports found.</p>
-                  {isPatient && (
+                  <p className="text-muted-foreground">
+                    {isPatient && hasActiveReport 
+                      ? "You already have an active report. Each patient can only have one active (pending or approved) report at a time."
+                      : "No reports found."
+                    }
+                  </p>
+                  {isPatient && !hasActiveReport && (
                     <Button asChild className="mt-4">
                       <Link href="/reports/new">Submit your first report</Link>
                     </Button>
+                  )}
+                  {isPatient && hasActiveReport && (
+                    <div className="space-y-2 mt-4">
+                      <p className="text-sm text-muted-foreground">
+                        If your current report gets rejected, you'll be able to submit a new one.
+                      </p>
+                      <Button asChild variant="outline">
+                        <Link href="/reports">View My Report</Link>
+                      </Button>
+                    </div>
                   )}
                 </CardContent>
               </Card>

@@ -57,27 +57,29 @@ export default function HomePage() {
     switch (role) {
       case 'PATIENT':
         return (
-          <div className="div-cards">
-            <Card className="p-6">
-              <Plus className="card-icons" />
-              <h3 className="card-title">Submit New Report</h3>
-              <p className="card-text">
-                Share your health information and attach supporting documents.
-              </p>
-              <Button asChild>
-                <Link href="/reports/new">Create Report</Link>
-              </Button>
-            </Card>
-            <Card className="p-6">
-              <FileText className="card-icons" />
-              <h3 className="card-title">My Reports</h3>
-              <p className="card-text">
-                View and manage your submitted reports and their status.
-              </p>
-              <Button variant="default" asChild>
-                <Link href="/reports">View Reports</Link>
-              </Button>
-            </Card>
+          <div className="flex justify-center items-start min-h-[400px]">
+            <div className="flex flex-col md:flex-row gap-6 items-stretch">
+              <Card className="p-6 w-80 flex flex-col">
+                <Plus className="card-icons" />
+                <h3 className="card-title">Submit New Report</h3>
+                <p className="card-text flex-grow">
+                  Share your health information and attach supporting documents.
+                </p>
+                <Button asChild className="mt-4">
+                  <Link href="/reports/new">Create Report</Link>
+                </Button>
+              </Card>
+              <Card className="p-6 w-80 flex flex-col">
+                <FileText className="card-icons" />
+                <h3 className="card-title">My Reports</h3>
+                <p className="card-text flex-grow">
+                  View and manage your submitted reports and their status.
+                </p>
+                <Button variant="default" asChild className="mt-4">
+                  <Link href="/reports">View Reports</Link>
+                </Button>
+              </Card>
+            </div>
           </div>
         )
         
