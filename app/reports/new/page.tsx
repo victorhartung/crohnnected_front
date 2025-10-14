@@ -61,6 +61,7 @@ export default function NewReportPage() {
     mime: string;
     sizeBytes: number;
   } | null>(null);
+  const [pdfError, setPdfError] = useState("");
   const [selectedLocation, setSelectedLocation] = useState<LocationData | null>(
     null
   );
@@ -142,6 +143,11 @@ export default function NewReportPage() {
     form.register("medications");
   }, [form]);
 
+  // Clear PDF validation error when a file is selected
+  useEffect(() => {
+    if (pdfFile) setPdfError("");
+  }, [pdfFile]);
+
   const handleLocationSelect = (location: LocationData | null) => {
     setSelectedLocation(location);
     if (!location) {
@@ -166,8 +172,17 @@ export default function NewReportPage() {
       return;
     }
 
-    setIsLoading(true);
+    // Clear previous errors
+    setPdfError("");
     setError("");
+
+    // Require PDF/document for patient submissions
+    if (!pdfFile) {
+      setPdfError("Please attach a supporting document (PDF) before submitting.");
+      return;
+    }
+
+    setIsLoading(true);
 
     try {
       const payload = {
@@ -504,6 +519,14 @@ export default function NewReportPage() {
                 currentFile={pdfFile}
                 disabled={isLoading}
               />
+                {pdfError && (
+                  <div className="mt-2">
+                    <Alert variant="destructive">
+                      <AlertCircle className="h-4 w-4" />
+                      <AlertDescription>{pdfError}</AlertDescription>
+                    </Alert>
+                  </div>
+                )}
             </CardContent>
           </Card>
 

@@ -51,6 +51,20 @@ export const POST = withAuth(async (request: NextRequest, user: User) => {
     // Validate input
     const validatedData = createReportSchema.parse(body);
 
+    // For patient-created reports, require a supporting document
+    if (user.role === UserRole.PATIENT) {
+      const hasDocument =
+        !!validatedData.documentBase64 &&
+        !!validatedData.documentOriginalName &&
+        !!validatedData.documentMime;
+      if (!hasDocument) {
+        return Response.json(
+          { success: false, error: "Supporting document (PDF) is required" },
+          { status: 400 }
+        );
+      }
+    }
+
     // Create report
     const report = await prisma.report.create({
       data: {
