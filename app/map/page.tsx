@@ -84,7 +84,6 @@ export default function MapPage() {
     { label: "Symptom severity", value: "symptomSeverity" },
     { label: "Medications", value: "medications" },
     { label: "Flare frequency", value: "flareFrequencyPerYear" },
-    { label: "Surgery history", value: "surgeryHistory" },
     { label: "Diagnosis date", value: "diagnosisDate" },
     { label: "Status", value: "status" },
     { label: "Approved at", value: "approvedAt" },
