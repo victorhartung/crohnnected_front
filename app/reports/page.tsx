@@ -26,6 +26,7 @@ import {
 } from "lucide-react";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 
@@ -75,6 +76,7 @@ export default function ReportsPage() {
     isDoctor ||
     session?.user?.role === "MODERATOR" ||
     session?.user?.role === "ADMIN";
+  const params = useSearchParams();
 
   const [activeTab, setActiveTab] = useState<TabKey>("all");
   const [tabs, setTabs] = useState<Record<TabKey, TabState>>({
@@ -122,6 +124,16 @@ export default function ReportsPage() {
 
   const [countsLoading, setCountsLoading] = useState(false);
   const [countsError, setCountsError] = useState("");
+
+  useEffect(() => {
+    const statusParam = params?.get("status");
+    if (statusParam) {
+      const normalized = statusParam.toLowerCase();
+      if (["all", "pending", "approved", "rejected"].includes(normalized)) {
+        setActiveTab(normalized as TabKey);
+      }
+    }
+  }, [params]);
 
   const uniqueCountries = useMemo(() => {
     const countries = new Set<string>();
