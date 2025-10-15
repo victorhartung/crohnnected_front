@@ -1,5 +1,6 @@
 "use client";
 
+import { MultiSelect, Option } from "@/components/multi-select";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import {
@@ -32,7 +33,6 @@ import {
 import { useSession } from "next-auth/react";
 import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
-import { MultiSelect, Option } from "@/components/multi-select";
 import { toast } from "sonner";
 
 // Dynamically import the map component to avoid SSR issues
@@ -75,7 +75,6 @@ export default function MapPage() {
   const [availableSymptoms, setAvailableSymptoms] = useState<string[]>([]);
   // Fields that can be exported (keep in sync with backend allowedFields)
   const availableExportFields: Option[] = [
-    { label: "ID", value: "id" },
     { label: "Age", value: "ageAtReport" },
     { label: "Sex", value: "sex" },
     { label: "Country", value: "country" },
@@ -93,10 +92,9 @@ export default function MapPage() {
   ];
   const [selectedExportFields, setSelectedExportFields] = useState<string[]>([
     // Seleção padrão
-    'id',
-    'ageAtReport',
-    'sex',
-    'country',
+    "ageAtReport",
+    "sex",
+    "country",
   ]);
   const [filters, setFilters] = useState<MapFilters>({
     country: "all",
@@ -285,9 +283,9 @@ export default function MapPage() {
         params.append("approvedOnly", "true");
       }
       params.append("format", "csv");
-      
+
       if (selectedExportFields && selectedExportFields.length > 0) {
-        params.append('fields', selectedExportFields.join(','));
+        params.append("fields", selectedExportFields.join(","));
       }
 
       const response = await fetch(`/api/reports/export?${params.toString()}`);
@@ -521,7 +519,10 @@ export default function MapPage() {
                   searchPlaceholder="Search fields..."
                   emptyText="No fields"
                 />
-                <p className="text-xs text-muted-foreground">Pick which columns appear in the CSV. Leave empty to use the server defaults.</p>
+                <p className="text-xs text-muted-foreground">
+                  Pick which columns appear in the CSV. Leave empty to use the
+                  server defaults.
+                </p>
               </div>
 
               <Separator />
