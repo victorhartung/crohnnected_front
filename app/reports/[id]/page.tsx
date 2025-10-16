@@ -1,18 +1,9 @@
+"use client";
 
-'use client'
-
-import { useState, useEffect } from 'react'
-import { useSession } from 'next-auth/react'
-import { useParams, useRouter } from 'next/navigation'
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { Button } from '@/components/ui/button'
-import { Textarea } from '@/components/ui/textarea'
-import { Label } from '@/components/ui/label'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { Separator } from '@/components/ui/separator'
-import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,
@@ -21,208 +12,241 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@/components/ui/dialog'
-import { 
-  Loader2, 
-  AlertCircle, 
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  downloadPDFFromBase64,
+  formatDate,
+  formatDateTime,
+  formatFileSize,
+  getSeverityColor,
+  getStatusColor,
+} from "@/lib/utils";
+import { rejectReportSchema, type RejectReportInput } from "@/lib/validations";
+import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  AlertCircle,
   ArrowLeft,
-  FileText, 
-  Calendar, 
-  MapPin,
-  Download,
-  User,
-  Stethoscope,
-  Clock,
+  Calendar,
   CheckCircle,
-  XCircle
-} from 'lucide-react'
-import { formatDate, formatDateTime, formatFileSize, getStatusColor, getSeverityColor, downloadPDFFromBase64 } from '@/lib/utils'
-import { rejectReportSchema, type RejectReportInput } from '@/lib/validations'
-import { toast } from 'sonner'
+  Clock,
+  Download,
+  FileText,
+  Loader2,
+  MapPin,
+  Stethoscope,
+  User,
+  XCircle,
+} from "lucide-react";
+import { useSession } from "next-auth/react";
+import dynamic from "next/dynamic";
+import { useParams, useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+
+// Importa o componente de mapa dinamicamente (client-side only)
+const SingleLocationMap = dynamic(
+  () => import("@/components/single-location-map"),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="flex items-center justify-center h-[300px] bg-muted rounded-lg">
+        <Loader2 className="h-6 w-6 animate-spin" />
+      </div>
+    ),
+  }
+);
 
 interface Report {
-  id: string
-  ageAtReport?: number
-  sex?: string
-  country: string
-  state?: string
-  city?: string
-  symptoms: string[]
-  symptomSeverity: string
-  medications?: string[]
-  flareFrequencyPerYear?: number
-  surgeryHistory?: Array<{ type: string; year?: number; notes?: string }>
-  diagnosisDate?: string
-  notes?: string
-  status: string
-  createdAt: string
-  approvedAt?: string
+  id: string;
+  ageAtReport?: number;
+  sex?: string;
+  country: string;
+  state?: string;
+  city?: string;
+  lat?: number;
+  lng?: number;
+  symptoms: string[];
+  symptomSeverity: string;
+  medications?: string[];
+  flareFrequencyPerYear?: number;
+  surgeryHistory?: Array<{ type: string; year?: number; notes?: string }>;
+  diagnosisDate?: string;
+  notes?: string;
+  status: string;
+  createdAt: string;
+  approvedAt?: string;
   approvedBy?: {
-    name?: string
-    email: string
-  }
-  rejectionReason?: string
-  hasDocument: boolean
-  documentOriginalName?: string
-  documentSizeBytes?: number
+    name?: string;
+    email: string;
+  };
+  rejectionReason?: string;
+  hasDocument: boolean;
+  documentOriginalName?: string;
+  documentSizeBytes?: number;
 }
 
 export default function ReportDetailPage() {
-  const { data: session, status } = useSession()
-  const params = useParams()
-  const router = useRouter()
-  const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState('')
-  const [report, setReport] = useState<Report | null>(null)
-  const [isDownloading, setIsDownloading] = useState(false)
-  const [rejectDialogOpen, setRejectDialogOpen] = useState(false)
+  const { data: session, status } = useSession();
+  const params = useParams();
+  const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [report, setReport] = useState<Report | null>(null);
+  const [isDownloading, setIsDownloading] = useState(false);
+  const [rejectDialogOpen, setRejectDialogOpen] = useState(false);
 
-  const reportId = params?.id as string
+  const reportId = params?.id as string;
 
-  const isPatient = session?.user?.role === 'PATIENT'
-  const canApprove = session?.user?.role === 'DOCTOR' || session?.user?.role === 'ADMIN'
-  const canViewDocument = session?.user?.role !== 'RESEARCHER' // Researchers can't access PDFs
+  const isPatient = session?.user?.role === "PATIENT";
+  const canApprove =
+    session?.user?.role === "DOCTOR" || session?.user?.role === "ADMIN";
+  const canViewDocument = session?.user?.role !== "RESEARCHER"; // Researchers can't access PDFs
 
   const rejectForm = useForm<RejectReportInput>({
     resolver: zodResolver(rejectReportSchema),
     defaultValues: {
-      reason: '',
+      reason: "",
     },
-  })
+  });
 
   useEffect(() => {
     if (reportId && session?.user) {
-      loadReport()
+      loadReport();
     }
-  }, [reportId, session])
+  }, [reportId, session]);
 
   const loadReport = async () => {
-    setIsLoading(true)
-    setError('')
+    setIsLoading(true);
+    setError("");
 
     try {
-      const response = await fetch(`/api/reports/${reportId}`)
+      const response = await fetch(`/api/reports/${reportId}`);
       if (!response.ok) {
         if (response.status === 404) {
-          setError('Report not found')
+          setError("Report not found");
         } else if (response.status === 403) {
-          setError('You do not have permission to view this report')
+          setError("You do not have permission to view this report");
         } else {
-          const errorData = await response.json()
-          setError(errorData.message || 'Failed to load report')
+          const errorData = await response.json();
+          setError(errorData.message || "Failed to load report");
         }
-        return
+        return;
       }
 
-  const data = await response.json()
-  // API retorna { success: true, data: { report } }
-  setReport(data?.data?.report ?? null)
+      const data = await response.json();
+      // API retorna { success: true, data: { report } }
+      setReport(data?.data?.report ?? null);
     } catch (error) {
-      setError('An unexpected error occurred')
-      console.error('Failed to load report:', error)
+      setError("An unexpected error occurred");
+      console.error("Failed to load report:", error);
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   const handleApproveReport = async () => {
-    if (!report) return
+    if (!report) return;
 
     try {
       const response = await fetch(`/api/reports/${report.id}/approve`, {
-        method: 'PATCH',
+        method: "PATCH",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify({ notes: 'Approved by healthcare provider' }),
-      })
+        body: JSON.stringify({ notes: "Approved by healthcare provider" }),
+      });
 
       if (!response.ok) {
-        const errorData = await response.json()
-        toast.error(errorData.message || 'Failed to approve report')
-        return
+        const errorData = await response.json();
+        toast.error(errorData.message || "Failed to approve report");
+        return;
       }
 
-      toast.success('Report approved successfully')
-      loadReport() // Refresh the report
+      toast.success("Report approved successfully");
+      loadReport(); // Refresh the report
     } catch (error) {
-      toast.error('Failed to approve report')
-      console.error('Approve report error:', error)
+      toast.error("Failed to approve report");
+      console.error("Approve report error:", error);
     }
-  }
+  };
 
   const handleRejectReport = async (data: RejectReportInput) => {
-    if (!report) return
+    if (!report) return;
 
     try {
       const response = await fetch(`/api/reports/${report.id}/reject`, {
-        method: 'PATCH',
+        method: "PATCH",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(data),
-      })
+      });
 
       if (!response.ok) {
-        const errorData = await response.json()
-        toast.error(errorData.message || 'Failed to reject report')
-        return
+        const errorData = await response.json();
+        toast.error(errorData.message || "Failed to reject report");
+        return;
       }
 
-      toast.success('Report rejected')
-      setRejectDialogOpen(false)
-      rejectForm.reset()
-      loadReport() // Refresh the report
+      toast.success("Report rejected");
+      setRejectDialogOpen(false);
+      rejectForm.reset();
+      loadReport(); // Refresh the report
     } catch (error) {
-      toast.error('Failed to reject report')
-      console.error('Reject report error:', error)
+      toast.error("Failed to reject report");
+      console.error("Reject report error:", error);
     }
-  }
+  };
 
   const handleDownloadPDF = async () => {
-    if (!report?.hasDocument) return
+    if (!report?.hasDocument) return;
 
-    setIsDownloading(true)
+    setIsDownloading(true);
 
     try {
-      const response = await fetch(`/api/reports/${report.id}/document`)
+      const response = await fetch(`/api/reports/${report.id}/document`);
       if (!response.ok) {
-        const errorData = await response.json()
-        toast.error(errorData.error || 'Failed to download document')
-        return
+        const errorData = await response.json();
+        toast.error(errorData.error || "Failed to download document");
+        return;
       }
 
-      const data = await response.json()
-      const doc = data?.data ?? {}
-      downloadPDFFromBase64(doc.documentBase64, doc.documentOriginalName)
-      toast.success('Document downloaded successfully')
+      const data = await response.json();
+      const doc = data?.data ?? {};
+      downloadPDFFromBase64(doc.documentBase64, doc.documentOriginalName);
+      toast.success("Document downloaded successfully");
     } catch (error) {
-      toast.error('Failed to download document')
-      console.error('Download error:', error)
+      toast.error("Failed to download document");
+      console.error("Download error:", error);
     } finally {
-      setIsDownloading(false)
+      setIsDownloading(false);
     }
-  }
+  };
 
-  if (status === 'loading' || isLoading) {
+  if (status === "loading" || isLoading) {
     return (
       <div className="container mx-auto px-4 py-8">
         <div className="flex items-center justify-center py-8">
           <Loader2 className="h-8 w-8 animate-spin" />
         </div>
       </div>
-    )
+    );
   }
 
-  if (status === 'unauthenticated') {
+  if (status === "unauthenticated") {
     return (
       <div className="container mx-auto px-4 py-8">
         <Alert>
           <AlertCircle className="h-4 w-4" />
-          <AlertDescription>Please sign in to view this report.</AlertDescription>
+          <AlertDescription>
+            Please sign in to view this report.
+          </AlertDescription>
         </Alert>
       </div>
-    )
+    );
   }
 
   if (error || !report) {
@@ -235,11 +259,11 @@ export default function ReportDetailPage() {
           </Button>
           <Alert variant="destructive">
             <AlertCircle className="h-4 w-4" />
-            <AlertDescription>{error || 'Report not found'}</AlertDescription>
+            <AlertDescription>{error || "Report not found"}</AlertDescription>
           </Alert>
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -250,14 +274,17 @@ export default function ReportDetailPage() {
             <ArrowLeft className="mr-2 h-4 w-4" />
             Back to Reports
           </Button>
-          
-          {canApprove && report.status === 'PENDING' && (
+
+          {canApprove && report.status === "PENDING" && (
             <div className="flex gap-2">
               <Button onClick={handleApproveReport}>
                 <CheckCircle className="mr-2 h-4 w-4" />
                 Approve
               </Button>
-              <Dialog open={rejectDialogOpen} onOpenChange={setRejectDialogOpen}>
+              <Dialog
+                open={rejectDialogOpen}
+                onOpenChange={setRejectDialogOpen}
+              >
                 <DialogTrigger asChild>
                   <Button variant="destructive">
                     <XCircle className="mr-2 h-4 w-4" />
@@ -278,7 +305,7 @@ export default function ReportDetailPage() {
                         <Textarea
                           id="reason"
                           placeholder="Enter the reason for rejection..."
-                          {...rejectForm.register('reason')}
+                          {...rejectForm.register("reason")}
                           rows={3}
                         />
                         {rejectForm.formState.errors.reason && (
@@ -313,7 +340,7 @@ export default function ReportDetailPage() {
             <div className="flex justify-between items-start">
               <div className="space-y-2">
                 <CardTitle className="text-2xl">
-                  Report #{report.id ? report.id.slice(-8) : 'N/A'}
+                  Report #{report.id ? report.id.slice(-8) : "N/A"}
                 </CardTitle>
                 <div className="flex items-center gap-4 text-sm text-muted-foreground font-semibold">
                   <div className="flex items-center gap-1">
@@ -329,10 +356,16 @@ export default function ReportDetailPage() {
                 </div>
               </div>
               <div className="flex items-center gap-2">
-                <Badge variant={'none'} className={getStatusColor(report.status)}>
+                <Badge
+                  variant={"none"}
+                  className={getStatusColor(report.status)}
+                >
                   {report.status}
                 </Badge>
-                <Badge variant={'none'} className={getSeverityColor(report.symptomSeverity)}>
+                <Badge
+                  variant={"none"}
+                  className={getSeverityColor(report.symptomSeverity)}
+                >
                   {report.symptomSeverity} Severity
                 </Badge>
               </div>
@@ -341,7 +374,7 @@ export default function ReportDetailPage() {
         </Card>
 
         {/* Status Information */}
-        {(report.status === 'APPROVED' || report.status === 'REJECTED') && (
+        {(report.status === "APPROVED" || report.status === "REJECTED") && (
           <Card>
             <CardHeader>
               <CardTitle className="text-lg flex items-center gap-2">
@@ -350,19 +383,19 @@ export default function ReportDetailPage() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              {report.status === 'APPROVED' && (
+              {report.status === "APPROVED" && (
                 <div className="space-y-2">
                   <p className="text-sm text-muted-foreground">
-                    <span className="font-medium text-black">Approved by:</span>{' '}
+                    <span className="font-medium text-black">Approved by:</span>{" "}
                     {report.approvedBy?.name || report.approvedBy?.email}
                   </p>
                   <p className="text-sm text-muted-foreground">
-                    <span className="font-medium text-black">Approved on:</span>{' '}
+                    <span className="font-medium text-black">Approved on:</span>{" "}
                     {report.approvedAt && formatDateTime(report.approvedAt)}
                   </p>
                 </div>
               )}
-              {report.status === 'REJECTED' && report.rejectionReason && (
+              {report.status === "REJECTED" && report.rejectionReason && (
                 <div className="space-y-2">
                   <p className="text-sm font-medium">Rejection Reason:</p>
                   <p className="text-sm bg-destructive/10 p-3 rounded-md">
@@ -387,7 +420,9 @@ export default function ReportDetailPage() {
               {report.ageAtReport && (
                 <div>
                   <span className="text-sm font-medium">Age at Report:</span>
-                  <p className="text-sm text-muted-foreground">{report.ageAtReport} years</p>
+                  <p className="text-sm text-muted-foreground">
+                    {report.ageAtReport} years
+                  </p>
                 </div>
               )}
               {report.sex && (
@@ -417,11 +452,26 @@ export default function ReportDetailPage() {
             </CardHeader>
             <CardContent className="space-y-3">
               <div>
-                <span className="text-sm font-medium">Location:</span>
                 <p className="text-sm text-muted-foreground">
-                  {[report.city, report.state, report.country].filter(Boolean).join(', ')}
+                  {[report.city, report.state, report.country]
+                    .filter(Boolean)
+                    .join(", ")}
                 </p>
               </div>
+
+              {/* Mapa da localização */}
+              {report.lat && report.lng && (
+                <div className="mt-4">
+                  <SingleLocationMap
+                    lat={report.lat}
+                    lng={report.lng}
+                    city={report.city}
+                    state={report.state}
+                    country={report.country}
+                    height="300px"
+                  />
+                </div>
+              )}
             </CardContent>
           </Card>
         </div>
@@ -448,7 +498,9 @@ export default function ReportDetailPage() {
 
             {report.medications && report.medications.length > 0 && (
               <div>
-                <span className="text-sm font-medium block mb-2">Current Medications:</span>
+                <span className="text-sm font-medium block mb-2">
+                  Current Medications:
+                </span>
                 <div className="flex flex-wrap gap-2">
                   {report.medications.map((medication) => (
                     <Badge key={medication} variant="outline">
@@ -470,16 +522,25 @@ export default function ReportDetailPage() {
 
             {report.surgeryHistory && report.surgeryHistory.length > 0 && (
               <div>
-                <span className="text-sm font-medium block mb-2">Surgery History:</span>
+                <span className="text-sm font-medium block mb-2">
+                  Surgery History:
+                </span>
                 <div className="space-y-2">
                   {report.surgeryHistory.map((surgery, index) => (
                     <div key={index} className="bg-muted/50 p-3 rounded-md">
                       <p className="text-sm">
                         <span className="font-medium">{surgery.type}</span>
-                        {surgery.year && <span className="text-muted-foreground"> ({surgery.year})</span>}
+                        {surgery.year && (
+                          <span className="text-muted-foreground">
+                            {" "}
+                            ({surgery.year})
+                          </span>
+                        )}
                       </p>
                       {surgery.notes && (
-                        <p className="text-xs text-muted-foreground mt-1">{surgery.notes}</p>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          {surgery.notes}
+                        </p>
                       )}
                     </div>
                   ))}
@@ -489,9 +550,13 @@ export default function ReportDetailPage() {
 
             {report.notes && (
               <div>
-                <span className="text-sm font-medium block mb-2">Additional Notes:</span>
+                <span className="text-sm font-medium block mb-2">
+                  Additional Notes:
+                </span>
                 <div className="bg-muted/50 p-3 rounded-md">
-                  <p className="text-sm text-muted-foreground">{report.notes}</p>
+                  <p className="text-sm text-muted-foreground">
+                    {report.notes}
+                  </p>
                 </div>
               </div>
             )}
@@ -514,12 +579,13 @@ export default function ReportDetailPage() {
                   <div>
                     <p className="font-medium">{report.documentOriginalName}</p>
                     <p className="text-sm text-muted-foreground">
-                      {report.documentSizeBytes && formatFileSize(report.documentSizeBytes)}
+                      {report.documentSizeBytes &&
+                        formatFileSize(report.documentSizeBytes)}
                     </p>
                   </div>
                 </div>
                 {canViewDocument ? (
-                  <Button 
+                  <Button
                     variant="default"
                     onClick={handleDownloadPDF}
                     disabled={isDownloading}
@@ -540,5 +606,5 @@ export default function ReportDetailPage() {
         )}
       </div>
     </div>
-  )
+  );
 }
