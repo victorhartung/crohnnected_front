@@ -1,86 +1,94 @@
-'use client'
+"use client";
 
-import { useState, useEffect } from 'react'
-import { useParams, useRouter } from 'next/navigation'
-import { useSession } from 'next-auth/react'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { Alert, AlertDescription } from '@/components/ui/alert'
-import { 
-  Loader2, 
-  AlertCircle, 
+import { useState, useEffect } from "react";
+import { useParams, useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import {
+  Loader2,
+  AlertCircle,
   ArrowLeft,
   Calendar,
   User,
   Tag,
-  Edit
-} from 'lucide-react'
-import { formatDate } from '@/lib/utils'
-import Link from 'next/link'
+  Edit,
+} from "lucide-react";
+import { formatDate } from "@/lib/utils";
+import Link from "next/link";
 
 interface Protocol {
-  id: string
-  title: string
-  slug?: string
-  summary?: string
-  content: string
-  tags: string[]
-  isPublic: boolean
+  id: string;
+  title: string;
+  slug?: string;
+  summary?: string;
+  content: string;
+  tags: string[];
+  isPublic: boolean;
   createdBy: {
-    name?: string
-    email: string
-  }
-  createdAt: string
-  updatedAt: string
+    name?: string;
+    email: string;
+  };
+  createdAt: string;
+  updatedAt: string;
 }
 
 export default function ProtocolDetailPage() {
-  const { data: session } = useSession()
-  const params = useParams()
-  const router = useRouter()
-  const [isLoading, setIsLoading] = useState(true)
-  const [error, setError] = useState('')
-  const [protocol, setProtocol] = useState<Protocol | null>(null)
+  const { data: session } = useSession();
+  const params = useParams();
+  const router = useRouter();
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [protocol, setProtocol] = useState<Protocol | null>(null);
 
-  const slug = params?.slug as string
-  const canEdit = session?.user?.role === 'MODERATOR' || session?.user?.role === 'ADMIN' || session?.user?.role === 'DOCTOR'
+  const slug = params?.slug as string;
+  const canEdit =
+    session?.user?.role === "MODERATOR" ||
+    session?.user?.role === "ADMIN" ||
+    session?.user?.role === "DOCTOR";
 
   useEffect(() => {
-    console.log('Slug from params:', slug)
+    console.log("Slug from params:", slug);
     if (slug) {
-      loadProtocol()
+      loadProtocol();
     }
-  }, [slug])
+  }, [slug]);
 
   const loadProtocol = async () => {
-    setIsLoading(true)
-    setError('')
+    setIsLoading(true);
+    setError("");
 
     try {
-      
-      const response = await fetch(`/api/hub/protocols/${slug}`)
-      
+      const response = await fetch(`/api/hub/protocols/${slug}`);
+
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}))
+        const errorData = await response.json().catch(() => ({}));
 
         if (response.status === 404) {
-          setError('Protocol not found')
+          setError("Protocol not found");
         } else {
-          setError(`Failed to load protocol: ${response.status}`)
+          setError(`Failed to load protocol: ${response.status}`);
         }
-        return
+        return;
       }
 
-      const data = await response.json()
-      setProtocol(data)
+      const data = await response.json();
+      setProtocol(data);
     } catch (error) {
-      console.error('Failed to load protocol:', error)
-      setError('An unexpected error occurred')
+      console.error("Failed to load protocol:", error);
+      setError("An unexpected error occurred");
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   if (isLoading) {
     return (
@@ -89,7 +97,7 @@ export default function ProtocolDetailPage() {
           <Loader2 className="h-8 w-8 animate-spin" />
         </div>
       </div>
-    )
+    );
   }
 
   if (error) {
@@ -100,29 +108,28 @@ export default function ProtocolDetailPage() {
             <ArrowLeft className="mr-2 h-4 w-4" />
             Back
           </Button>
-          
+
           <Alert variant="destructive">
             <AlertCircle className="h-4 w-4" />
             <AlertDescription>{error}</AlertDescription>
           </Alert>
-          
-          {error.includes('not found') && (
+
+          {error.includes("not found") && (
             <Card>
               <CardContent className="pt-6">
                 <p className="text-muted-foreground mb-4">
-                  The protocol you're looking for might have been moved or deleted.
+                  The protocol you're looking for might have been moved or
+                  deleted.
                 </p>
                 <Button asChild>
-                  <Link href="/hub?tab=protocols">
-                    Return to Protocols
-                  </Link>
+                  <Link href="/hub?tab=protocols">Return to Protocols</Link>
                 </Button>
               </CardContent>
             </Card>
           )}
         </div>
       </div>
-    )
+    );
   }
 
   if (!protocol) {
@@ -133,7 +140,7 @@ export default function ProtocolDetailPage() {
           <AlertDescription>Protocol not found</AlertDescription>
         </Alert>
       </div>
-    )
+    );
   }
 
   return (
@@ -147,7 +154,7 @@ export default function ProtocolDetailPage() {
               Back to Protocols
             </Link>
           </Button>
-          
+
           {canEdit && (
             <Button asChild>
               <Link href={`/hub/protocols/${protocol.id}/edit`}>
@@ -163,9 +170,11 @@ export default function ProtocolDetailPage() {
           <CardHeader>
             <CardTitle className="text-3xl">{protocol.title}</CardTitle>
             {protocol.summary && (
-              <CardDescription className="text-lg">{protocol.summary}</CardDescription>
+              <CardDescription className="text-lg">
+                {protocol.summary}
+              </CardDescription>
             )}
-            
+
             {/* Meta information */}
             <div className="flex items-center gap-4 text-sm text-muted-foreground pt-4">
               <div className="flex items-center gap-1">
@@ -190,15 +199,15 @@ export default function ProtocolDetailPage() {
               </div>
             )}
           </CardHeader>
-          
+
           <CardContent>
-            <div 
-              className="prose prose-gray max-w-none dark:prose-invert"
+            <div
+              className="prose prose-gray max-w-none dark:prose-invert whitespace-pre-wrap break-words"
               dangerouslySetInnerHTML={{ __html: protocol.content }}
             />
           </CardContent>
         </Card>
       </div>
     </div>
-  )
+  );
 }
