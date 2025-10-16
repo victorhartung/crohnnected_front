@@ -233,4 +233,48 @@ input[type="date"] {
 
 
 
+  @layer utilities {
+    .animate-progress {
+      animation: progress 5s linear forwards;
+    }
+  }
+
+  @keyframes progress {
+    from {
+      width: 100%;
+    }
+    to {
+      width: 0%;
+    }
+  }
+
+  @keyframes slideInRight {
+    from {
+      transform: translateX(100%);
+      opacity: 0;
+    }
+    to {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+
+  @keyframes slideOutRight {
+    from {
+      transform: translateX(0);
+      opacity: 1;
+    }
+    to {
+      transform: translateX(100%);
+      opacity: 0;
+    }
+  }
+
+  .animate-in {
+    animation: slideInRight 0.3s ease-out;
+  }
+
+  .animate-out {
+    animation: slideOutRight 0.3s ease-in;
+  }
 }

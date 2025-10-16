@@ -96,13 +96,65 @@ const config: Config = {
             height: '0',
           },
         },
+        'slide-in-from-right': {
+          '0%': { 
+            transform: 'translateX(100%)', 
+            opacity: '0' 
+          },
+          '100%': { 
+            transform: 'translateX(0)', 
+            opacity: '1' 
+          },
+        },
+        'slide-out-to-right': {
+          '0%': { 
+            transform: 'translateX(0)', 
+            opacity: '1' 
+          },
+          '100%': { 
+            transform: 'translateX(100%)', 
+            opacity: '0' 
+          },
+        },
+        'slide-in-from-top': {
+          '0%': { 
+            transform: 'translateY(-100%)', 
+            opacity: '0' 
+          },
+          '100%': { 
+            transform: 'translateY(0)', 
+            opacity: '1' 
+          },
+        },
+        'slide-out-to-top': {
+          '0%': { 
+            transform: 'translateY(0)', 
+            opacity: '1' 
+          },
+          '100%': { 
+            transform: 'translateY(-100%)', 
+            opacity: '0' 
+          },
+        },
+        'progress': {
+          '0%': { 
+            width: '100%' 
+          },
+          '100%': { 
+            width: '0%' 
+          },
+        },
       },
       animation: {
-        'accordion-down': 'accordion-down 0.2s ease-out',
-        'accordion-up': 'accordion-up 0.2s ease-out',
+        'slide-in-from-right': 'slide-in-from-right 0.3s ease-out',
+        'slide-out-to-right': 'slide-out-to-right 0.3s ease-in forwards',
+        'slide-in-from-top': 'slide-in-from-top 0.3s ease-out',
+        'slide-out-to-top': 'slide-out-to-top 0.3s ease-in forwards',
+        'progress': 'progress 5s linear forwards',
       },
     },
   },
   plugins: [require('tailwindcss-animate')],
 };
+
 export default config;
