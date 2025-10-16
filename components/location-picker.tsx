@@ -31,17 +31,69 @@ export default function LocationPicker({
   const markerRef = useRef<L.Marker | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [userLocation, setUserLocation] = useState<{
+    lat: number;
+    lng: number;
+  } | null>(null);
+
+  // Obtém a localização do usuário
+  useEffect(() => {
+    if (initialLocation) {
+      // Se já tem localização inicial, não precisa buscar a do usuário
+      return;
+    }
+
+    if ("geolocation" in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setUserLocation({
+            lat: position.coords.latitude,
+            lng: position.coords.longitude,
+          });
+        },
+        (error) => {
+          console.log("Geolocation error:", error.message);
+          // Silenciosamente usa o fallback (Brasil) se houver erro
+        },
+        {
+          enableHighAccuracy: false,
+          timeout: 5000,
+          maximumAge: 0,
+        }
+      );
+    }
+  }, [initialLocation]);
 
   // Inicializa o mapa
   useEffect(() => {
     if (!mapRef.current) return;
 
-    // Cria o mapa centrado em uma posição padrão (Brasil)
+    // Determina a posição inicial do mapa
+    let initialLat: number;
+    let initialLng: number;
+    let initialZoom: number;
+
+    if (initialLocation) {
+      // Usa a localização inicial fornecida
+      initialLat = initialLocation.lat;
+      initialLng = initialLocation.lng;
+      initialZoom = 10;
+    } else if (userLocation) {
+      // Usa a localização do usuário
+      initialLat = userLocation.lat;
+      initialLng = userLocation.lng;
+      initialZoom = 12;
+    } else {
+      // Fallback para o Brasil
+      initialLat = -14.235;
+      initialLng = -51.9253;
+      initialZoom = 4;
+    }
+
+    // Cria o mapa centrado na posição determinada
     const map = L.map(mapRef.current).setView(
-      initialLocation
-        ? [initialLocation.lat, initialLocation.lng]
-        : [-14.235, -51.9253],
-      initialLocation ? 10 : 4
+      [initialLat, initialLng],
+      initialZoom
     );
     leafletMapRef.current = map;
 
@@ -68,7 +120,7 @@ export default function LocationPicker({
       leafletMapRef.current = null;
       markerRef.current = null;
     };
-  }, []);
+  }, [userLocation]);
 
   // Função para adicionar/atualizar marcador
   const addMarker = (lat: number, lng: number, map: L.Map) => {
