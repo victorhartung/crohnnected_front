@@ -1,8 +1,6 @@
 "use client";
 
-import { useSession, signOut } from "next-auth/react";
-import Link from "next/link";
-import { useState } from "react";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -12,50 +10,55 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Menu, X, User, LogOut, Settings } from "lucide-react";
-import { UserRole } from "@prisma/client";
+import Logo from "@/public/images/logo.png";
 import { useUIStore } from "@/store/ui-store";
-import Image from "next/image"
-import Logo from "@/public/images/logo.png"
-import { useLanguage } from './language-provider'
+import { UserRole } from "@prisma/client";
+import { LogOut, Menu, User, X } from "lucide-react";
+import { signOut, useSession } from "next-auth/react";
+import Image from "next/image";
+import Link from "next/link";
+import { useState } from "react";
+import { useLanguage } from "./language-provider";
 
 function LanguageFlags() {
-  const { locale, setLocale } = useLanguage()
+  const { locale, setLocale } = useLanguage();
 
   return (
     <div className="flex items-center space-x-2">
       <button
         aria-label="English"
         title="English"
-        className={`p-1 rounded ${locale === 'en' ? 'ring-2 ring-offset-1' : ''}`}
-        onClick={() => setLocale('en')}
+        className={`p-1 rounded ${
+          locale === "en" ? "ring-2 ring-offset-1" : ""
+        }`}
+        onClick={() => setLocale("en")}
       >
         🇬🇧
       </button>
       <button
         aria-label="Português"
         title="Português"
-        className={`p-1 rounded ${locale === 'pt' ? 'ring-2 ring-offset-1' : ''}`}
-        onClick={() => setLocale('pt')}
+        className={`p-1 rounded ${
+          locale === "pt" ? "ring-2 ring-offset-1" : ""
+        }`}
+        onClick={() => setLocale("pt")}
       >
         🇧🇷
       </button>
     </div>
-  )
+  );
 }
 
 export function Header() {
   const { data: session, status } = useSession();
   const { sidebarOpen, toggleSidebar } = useUIStore();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const { t } = useLanguage()
+  const { t } = useLanguage();
 
   const getNavItems = () => {
     const baseItems = [
-      { label: t('header.home'), href: '/' },
-      { label: t('header.hub'), href: '/hub' },
-      { label: t('header.map'), href: '/map' },
+      { label: t("header.hub"), href: "/hub" },
+      { label: t("header.map"), href: "/map" },
     ];
 
     if (status !== "authenticated" || !session?.user) {
@@ -97,8 +100,7 @@ export function Header() {
       ],
     };
 
-   
-  const combined = [...baseItems, ...roleItems[session.user.role]];
+    const combined = [...baseItems, ...roleItems[session.user.role]];
     const seen = new Set<string>();
     return combined.filter((item) => {
       if (seen.has(item.href)) return false;
@@ -116,13 +118,13 @@ export function Header() {
           <div className="flex h-16 items-center justify-between">
             <div className="flex items-center space-x-4">
               <Link href="/" className="text-xl font-bold">
-                     <Image
-                        src={Logo}
-                        alt="Crohnnected Logo"
-                        width={150}
-                        height={70}
-                        priority
-                      />           
+                <Image
+                  src={Logo}
+                  alt="Crohnnected Logo"
+                  width={150}
+                  height={70}
+                  priority
+                />
               </Link>
             </div>
           </div>
@@ -143,7 +145,7 @@ export function Header() {
                 width={150}
                 height={70}
                 priority
-              /> 
+              />
             </Link>
 
             {/* Desktop Navigation */}
@@ -196,16 +198,16 @@ export function Header() {
                     <DropdownMenuItem asChild>
                       <Link href="/profile" className="cursor-pointer">
                         <User className="mr-2 h-4 w-4" />
-                        <span>{t('header.profile')}</span>
+                        <span>{t("header.profile")}</span>
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem
                       className="cursor-pointer"
-                      onClick={() => signOut({ callbackUrl: '/' })}
+                      onClick={() => signOut({ callbackUrl: "/" })}
                     >
                       <LogOut className="mr-2 h-4 w-4" />
-                      <span>{t('header.logout')}</span>
+                      <span>{t("header.logout")}</span>
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
@@ -225,14 +227,14 @@ export function Header() {
                 </Button>
               </div>
             ) : (
-                <div className="flex items-center space-x-2">
-                  <Button variant="ghost" asChild>
-                    <Link href="/login">{t('header.login')}</Link>
-                  </Button>
-                  <Button asChild>
-                    <Link href="/register">{t('header.register')}</Link>
-                  </Button>
-                </div>
+              <div className="flex items-center space-x-2">
+                <Button variant="ghost" asChild>
+                  <Link href="/login">{t("header.login")}</Link>
+                </Button>
+                <Button asChild>
+                  <Link href="/register">{t("header.register")}</Link>
+                </Button>
+              </div>
             )}
             {/* Seletor de linguas */}
             <LanguageFlags />
