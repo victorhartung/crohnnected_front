@@ -635,8 +635,8 @@ export default function ReportsPage() {
                         </div>
 
                         {report.hasDocument && (
-                          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                            <FileText className="h-4 w-4" />
+                          <div className="flex items-center gap-2 text-sm font-bold text-primary">
+                            <FileText className="h-4 w-4"/>
                             PDF attached: {report.documentOriginalName}
                           </div>
                         )}
@@ -686,7 +686,7 @@ export default function ReportsPage() {
                   </div>
                   <div className="flex gap-2">
                     <Button
-                      variant="outline"
+                      variant="white"
                       size="sm"
                       disabled={current.page <= 1 || current.loading}
                       onClick={() => setPage(activeTab, current.page - 1)}
@@ -694,7 +694,7 @@ export default function ReportsPage() {
                       Previous
                     </Button>
                     <Button
-                      variant="outline"
+                      variant="white"
                       size="sm"
                       disabled={
                         current.page >= current.totalPages || current.loading

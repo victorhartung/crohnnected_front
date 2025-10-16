@@ -190,7 +190,7 @@ export default function NewReportPage() {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-4 bg-">
                 <div className="space-y-2">
                   <Label htmlFor="ageAtReport">Age at Report</Label>
                   <Input
@@ -413,7 +413,7 @@ export default function NewReportPage() {
             </Button>
             <Button
               type="button"
-              variant="outline"
+              variant="destructive"
               onClick={() => router.push('/reports')}
               disabled={isLoading}
             >

@@ -1,21 +1,21 @@
-'use client'
+"use client"
 
-import { useSession } from 'next-auth/react'
-import Link from 'next/link'
-import { Card } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
-import { FileText, Users, BarChart3, MapPin, Plus, Eye } from 'lucide-react'
+import Image from "next/image"
+import Link from "next/link"
+import { useSession } from "next-auth/react"
+import { Card } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
+import { FileText, Users, BarChart3, Plus, MapPin } from "lucide-react"
+import LogoHome from "@/public/images/logo-home.png"
 
 export default function HomePage() {
   const { data: session, status } = useSession()
 
   const getRoleSpecificContent = () => {
-    if (status === 'loading') {
-      return null
-    }
+    if (status === "loading") return null
 
-    if (status === 'unauthenticated') {
+    if (status === "unauthenticated") {
       return (
         <div className="div-cards">
           <Card className="p-6">
@@ -53,9 +53,9 @@ export default function HomePage() {
     }
 
     const role = session?.user?.role
-    
+
     switch (role) {
-      case 'PATIENT':
+      case "PATIENT":
         return (
           <div className="div-cards">
             <Card className="p-6">
@@ -80,8 +80,8 @@ export default function HomePage() {
             </Card>
           </div>
         )
-        
-      case 'DOCTOR':
+
+      case "DOCTOR":
         return (
           <div className="div-cards">
             <Card className="p-6">
@@ -106,8 +106,8 @@ export default function HomePage() {
             </Card>
           </div>
         )
-        
-      case 'RESEARCHER':
+
+      case "RESEARCHER":
         return (
           <div className="div-cards">
             <Card className="p-6">
@@ -132,7 +132,7 @@ export default function HomePage() {
             </Card>
           </div>
         )
-        
+
       default:
         return (
           <div className="div-cards">
@@ -175,48 +175,51 @@ export default function HomePage() {
     <div className="main-container">
       <div className="main-alignment">
         <h1 className="main-title">
-          Welcome to Crohnnected
+          Welcome to
+          <Image
+            src={LogoHome}
+            alt="Crohnnected Logo"
+            width={440}
+            height={360}
+            priority
+            className="mx-auto"
+          />
           {session?.user && (
-            <span className="main-subtitle">
+            <span className="main-subtitle-name">
               Hello, {session.user.name || session.user.email}
             </span>
           )}
         </h1>
+
         <p className="main-text">
-          A comprehensive healthcare platform connecting Crohn's disease patients, 
-          doctors, and researchers to improve treatment outcomes and advance research.
+          A comprehensive healthcare platform connecting Crohn&apos;s disease patients, doctors, 
+          and researchers to improve treatment outcomes and advance research.
         </p>
+
         {session?.user && (
           <Badge variant="account" className="text-sm">
             {session.user.role} Account
           </Badge>
         )}
       </div>
-      
+
       <div className="max-w-4xl mx-auto">
         {getRoleSpecificContent()}
       </div>
-      
-      {/* Statistics or additional info */}
+
       <div className="stats-alignment">
         <div className="stats">
           <div>
             <h4 className="stat-title">Secure</h4>
-            <p className="stat-text">
-              HIPAA-compliant platform with end-to-end encryption
-            </p>
+            <p className="stat-text">HIPAA-compliant platform with end-to-end encryption</p>
           </div>
           <div>
             <h4 className="stat-title">Collaborative</h4>
-            <p className="stat-text">
-              Connecting patients, doctors, and researchers worldwide
-            </p>
+            <p className="stat-text">Connecting patients, doctors, and researchers worldwide</p>
           </div>
           <div>
             <h4 className="stat-title">Impactful</h4>
-            <p className="stat-text">
-              Contributing to better understanding of Crohn's disease
-            </p>
+            <p className="stat-text">Contributing to better understanding of Crohn&apos;s disease</p>
           </div>
         </div>
       </div>

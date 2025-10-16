@@ -5,7 +5,7 @@
 /*
            RGB:                        HSL:
         "#1D9B9A",          "hsl(180, 69%, 36%)",             // primary 
-        "#EBF9F9",          "hsl(180, 54%, 95%)",             // background 
+        "#EBF9F9",          "hsl(180, 0%, 100%)",             // background 
         "#CFEDEB",          "hsl(176, 45%, 87%)",             // cabeçalho
         "#00101E",          "hsl(208, 100%, 5.9%)",           // logo
         "#B8E5E5",          "hsl(176, 45%, 40%)",             // cor fundo avatar usuário
@@ -110,12 +110,16 @@
     }
 
     .main-subtitle {
-      @apply block text-2xl text-primary mt-2
+      @apply block text-2xl text-primary mt-2;
     }
 
     .main-text {
-      @apply text-lg text-muted-foreground max-w-2xl mx-auto
+      @apply text-lg text-muted-foreground max-w-2xl mx-auto;
     }
+
+  .main-subtitle-name {
+  @apply block text-2xl mt-2 bg-gradient-to-tr from-teal-900 via-teal-500 to-teal-600 text-transparent bg-clip-text;
+  }
 
   /*----- cards -----*/  
     .div-cards {
@@ -153,7 +157,7 @@
 
   /*----- search -----*/
     .search-input {
-      @apply flex h-10 w-full rounded-md border border-input bg-slate-100 px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground 
+      @apply flex h-10 w-full rounded-md border border-input bg-white bg-slate-50/40 px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground 
       focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50;
 
       &:not(:placeholder-shown),
@@ -173,7 +177,7 @@
 
   /*----- select -----*/
     .select-trigger {
-      @apply flex h-10 w-full items-center justify-between rounded-md border border-input bg-slate-100 px-3 py-2 text-foreground text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1;
+      @apply flex h-10 w-full items-center justify-between rounded-md border border-input bg-white bg-slate-50/40 px-3 py-2 text-foreground text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1;
     }
 
     .select-scroll-downup-button {
@@ -207,5 +211,26 @@
   .avatar {
     @apply flex h-full w-full items-center justify-center rounded-full bg-avatar;
   }
+
+
+input[type="date"] {
+  position: relative;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator {
+  position: absolute;
+  left: 8px;          
+  right: auto;
+  filter: invert(1);   
+  opacity: 1;
+  cursor: pointer;
+  transform: translateY(-1px);
+}
+
+input[type="date"] {
+  padding-left: 1.8rem; 
+}
+
+
 
 }

@@ -21,7 +21,9 @@ const buttonVariants = cva(
         whiteline:
           "border border-input bg-slate-100 hover:bg-accent hover:text-accent-foreground",
         white:
-          "border border-input bg-white hover:bg-accent hover:text-accent-foreground",         
+          "border border-input bg-white hover:bg-accent hover:text-accent-foreground",
+        whiteselect:
+          "border border-input bg-white bg-slate-50/40"           
       },
       size: {
         default: "h-10 px-4 py-2",

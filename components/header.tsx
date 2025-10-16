@@ -16,6 +16,8 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Menu, X, User, LogOut, Settings } from "lucide-react";
 import { UserRole } from "@prisma/client";
 import { useUIStore } from "@/store/ui-store";
+import Image from "next/image"
+import Logo from "@/public/images/logo.png"
 
 export function Header() {
   const { data: session, status } = useSession();
@@ -75,7 +77,13 @@ export function Header() {
           <div className="flex h-16 items-center justify-between">
             <div className="flex items-center space-x-4">
               <Link href="/" className="text-xl font-bold">
-                Crohnnected
+                     <Image
+                        src={Logo}
+                        alt="Crohnnected Logo"
+                        width={150}
+                        height={70}
+                        priority
+                      />           
               </Link>
             </div>
           </div>
@@ -90,7 +98,13 @@ export function Header() {
         <div className="flex h-16 items-center justify-between">
           <div className="flex items-center space-x-4">
             <Link href="/" className="text-xl font-bold">
-              Crohnnected
+              <Image
+                src={Logo}
+                alt="Crohnnected Logo"
+                width={150}
+                height={70}
+                priority
+              /> 
             </Link>
 
             {/* Desktop Navigation */}

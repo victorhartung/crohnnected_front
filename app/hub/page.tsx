@@ -136,18 +136,20 @@ export default function HubPage() {
     })
   }
 
-  const getTabIcon = (tab: string) => {
-    switch (tab) {
-      case 'articles':
-        return <BookOpen className="h-4 w-4" />
-      case 'protocols':
-        return <FileText className="h-4 w-4" />
-      case 'stories':
-        return <Heart className="h-4 w-4" />     
-      default:
-        return null
-    }
+  const getTabIcon = (tab: string, size: "small" | "large" = "small") => {
+  const sizeClass = size === "large" ? "h-12 w-12" : "h-4 w-4";
+
+  switch (tab) {
+    case 'articles':
+      return <BookOpen className={sizeClass} />;
+    case 'protocols':
+      return <FileText className={sizeClass} />;
+    case 'stories':
+      return <Heart className={sizeClass} />;
+    default:
+      return null;
   }
+};
 
   const getCreateLink = (type: string) => `/hub/${type}/new`
 
@@ -218,15 +220,15 @@ export default function HubPage() {
         <Tabs value={activeTab} onValueChange={handleTabChange}>
           <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="articles" className="flex items-center gap-2">
-              {getTabIcon('articles')}
+              {getTabIcon('articles', 'small')}
               Articles ({articles.length})
             </TabsTrigger>
             <TabsTrigger value="protocols" className="flex items-center gap-2">
-              {getTabIcon('protocols')}
+              {getTabIcon('protocols', 'small')}
               Protocols ({protocols.length})
             </TabsTrigger>
             <TabsTrigger value="stories" className="flex items-center gap-2">
-              {getTabIcon('stories')}
+              {getTabIcon('stories', 'small')}
               Stories ({stories.length})
             </TabsTrigger>
           </TabsList>
@@ -239,14 +241,14 @@ export default function HubPage() {
             ) : filteredContent.length === 0 ? (
               <Card>
                 <CardContent className="py-8 text-center">
-                  <div className="mx-auto mb-4 h-12 w-12 text-muted-foreground flex items-center justify-center ">
-                    {getTabIcon(activeTab)}
+                  <div className="mx-auto mb-4 flex flex-col items-center justify-center space-y-2 text-muted-foreground">
+                    {getTabIcon(activeTab, 'large')}
+                    <p className="text-muted-foreground">
+                      {searchQuery || selectedTag
+                        ? `No ${activeTab} match your search criteria.`
+                        : `No ${activeTab} available yet.`}
+                    </p>
                   </div>
-                  <p className="text-muted-foreground">
-                    {searchQuery || selectedTag
-                      ? `No ${activeTab} match your search criteria.`
-                      : `No ${activeTab} available yet.`}
-                  </p>
                   {canCreateContent && !searchQuery && !selectedTag && (
                     <Button asChild className="mt-4">
                       <Link href={getCreateLink(activeTab)}>

@@ -11,7 +11,7 @@ const badgeVariants = cva(
         default:
           'border-transparent bg-primary text-primary-foreground hover:bg-primary/80',
         account:
-          'border-transparent bg-primary text-primary-foreground',          
+          'border-transparent bg-[radial-gradient(ellipse_at_top_left,_var(--tw-gradient-stops))] from-teal-700 via-teal-500 to-teal-700 text-primary-foreground',         
         secondary:
           'border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80',
         destructive:

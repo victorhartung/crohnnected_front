@@ -356,7 +356,7 @@ export default function AdminPage() {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
-                    <div className="text-2xl font-bold">{stats?.hubContent.articles || 0}</div>
+                    <div className="text-2xl font-bold text-center">{stats?.hubContent.articles || 0}</div>
                     <div className="space-y-2">
                       <Button size="sm" asChild className="w-full">
                         <Link href="/hub/articles/new">
@@ -384,7 +384,7 @@ export default function AdminPage() {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
-                    <div className="text-2xl font-bold">{stats?.hubContent.protocols || 0}</div>
+                    <div className="text-2xl font-bold text-center">{stats?.hubContent.protocols || 0}</div>
                     <div className="space-y-2">
                       <Button size="sm" asChild className="w-full">
                         <Link href="/hub/protocols/new">
@@ -412,7 +412,7 @@ export default function AdminPage() {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
-                    <div className="text-2xl font-bold">{stats?.hubContent.stories || 0}</div>
+                    <div className="text-2xl font-bold text-center">{stats?.hubContent.stories || 0}</div>
                     <div className="space-y-2">
                       <Button size="sm" asChild className="w-full">
                         <Link href="/hub/stories/new">
@@ -443,8 +443,9 @@ export default function AdminPage() {
                       <p className="text-sm text-muted-foreground capitalize">{status}</p>
                     </div>
                     {status !== 'total' && (
-                      <Button size="sm" variant="whiteline" asChild className="w-full mt-3">
-                        <Link href={`/reports${status !== 'total' ? `?status=${status}` : ''}`}>
+                      <Button size="sm" variant="whiteline" className="w-full mt-3 h-auto whitespace-normal text-center leading-tight px-3 py-2 break-words" asChild >
+                        <Link href={`/reports${status !== 'total' ? `?status=${status}` : ''}`}
+                          className="block w-full whitespace-normal break-words text-center" >
                           View {status} Reports
                         </Link>
                       </Button>

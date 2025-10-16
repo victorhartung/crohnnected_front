@@ -9,6 +9,9 @@ const inter = Inter({ subsets: ['latin'] })
 export const metadata = {
   title: 'Crohnnected',
   description: 'A comprehensive healthcare platform for Crohn\'s disease patients, doctors, and researchers.',
+  icons: {
+    icon: '/favicon.png',
+  },
 }
 
 export default function RootLayout({

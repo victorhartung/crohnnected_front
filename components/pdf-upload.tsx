@@ -152,7 +152,7 @@ export function PDFUpload({ onFileChange, currentFile, disabled }: PDFUploadProp
             </p>
             <Button
               type="button"
-              variant="outline"
+              variant="default"
               onClick={() => fileInputRef.current?.click()}
               disabled={disabled}
             >

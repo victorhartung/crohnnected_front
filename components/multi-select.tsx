@@ -59,26 +59,30 @@ export function MultiSelect({
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <Button
-          variant="whiteline"
+          variant="whiteselect"
           role="combobox"
           aria-expanded={open}
           className={cn(
-            "w-full relative flex flex-col items-stretch text-left min-h-10 px-3 py-2",
+            "w-full relative flex items-center justify-between text-left min-h-10 px-3 py-2 overflow-hidden",
             !value.length && "text-muted-foreground"
           )}
           disabled={disabled}
         >
-          <div className="flex w-full items-start justify-between">
-            <div className="flex flex-wrap gap-1 flex-1 pr-6">
+          <div className="flex items-center justify-between w-full overflow-hidden">
+            <div className="flex items-center gap-1 flex-1 pr-6 overflow-hidden whitespace-nowrap text-ellipsis">
               {value.length > 0 ? (
                 <>
                   {selectedOptions.slice(0, 2).map((option) => (
-                    <Badge variant="outwhite" key={option.value}>
+                    <Badge
+                      variant="outwhite"
+                      key={option.value}
+                      className="shrink-0"
+                    >
                       {option.label}
                     </Badge>
                   ))}
                   {value.length > 2 && (
-                    <Badge variant="outwhite">
+                    <Badge variant="outwhite" className="shrink-0">
                       +{value.length - 2} more
                     </Badge>
                   )}
@@ -88,21 +92,22 @@ export function MultiSelect({
               )}
             </div>
 
-            <div className="absolute right-3 top-1/2 -translate-y-1/2">
-              <ChevronsUpDown className="h-4 w-4 shrink-0 opacity-50" />
+            <div className="absolute right-3 top-1/2 -translate-y-1/2 shrink-0">
+              <ChevronsUpDown className="h-4 w-4 opacity-50" />
             </div>
-            </div>
+          </div>
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-full p-0">
         <div className="p-2">
           <input
-            className="w-full rounded-md border px-3 py-2 text-sm outline-none bg-slate-100"
+            className="w-full rounded-md border px-3 py-2 text-sm outline-none bg-slate-50"
             placeholder={searchPlaceholder}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
         </div>
+        
         <div className="max-h-60 overflow-y-auto">
           {options.filter(opt => opt.label.toLowerCase().includes(search.toLowerCase())).length === 0 ? (
             <div className="p-3 text-sm text-muted-foreground">{emptyText}</div>
