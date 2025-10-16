@@ -10,15 +10,16 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Report } from "@/interfaces/report";
 import Logo from "@/public/images/logo.png";
-import { useUIStore } from "@/store/ui-store";
 import { UserRole } from "@prisma/client";
 import { LogOut, Menu, User, X } from "lucide-react";
 import { signOut, useSession } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useLanguage } from "./language-provider";
+import { useReportContext } from "./report-context";
 
 function LanguageFlags() {
   const { locale, setLocale } = useLanguage();
@@ -51,9 +52,36 @@ function LanguageFlags() {
 
 export function Header() {
   const { data: session, status } = useSession();
-  const { sidebarOpen, toggleSidebar } = useUIStore();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { t } = useLanguage();
+
+  const [hasActiveReport, setHasActiveReport] = useState(false);
+  const { reportVersion } = useReportContext();
+
+  useEffect(() => {
+    const checkActiveReport = async () => {
+      if (session?.user?.role !== "PATIENT") {
+        return;
+      }
+
+      try {
+        const res = await fetch("/api/reports?limit=1");
+        if (res.ok) {
+          const data = await res.json();
+          const activeReport = data?.data?.reports?.find(
+            (report: Report) => report.status !== "REJECTED"
+          );
+          setHasActiveReport(!!activeReport);
+        }
+      } catch (error) {
+        console.error("Error checking active report:", error);
+      }
+    };
+
+    if (status === "authenticated") {
+      checkActiveReport();
+    }
+  }, [session, status, reportVersion]);
 
   const getNavItems = () => {
     const baseItems = [
@@ -70,12 +98,18 @@ export function Header() {
       UserRole,
       Array<{ label: string; href: string }>
     > = {
-      PATIENT: [
-        { label: "My Reports", href: "/reports" },
-        { label: "New Report", href: "/reports/new" },
-        { label: "Hub", href: "/hub" },
-        { label: "Map", href: "/map" },
-      ],
+      PATIENT: !hasActiveReport
+        ? [
+            { label: "My Reports", href: "/reports" },
+            { label: "New Report", href: "/reports/new" },
+            { label: "Hub", href: "/hub" },
+            { label: "Map", href: "/map" },
+          ]
+        : [
+            { label: "My Reports", href: "/reports" },
+            { label: "Hub", href: "/hub" },
+            { label: "Map", href: "/map" },
+          ],
       DOCTOR: [
         { label: "Reports", href: "/reports" },
         { label: "Hub", href: "/hub" },

@@ -23,12 +23,18 @@ export const POST = withAuth(async (request: NextRequest, user: User) => {
       );
     }
 
+    // Check if patient already has an active report (anything that is not REJECTED)
     const existing = await prisma.report.findFirst({
-      where: { patientId: user.id },
+      where: {
+        patientId: user.id,
+        status: {
+          not: ReportStatus.REJECTED,
+        },
+      },
     });
     if (existing) {
       return Response.json(
-        { success: false, error: "Patient already has a report" },
+        { success: false, error: "Patient already has an active report" },
         { status: 400 }
       );
     }

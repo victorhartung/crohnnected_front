@@ -1,5 +1,6 @@
 "use client";
 
+import { useReportContext } from "@/components/report-context";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import {
@@ -25,9 +26,11 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 
+import { useLanguage } from "@/components/language-provider";
 import type { LocationData } from "@/components/location-picker";
 import { MultiSelect, type Option } from "@/components/multi-select";
 import { PDFUpload } from "@/components/pdf-upload";
+import { Report } from "@/interfaces/report";
 import { COMMON_MEDICATIONS, COMMON_SYMPTOMS } from "@/lib/constants";
 import { reportSchema, type ReportInput } from "@/lib/validations";
 import {
@@ -39,7 +42,6 @@ import {
 } from "lucide-react";
 import dynamic from "next/dynamic";
 import { toast } from "sonner";
-import { useLanguage } from '@/components/language-provider'
 
 // Importa o LocationPicker dinamicamente para evitar problemas de SSR
 const LocationPicker = dynamic(() => import("@/components/location-picker"), {
@@ -53,7 +55,8 @@ const LocationPicker = dynamic(() => import("@/components/location-picker"), {
 
 export default function NewReportPage() {
   const { data: session, status } = useSession();
-  const { t } = useLanguage()
+  const { t } = useLanguage();
+  const { refreshReports } = useReportContext();
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
@@ -97,12 +100,15 @@ export default function NewReportPage() {
         const res = await fetch("/api/reports?limit=1");
         if (!res.ok) return;
         const data = await res.json();
-        if (data?.data?.total && data.data.total > 0) {
-          // Patient already has a report, redirect
+        const activeReport = data?.data?.reports?.find(
+          (report: Report) => report.status !== "REJECTED"
+        );
+        if (!!activeReport) {
+          // Patient already has an active report, redirect
           router.push("/reports");
         }
       } catch (e) {
-        // ignore
+        console.error("Error checking active report:", error);
       }
     };
 
@@ -180,7 +186,9 @@ export default function NewReportPage() {
 
     // Require PDF/document for patient submissions
     if (!pdfFile) {
-      setPdfError("Please attach a supporting document (PDF) before submitting.");
+      setPdfError(
+        "Please attach a supporting document (PDF) before submitting."
+      );
       return;
     }
 
@@ -209,6 +217,7 @@ export default function NewReportPage() {
         return;
       }
 
+      refreshReports();
       toast.success("Report submitted successfully!");
       router.push("/reports");
     } catch (error) {
@@ -232,13 +241,11 @@ export default function NewReportPage() {
   if (status === "unauthenticated") {
     return (
       <div className="container mx-auto px-4 py-8">
-          <Alert>
-            <AlertCircle className="h-4 w-4" />
-            <AlertDescription>
-              {t('reports.submitNew')}
-            </AlertDescription>
-          </Alert>
-        </div>
+        <Alert>
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>{t("reports.submitNew")}</AlertDescription>
+        </Alert>
+      </div>
     );
   }
 
@@ -257,9 +264,9 @@ export default function NewReportPage() {
     <div className="container mx-auto px-4 py-8 max-w-4xl">
       <div className="space-y-6">
         <div>
-          <h1 className="text-3xl font-bold">{t('reports.submitNew')}</h1>
+          <h1 className="text-3xl font-bold">{t("reports.submitNew")}</h1>
           <p className="text-muted-foreground">
-            {t('reports.submitNew')}
+            {t("reports.submitNew")}
             documentation.
           </p>
         </div>
@@ -521,14 +528,14 @@ export default function NewReportPage() {
                 currentFile={pdfFile}
                 disabled={isLoading}
               />
-                {pdfError && (
-                  <div className="mt-2">
-                    <Alert variant="destructive">
-                      <AlertCircle className="h-4 w-4" />
-                      <AlertDescription>{pdfError}</AlertDescription>
-                    </Alert>
-                  </div>
-                )}
+              {pdfError && (
+                <div className="mt-2">
+                  <Alert variant="destructive">
+                    <AlertCircle className="h-4 w-4" />
+                    <AlertDescription>{pdfError}</AlertDescription>
+                  </Alert>
+                </div>
+              )}
             </CardContent>
           </Card>
 

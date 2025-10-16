@@ -1,13 +1,13 @@
+"use client";
 
-'use client'
-
-import { SessionProvider } from 'next-auth/react'
-import { Toaster } from 'sonner'
-import { ThemeProvider } from './theme-provider'
-import { LanguageProvider } from './language-provider'
+import { SessionProvider } from "next-auth/react";
+import { Toaster } from "sonner";
+import { LanguageProvider } from "./language-provider";
+import { ReportProvider } from "./report-context";
+import { ThemeProvider } from "./theme-provider";
 
 interface ProvidersProps {
-  children: React.ReactNode
+  children: React.ReactNode;
 }
 
 export function Providers({ children }: ProvidersProps) {
@@ -20,10 +20,12 @@ export function Providers({ children }: ProvidersProps) {
         disableTransitionOnChange
       >
         <LanguageProvider>
-          {children}
-          <Toaster />
+          <ReportProvider>
+            {children}
+            <Toaster />
+          </ReportProvider>
         </LanguageProvider>
       </ThemeProvider>
     </SessionProvider>
-  )
+  );
 }

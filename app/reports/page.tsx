@@ -13,6 +13,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Report } from "@/interfaces/report";
 import { formatDate, getSeverityColor, getStatusColor } from "@/lib/utils";
 import {
   AlertCircle,
@@ -29,31 +30,6 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
-import { useLanguage } from '@/components/language-provider'
-
-interface Report {
-  id: string;
-  ageAtReport?: number;
-  sex?: string;
-  country: string;
-  state?: string;
-  city?: string;
-  symptoms: string[];
-  symptomSeverity: string;
-  medications?: string[];
-  status: "PENDING" | "APPROVED" | "REJECTED";
-  createdAt: string;
-  approvedAt?: string;
-  approvedBy?: {
-    name?: string;
-    email: string;
-  };
-  rejectionReason?: string;
-  hasDocument: boolean;
-  documentOriginalName?: string;
-  documentSizeBytes?: number;
-  notes?: string;
-}
 
 type TabKey = "all" | "pending" | "approved" | "rejected";
 
@@ -69,7 +45,6 @@ type TabState = {
 
 export default function ReportsPage() {
   const { data: session, status } = useSession();
-  const { t } = useLanguage()
 
   const isPatient = session?.user?.role === "PATIENT";
   const isDoctor = session?.user?.role === "DOCTOR";
@@ -81,7 +56,6 @@ export default function ReportsPage() {
   const params = useSearchParams();
 
   const [hasActiveReport, setHasActiveReport] = useState(false);
-  const [isCheckingReport, setIsCheckingReport] = useState(true);
 
   const [activeTab, setActiveTab] = useState<TabKey>("all");
   const [tabs, setTabs] = useState<Record<TabKey, TabState>>({
@@ -132,28 +106,25 @@ export default function ReportsPage() {
 
   useEffect(() => {
     const checkActiveReport = async () => {
-      if (session?.user?.role !== 'PATIENT') {
-        setIsCheckingReport(false);
+      if (session?.user?.role !== "PATIENT") {
         return;
       }
 
       try {
-        const res = await fetch('/api/reports?limit=1');
+        const res = await fetch("/api/reports?limit=1");
         if (res.ok) {
           const data = await res.json();
           const activeReport = data?.data?.reports?.find(
-            (report: Report) => report.status !== 'REJECTED'
+            (report: Report) => report.status !== "REJECTED"
           );
           setHasActiveReport(!!activeReport);
         }
       } catch (error) {
-        console.error('Error checking active report:', error);
-      } finally {
-        setIsCheckingReport(false);
+        console.error("Error checking active report:", error);
       }
     };
 
-    if (status === 'authenticated') {
+    if (status === "authenticated") {
       checkActiveReport();
     }
   }, [session, status]);
@@ -541,8 +512,8 @@ export default function ReportsPage() {
                 </SelectContent>
               </Select>
 
-              <Button 
-                variant="default" 
+              <Button
+                variant="default"
                 onClick={() => {
                   setSearchQuery("");
                   setSelectedCountry("all");
@@ -607,26 +578,11 @@ export default function ReportsPage() {
               <Card>
                 <CardContent className="py-8 text-center">
                   <FileText className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                  <p className="text-muted-foreground">
-                    {isPatient && hasActiveReport 
-                      ? "You already have an active report. Each patient can only have one active (pending or approved) report at a time."
-                      : "No reports found."
-                    }
-                  </p>
+                  <p className="text-muted-foreground">No reports found.</p>
                   {isPatient && !hasActiveReport && (
                     <Button asChild className="mt-4">
                       <Link href="/reports/new">Submit your first report</Link>
                     </Button>
-                  )}
-                  {isPatient && hasActiveReport && (
-                    <div className="space-y-2 mt-4">
-                      <p className="text-sm text-muted-foreground">
-                        If your current report gets rejected, you'll be able to submit a new one.
-                      </p>
-                      <Button asChild variant="outline">
-                        <Link href="/reports">View My Report</Link>
-                      </Button>
-                    </div>
                   )}
                 </CardContent>
               </Card>
@@ -649,10 +605,16 @@ export default function ReportsPage() {
                           </div>
                         </div>
                         <div className="flex items-center gap-2">
-                          <Badge variant={'none'} className={getStatusColor(report.status)}>
+                          <Badge
+                            variant={"none"}
+                            className={getStatusColor(report.status)}
+                          >
                             {report.status}
                           </Badge>
-                          <Badge variant={'none'} className={getSeverityColor(report.symptomSeverity)}>
+                          <Badge
+                            variant={"none"}
+                            className={getSeverityColor(report.symptomSeverity)}
+                          >
                             {report.symptomSeverity}
                           </Badge>
                         </div>
@@ -673,7 +635,9 @@ export default function ReportsPage() {
                             </p>
                           </div>
                           <div>
-                            <div className="text-sm text-muted-foreground mb-1 font-semibold">Symptoms</div>
+                            <div className="text-sm text-muted-foreground mb-1 font-semibold">
+                              Symptoms
+                            </div>
                             <div className="flex flex-wrap gap-1">
                               {(report.symptoms || [])
                                 .slice(0, 3)
@@ -697,7 +661,7 @@ export default function ReportsPage() {
 
                         {report.hasDocument && (
                           <div className="flex items-center gap-2 text-sm font-bold text-primary">
-                            <FileText className="h-4 w-4"/>
+                            <FileText className="h-4 w-4" />
                             PDF attached: {report.documentOriginalName}
                           </div>
                         )}
