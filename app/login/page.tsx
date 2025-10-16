@@ -15,11 +15,13 @@ import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Loader2, AlertCircle } from 'lucide-react'
 import { loginSchema, type LoginInput } from '@/lib/validations'
 import { toast } from 'sonner'
+import { useLanguage } from '@/components/language-provider'
 
 export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
   const router = useRouter()
+  const { t } = useLanguage()
 
   const form = useForm<LoginInput>({
     resolver: zodResolver(loginSchema),
@@ -59,10 +61,8 @@ export default function LoginPage() {
     <div className="container mx-auto px-4 py-8 max-w-md">
       <Card>
         <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl text-center">Sign in</CardTitle>
-          <CardDescription className="text-center">
-            Enter your email and password to access your account
-          </CardDescription>
+          <CardTitle className="text-2xl text-center">{t('auth.signIn')}</CardTitle>
+          <CardDescription className="text-center">{t('auth.createAccountDesc')}</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -107,14 +107,14 @@ export default function LoginPage() {
 
             <Button type="submit" className="w-full" disabled={isLoading}>
               {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Sign in
+              {t('auth.signIn')}
             </Button>
           </form>
 
           <div className="mt-6 text-center text-sm">
-            <span className="text-muted-foreground">Don't have an account? </span>
+            <span className="text-muted-foreground">{t('auth.dontHave')} </span>
             <Link href="/register" className="text-primary hover:underline">
-              Sign up
+              {t('auth.signUp')}
             </Link>
           </div>
         </CardContent>

@@ -23,6 +23,7 @@ import {
 } from 'lucide-react'
 import { formatDate } from '@/lib/utils'
 import { toast } from 'sonner'
+import { useLanguage } from '@/components/language-provider'
 
 interface HubContent {
   id: string
@@ -42,6 +43,7 @@ interface HubContent {
 
 export default function HubPage() {
   const { data: session } = useSession()
+  const { t } = useLanguage()
   const searchParams = useSearchParams()
   const router = useRouter()
   const [activeTab, setActiveTab] = useState('articles')
@@ -159,10 +161,8 @@ export default function HubPage() {
       <div className="space-y-6">
         <div className="flex justify-between items-start">
           <div>
-            <h1 className="text-3xl font-bold">Information Hub</h1>
-            <p className="text-muted-foreground">
-              Educational resources, clinical protocols, and patient stories for the Crohn's community.
-            </p>
+            <h1 className="text-3xl font-bold">{t('header.hub')}</h1>
+            <p className="text-muted-foreground">{t('map.readonlyBanner')}</p>
           </div>
           
           {canCreateContent && (
@@ -183,7 +183,7 @@ export default function HubPage() {
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
-                    placeholder="Search content..."
+                    placeholder={t('hub.searchPlaceholder') || 'Search content...'}
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className="pl-10"
@@ -197,7 +197,7 @@ export default function HubPage() {
                   size="sm"
                   onClick={() => setSelectedTag('')}
                 >
-                  All Topics
+                  {t('hub.allTopics') || 'All Topics'}
                 </Button>
                 {allTags.slice(0, 6).map((tag) => (
                   <Button
@@ -216,18 +216,18 @@ export default function HubPage() {
 
         {/* Content Tabs */}
         <Tabs value={activeTab} onValueChange={handleTabChange}>
-          <TabsList className="grid w-full grid-cols-3">
+            <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="articles" className="flex items-center gap-2">
               {getTabIcon('articles')}
-              Articles ({articles.length})
+              {t('hub.articlesLabel') || `Articles (${articles.length})`}
             </TabsTrigger>
             <TabsTrigger value="protocols" className="flex items-center gap-2">
               {getTabIcon('protocols')}
-              Protocols ({protocols.length})
+              {t('hub.protocolsLabel') || `Protocols (${protocols.length})`}
             </TabsTrigger>
             <TabsTrigger value="stories" className="flex items-center gap-2">
               {getTabIcon('stories')}
-              Stories ({stories.length})
+              {t('hub.storiesLabel') || `Stories (${stories.length})`}
             </TabsTrigger>
           </TabsList>
 

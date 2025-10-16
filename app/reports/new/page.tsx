@@ -39,6 +39,7 @@ import {
 } from "lucide-react";
 import dynamic from "next/dynamic";
 import { toast } from "sonner";
+import { useLanguage } from '@/components/language-provider'
 
 // Importa o LocationPicker dinamicamente para evitar problemas de SSR
 const LocationPicker = dynamic(() => import("@/components/location-picker"), {
@@ -52,6 +53,7 @@ const LocationPicker = dynamic(() => import("@/components/location-picker"), {
 
 export default function NewReportPage() {
   const { data: session, status } = useSession();
+  const { t } = useLanguage()
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
@@ -230,13 +232,13 @@ export default function NewReportPage() {
   if (status === "unauthenticated") {
     return (
       <div className="container mx-auto px-4 py-8">
-        <Alert>
-          <AlertCircle className="h-4 w-4" />
-          <AlertDescription>
-            Please sign in to submit a report.
-          </AlertDescription>
-        </Alert>
-      </div>
+          <Alert>
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>
+              {t('reports.submitNew')}
+            </AlertDescription>
+          </Alert>
+        </div>
     );
   }
 
@@ -255,9 +257,9 @@ export default function NewReportPage() {
     <div className="container mx-auto px-4 py-8 max-w-4xl">
       <div className="space-y-6">
         <div>
-          <h1 className="text-3xl font-bold">Submit New Report</h1>
+          <h1 className="text-3xl font-bold">{t('reports.submitNew')}</h1>
           <p className="text-muted-foreground">
-            Provide details about your condition and attach supporting
+            {t('reports.submitNew')}
             documentation.
           </p>
         </div>

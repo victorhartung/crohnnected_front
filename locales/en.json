@@ -1,0 +1,74 @@
+{
+  "map": {
+    "readonlyBanner": "You are viewing the map in read-only mode. Sign in to access additional features like data export."
+  },
+  "header": {
+    "home": "Home",
+    "hub": "Hub",
+    "map": "Map",
+    "login": "Login",
+    "register": "Register",
+    "profile": "Profile",
+    "logout": "Log out"
+  },
+  "footer": {
+    "title": "Crohnnected",
+    "description": "A comprehensive healthcare platform for Crohn's disease patients, doctors, and researchers.",
+    "patients": "For Patients",
+    "submitReport": "Submit Report",
+    "myReports": "My Reports",
+    "educationalHub": "Educational Hub",
+    "healthcare": "For Healthcare",
+    "reviewReports": "Review Reports",
+    "clinicalResources": "Clinical Resources",
+    "geographicData": "Geographic Data",
+    "contactDoctor": "Contact for Doctors",
+    "legal": "Legal",
+    "privacy": "Privacy Policy",
+    "terms": "Terms of Service",
+    "contact": "Contact",
+    "coffee": "Buy me a coffee",
+    "copyright": "&copy; {year} Crohnnected. All rights reserved."
+  }
+  ,"home": {
+    "welcome": "Welcome to Crohnnected",
+    "subtitle": "A comprehensive healthcare platform connecting Crohn's disease patients, doctors, and researchers to improve treatment outcomes and advance research.",
+    "forPatientsTitle": "For Patients",
+    "forDoctorsTitle": "For Doctors",
+    "forResearchersTitle": "For Researchers",
+    "getStarted": "Get Started",
+    "signIn": "Sign In",
+    "joinNow": "Join Now"
+  },
+  "auth": {
+    "createAccount": "Create account",
+    "createAccountDesc": "Enter your information to create your account",
+    "enterInfo": "Name",
+    "alreadyHave": "Already have an account?",
+    "dontHave": "Don't have an account?",
+    "signIn": "Sign in",
+    "signUp": "Sign up"
+  }
+  ,"hub": {
+    "searchPlaceholder": "Search content...",
+    "allTopics": "All Topics",
+    "articlesLabel": "Articles",
+    "protocolsLabel": "Protocols",
+    "storiesLabel": "Stories"
+  }
+    ,"reports": {
+      "title": "Reports",
+      "submitNew": "Submit New Report",
+      "myReports": "My Reports",
+      "reviewReports": "Review Reports",
+      "viewReports": "View Reports"
+    },
+    "profile": {
+      "title": "Profile",
+      "manageAccount": "Manage your account settings and profile information.",
+      "profileInformation": "Profile Information",
+      "accountDetails": "Account Details",
+      "fullName": "Full Name",
+      "birthDate": "Birth Date"
+    }
+}

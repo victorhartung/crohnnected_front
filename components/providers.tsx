@@ -4,6 +4,7 @@
 import { SessionProvider } from 'next-auth/react'
 import { Toaster } from 'sonner'
 import { ThemeProvider } from './theme-provider'
+import { LanguageProvider } from './language-provider'
 
 interface ProvidersProps {
   children: React.ReactNode
@@ -18,8 +19,10 @@ export function Providers({ children }: ProvidersProps) {
         enableSystem
         disableTransitionOnChange
       >
-        {children}
-        <Toaster />
+        <LanguageProvider>
+          {children}
+          <Toaster />
+        </LanguageProvider>
       </ThemeProvider>
     </SessionProvider>
   )

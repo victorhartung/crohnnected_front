@@ -1,4 +1,4 @@
-'use client'
+ 'use client'
 
 import { useSession } from 'next-auth/react'
 import Link from 'next/link'
@@ -6,9 +6,11 @@ import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { FileText, Users, BarChart3, MapPin, Plus, Eye } from 'lucide-react'
+import { useLanguage } from '@/components/language-provider'
 
 export default function HomePage() {
   const { data: session, status } = useSession()
+  const { t } = useLanguage()
 
   const getRoleSpecificContent = () => {
     if (status === 'loading') {
@@ -20,32 +22,26 @@ export default function HomePage() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <Card className="p-6">
             <FileText className="h-12 w-12 text-primary mb-4" />
-            <h3 className="text-xl font-semibold mb-2">For Patients</h3>
-            <p className="text-muted-foreground mb-4">
-              Submit reports, manage your health data, and access educational resources.
-            </p>
+            <h3 className="text-xl font-semibold mb-2">{t('home.forPatientsTitle')}</h3>
+            <p className="text-muted-foreground mb-4">{t('home.subtitle')}</p>
             <Button asChild>
-              <Link href="/register">Get Started</Link>
+              <Link href="/register">{t('home.getStarted')}</Link>
             </Button>
           </Card>
           <Card className="p-6">
             <Users className="h-12 w-12 text-primary mb-4" />
-            <h3 className="text-xl font-semibold mb-2">For Doctors</h3>
-            <p className="text-muted-foreground mb-4">
-              Review patient reports, approve submissions, and access clinical protocols.
-            </p>
+            <h3 className="text-xl font-semibold mb-2">{t('home.forDoctorsTitle')}</h3>
+            <p className="text-muted-foreground mb-4">{t('home.subtitle')}</p>
             <Button asChild>
-              <Link href="/login">Sign In</Link>
+              <Link href="/login">{t('home.signIn')}</Link>
             </Button>
           </Card>
           <Card className="p-6">
             <BarChart3 className="h-12 w-12 text-primary mb-4" />
-            <h3 className="text-xl font-semibold mb-2">For Researchers</h3>
-            <p className="text-muted-foreground mb-4">
-              Access anonymized data, export reports, and analyze trends.
-            </p>
+            <h3 className="text-xl font-semibold mb-2">{t('home.forResearchersTitle')}</h3>
+            <p className="text-muted-foreground mb-4">{t('home.subtitle')}</p>
             <Button asChild>
-              <Link href="/register">Join Now</Link>
+              <Link href="/register">{t('home.joinNow')}</Link>
             </Button>
           </Card>
         </div>
@@ -174,18 +170,17 @@ export default function HomePage() {
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="text-center space-y-4 mb-12">
-        <h1 className="text-4xl font-bold">
-          Welcome to Crohnnected
-          {session?.user && (
-            <span className="block text-2xl text-muted-foreground mt-2">
-              Hello, {session.user.name || session.user.email}
-            </span>
-          )}
-        </h1>
-        <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-          A comprehensive healthcare platform connecting Crohn's disease patients, 
-          doctors, and researchers to improve treatment outcomes and advance research.
-        </p>
+          <h1 className="text-4xl font-bold">
+            {t('home.welcome')}
+            {session?.user && (
+              <span className="block text-2xl text-muted-foreground mt-2">
+                Hello, {session.user.name || session.user.email}
+              </span>
+            )}
+          </h1>
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+            {t('home.subtitle')}
+          </p>
         {session?.user && (
           <Badge variant="outline" className="text-sm">
             {session.user.role} Account

@@ -16,18 +16,50 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Menu, X, User, LogOut, Settings } from "lucide-react";
 import { UserRole } from "@prisma/client";
 import { useUIStore } from "@/store/ui-store";
+import { useLanguage } from './language-provider'
+
+function LanguageFlags() {
+  const { locale, setLocale } = useLanguage()
+
+  return (
+    <div className="flex items-center space-x-2">
+      <button
+        aria-label="English"
+        title="English"
+        className={`p-1 rounded ${locale === 'en' ? 'ring-2 ring-offset-1' : ''}`}
+        onClick={() => setLocale('en')}
+      >
+        🇬🇧
+      </button>
+      <button
+        aria-label="Português"
+        title="Português"
+        className={`p-1 rounded ${locale === 'pt' ? 'ring-2 ring-offset-1' : ''}`}
+        onClick={() => setLocale('pt')}
+      >
+        🇧🇷
+      </button>
+    </div>
+  )
+}
 
 export function Header() {
   const { data: session, status } = useSession();
   const { sidebarOpen, toggleSidebar } = useUIStore();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { t } = useLanguage()
 
   const getNavItems = () => {
-    if (status !== "authenticated" || !session?.user) {
-      return [];
-    }
+    const baseItems = [
+      { label: t('header.home'), href: '/' },
+      { label: t('header.hub'), href: '/hub' },
+      { label: t('header.map'), href: '/map' },
+    ];
 
-    const baseItems = [{ label: "Home", href: "/" }];
+    if (status !== "authenticated" || !session?.user) {
+      // For anonymous users, expose a minimal navigation including Hub and Map
+      return baseItems;
+    }
 
     const roleItems: Record<
       UserRole,
@@ -63,7 +95,14 @@ export function Header() {
       ],
     };
 
-    return [...baseItems, ...roleItems[session.user.role]];
+   
+  const combined = [...baseItems, ...roleItems[session.user.role]];
+    const seen = new Set<string>();
+    return combined.filter((item) => {
+      if (seen.has(item.href)) return false;
+      seen.add(item.href);
+      return true;
+    });
   };
 
   const navItems = getNavItems();
@@ -143,16 +182,16 @@ export function Header() {
                     <DropdownMenuItem asChild>
                       <Link href="/profile" className="cursor-pointer">
                         <User className="mr-2 h-4 w-4" />
-                        <span>Profile</span>
+                        <span>{t('header.profile')}</span>
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem
                       className="cursor-pointer"
-                      onClick={() => signOut({ callbackUrl: "/" })}
+                      onClick={() => signOut({ callbackUrl: '/' })}
                     >
                       <LogOut className="mr-2 h-4 w-4" />
-                      <span>Log out</span>
+                      <span>{t('header.logout')}</span>
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
@@ -172,15 +211,17 @@ export function Header() {
                 </Button>
               </div>
             ) : (
-              <div className="flex items-center space-x-2">
-                <Button variant="ghost" asChild>
-                  <Link href="/login">Login</Link>
-                </Button>
-                <Button asChild>
-                  <Link href="/register">Register</Link>
-                </Button>
-              </div>
+                <div className="flex items-center space-x-2">
+                  <Button variant="ghost" asChild>
+                    <Link href="/login">{t('header.login')}</Link>
+                  </Button>
+                  <Button asChild>
+                    <Link href="/register">{t('header.register')}</Link>
+                  </Button>
+                </div>
             )}
+            {/* Seletor de linguas */}
+            <LanguageFlags />
           </div>
         </div>
 

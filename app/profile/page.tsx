@@ -29,6 +29,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { AlertCircle, Loader2, Shield, User } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
+import { useLanguage } from '@/components/language-provider'
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
@@ -37,6 +38,7 @@ export default function ProfilePage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [profileData, setProfileData] = useState<any>(null);
+  const { t } = useLanguage()
 
   const isPatient = session?.user?.role === "PATIENT";
   const isDoctor = session?.user?.role === "DOCTOR";
@@ -175,10 +177,8 @@ export default function ProfilePage() {
     <div className="container mx-auto px-4 py-8 max-w-2xl">
       <div className="space-y-6">
         <div>
-          <h1 className="text-3xl font-bold">Profile</h1>
-          <p className="text-muted-foreground">
-            Manage your account settings and profile information.
-          </p>
+          <h1 className="text-3xl font-bold">{t('profile.title')}</h1>
+          <p className="text-muted-foreground">{t('profile.manageAccount')}</p>
         </div>
 
         <Tabs

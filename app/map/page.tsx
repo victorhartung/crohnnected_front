@@ -34,6 +34,19 @@ import { useSession } from "next-auth/react";
 import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import { useLanguage } from '@/components/language-provider'
+
+function ReadOnlyBanner() {
+  const { t } = useLanguage()
+  return (
+    <div className="w-full mt-4">
+      <Alert>
+        <AlertCircle className="h-4 w-4" />
+        <AlertDescription>{t('map.readonlyBanner')}</AlertDescription>
+      </Alert>
+    </div>
+  )
+}
 
 // Dynamically import the map component to avoid SSR issues
 const MapView = dynamic(() => import("@/components/map-view"), {
@@ -108,8 +121,9 @@ export default function MapPage() {
     session?.user?.role === "ADMIN" ||
     session?.user?.role === "MODERATOR";
 
+  // Load map data once the session status is known (authenticated or not)
   useEffect(() => {
-    if (status === "authenticated") {
+    if (status !== "loading") {
       loadMapData();
     }
   }, [filters, status]);
@@ -255,7 +269,8 @@ export default function MapPage() {
   };
 
   useEffect(() => {
-    if (status === "authenticated") {
+    if (status !== "loading") {
+      // Load available countries for both authenticated and anonymous users
       loadAvailableCountries();
     }
   }, [status]);
@@ -343,16 +358,7 @@ export default function MapPage() {
     );
   }
 
-  if (status === "unauthenticated") {
-    return (
-      <div className="container mx-auto px-4 py-8">
-        <Alert>
-          <AlertCircle className="h-4 w-4" />
-          <AlertDescription>Please sign in to view the map.</AlertDescription>
-        </Alert>
-      </div>
-    );
-  }
+  // Instead of blocking unauthenticated users, show a read-only banner and continue
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -365,6 +371,9 @@ export default function MapPage() {
               incidence data.
             </p>
           </div>
+          {status === 'unauthenticated' && (
+            <ReadOnlyBanner />
+          )}
           {hasActiveFilters && (
             <Button variant="outline" onClick={clearFilters}>
               <X className="mr-2 h-4 w-4" />
@@ -507,22 +516,24 @@ export default function MapPage() {
                 </Select>
               </div>
 
-              {/* Export fields selector */}
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Export fields</label>
-                <MultiSelect
-                  options={availableExportFields}
-                  value={selectedExportFields}
-                  onChange={(v) => setSelectedExportFields(v)}
-                  placeholder="Select fields to export"
-                  searchPlaceholder="Search fields..."
-                  emptyText="No fields"
-                />
-                <p className="text-xs text-muted-foreground">
-                  Pick which columns appear in the CSV. Leave empty to use the
-                  server defaults.
-                </p>
-              </div>
+              {/* Export fields selector (only for roles that can export) */}
+              {canExport && (
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Export fields</label>
+                  <MultiSelect
+                    options={availableExportFields}
+                    value={selectedExportFields}
+                    onChange={(v) => setSelectedExportFields(v)}
+                    placeholder="Select fields to export"
+                    searchPlaceholder="Search fields..."
+                    emptyText="No fields"
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Pick which columns appear in the CSV. Leave empty to use the
+                    server defaults.
+                  </p>
+                </div>
+              )}
 
               <Separator />
 

@@ -29,6 +29,7 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
+import { useLanguage } from '@/components/language-provider'
 
 interface Report {
   id: string;
@@ -68,6 +69,7 @@ type TabState = {
 
 export default function ReportsPage() {
   const { data: session, status } = useSession();
+  const { t } = useLanguage()
 
   const isPatient = session?.user?.role === "PATIENT";
   const isDoctor = session?.user?.role === "DOCTOR";
