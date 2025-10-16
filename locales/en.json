@@ -54,7 +54,13 @@
     "allTopics": "All Topics",
     "articlesLabel": "Articles",
     "protocolsLabel": "Protocols",
-    "storiesLabel": "Stories"
+    "storiesLabel": "Stories",
+    "newArticle": "New Article",
+    "newProtocol": "New Protocol",
+    "newStory": "New Story",
+    "createFirstArticle": "Create the first article",
+    "createFirstProtocol": "Create the first protocol",
+    "createFirstStory": "Create the first story"
   }
     ,"reports": {
       "title": "Reports",

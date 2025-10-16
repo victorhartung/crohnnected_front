@@ -55,7 +55,13 @@
     "allTopics": "Todos os tópicos",
     "articlesLabel": "Artigos",
     "protocolsLabel": "Protocolos",
-    "storiesLabel": "Histórias"
+    "storiesLabel": "Histórias",
+    "newArticle": "Novo Artigo",
+    "newProtocol": "Novo Protocolo",
+    "newStory": "Nova História",
+    "createFirstArticle": "Criar o primeiro artigo",
+    "createFirstProtocol": "Criar o primeiro protocolo",
+    "createFirstStory": "Criar a primeira história"
   }
     ,"reports": {
       "title": "Relatórios",
