@@ -144,8 +144,14 @@ export default function ReportsPage() {
     tabs.all.items.forEach((r) => {
       if (r.country) countries.add(r.country);
     });
+
+    // Always include the currently selected country to prevent breaking the select
+    if (selectedCountry !== "all" && selectedCountry) {
+      countries.add(selectedCountry);
+    }
+
     return Array.from(countries).sort();
-  }, [tabs.all.items]);
+  }, [tabs.all.items, selectedCountry]);
 
   // Busca counts agregados
   const fetchCounts = useCallback(async () => {
