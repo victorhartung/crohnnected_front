@@ -15,11 +15,13 @@ import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Loader2, AlertCircle } from 'lucide-react'
 import { registerSchema, type RegisterInput } from '@/lib/validations'
 import { toast } from 'sonner'
+import { useLanguage } from '@/components/language-provider'
 
 export default function RegisterPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
   const router = useRouter()
+  const { t } = useLanguage()
 
   const form = useForm<RegisterInput>({
     resolver: zodResolver(registerSchema),
@@ -70,19 +72,17 @@ export default function RegisterPage() {
     <div className="container mx-auto px-4 py-8 max-w-md">
       <Card>
         <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl text-center">Create account</CardTitle>
-          <CardDescription className="text-center">
-            Enter your information to create your account
-          </CardDescription>
+          <CardTitle className="text-2xl text-center">{t('auth.createAccount')}</CardTitle>
+          <CardDescription className="text-center">{t('auth.createAccountDesc')}</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="name">Full Name</Label>
+              <Label htmlFor="name">{t('auth.enterInfo')}</Label>
               <Input
                 id="name"
                 type="text"
-                placeholder="Enter your full name"
+                placeholder={t('auth.enterInfo')}
                 {...form.register('name')}
                 disabled={isLoading}
               />
@@ -172,14 +172,14 @@ export default function RegisterPage() {
 
             <Button type="submit" className="w-full" disabled={isLoading}>
               {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Create account
+              {t('auth.createAccount')}
             </Button>
           </form>
 
           <div className="mt-6 text-center text-sm">
-            <span className="text-muted-foreground">Already have an account? </span>
+            <span className="text-muted-foreground">{t('auth.alreadyHave')} </span>
             <Link href="/login" className="text-primary hover:underline">
-              Sign in
+              {t('auth.signIn')}
             </Link>
           </div>
         </CardContent>

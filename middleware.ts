@@ -12,6 +12,9 @@ export default withAuth(
       pathname === '/' ||
       pathname.startsWith('/login') ||
       pathname.startsWith('/register') ||
+      // allow readonly access to hub and map for anonymous users
+      pathname.startsWith('/hub') ||
+      pathname.startsWith('/map') ||
       pathname.startsWith('/privacy') ||
       pathname.startsWith('/terms') ||
       pathname.startsWith('/contact') ||
@@ -37,6 +40,9 @@ export default withAuth(
           pathname === '/' ||
           pathname.startsWith('/login') ||
           pathname.startsWith('/register') ||
+          // allow readonly access to hub and map
+          pathname.startsWith('/hub') ||
+          pathname.startsWith('/map') ||
           pathname.startsWith('/privacy') ||
           pathname.startsWith('/terms') ||
           pathname.startsWith('/contact') ||

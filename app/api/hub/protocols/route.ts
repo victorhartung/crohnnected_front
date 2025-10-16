@@ -49,17 +49,16 @@ export const POST = withAuth(async (request: NextRequest, user: any) => {
     const body = await request.json()
     const validatedData = createProtocolSchema.parse(body)
 
-    const slug = validatedData.slug || generateSlug(validatedData.title)
+    let baseSlug = validatedData.slug?.trim()
+    if (!baseSlug) {
+      baseSlug = generateSlug(validatedData.title)
+    }
 
-    const existingProtocol = await prisma.protocol.findUnique({
-      where: { slug },
-    })
-
-    if (existingProtocol) {
-      return Response.json(
-        { success: false, error: 'Protocol with this slug already exists' },
-        { status: 400 }
-      )
+    let slug = baseSlug
+    let counter = 2
+    while (await prisma.protocol.findUnique({ where: { slug } })) {
+      slug = `${baseSlug}-${counter}`
+      counter++
     }
 
     const protocol = await prisma.protocol.create({

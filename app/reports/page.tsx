@@ -26,8 +26,10 @@ import {
 } from "lucide-react";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
+import { useLanguage } from '@/components/language-provider'
 
 interface Report {
   id: string;
@@ -67,6 +69,7 @@ type TabState = {
 
 export default function ReportsPage() {
   const { data: session, status } = useSession();
+  const { t } = useLanguage()
 
   const isPatient = session?.user?.role === "PATIENT";
   const isDoctor = session?.user?.role === "DOCTOR";
@@ -75,6 +78,7 @@ export default function ReportsPage() {
     isDoctor ||
     session?.user?.role === "MODERATOR" ||
     session?.user?.role === "ADMIN";
+  const params = useSearchParams();
 
   const [hasActiveReport, setHasActiveReport] = useState(false);
   const [isCheckingReport, setIsCheckingReport] = useState(true);
@@ -153,6 +157,16 @@ export default function ReportsPage() {
       checkActiveReport();
     }
   }, [session, status]);
+
+  useEffect(() => {
+    const statusParam = params?.get("status");
+    if (statusParam) {
+      const normalized = statusParam.toLowerCase();
+      if (["all", "pending", "approved", "rejected"].includes(normalized)) {
+        setActiveTab(normalized as TabKey);
+      }
+    }
+  }, [params]);
 
   const uniqueCountries = useMemo(() => {
     const countries = new Set<string>();

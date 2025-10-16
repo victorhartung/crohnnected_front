@@ -1,128 +1,137 @@
+"use client";
 
-'use client'
-
-import { useState, useEffect } from 'react'
-import { useSession } from 'next-auth/react'
-import Link from 'next/link'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Alert, AlertDescription } from '@/components/ui/alert'
-import { Badge } from '@/components/ui/badge'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { 
-  Loader2, 
-  AlertCircle, 
-  Users, 
-  FileText, 
-  BarChart3, 
-  Settings,
-  Shield,
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { formatDate } from "@/lib/utils";
+import {
   Activity,
-  TrendingUp,
+  AlertCircle,
+  BarChart3,
   Calendar,
+  Eye,
+  FileText,
+  Loader2,
   MapPin,
   Plus,
-  Eye,
-  Edit,
-  Trash2
-} from 'lucide-react'
-import { formatDate } from '@/lib/utils'
-import { toast } from 'sonner'
+  Settings,
+  Shield,
+  TrendingUp,
+  Users,
+} from "lucide-react";
+import { useSession } from "next-auth/react";
+import Link from "next/link";
+import { useEffect, useState } from "react";
 
 interface AdminStats {
   users: {
-    total: number
-    patients: number
-    doctors: number
-    researchers: number
-    moderators: number
-    admins: number
-  }
+    total: number;
+    patients: number;
+    doctors: number;
+    researchers: number;
+    moderators: number;
+    admins: number;
+  };
   reports: {
-    total: number
-    pending: number
-    approved: number
-    rejected: number
-  }
+    total: number;
+    pending: number;
+    approved: number;
+    rejected: number;
+  };
   hubContent: {
-    articles: number
-    protocols: number
-    stories: number
-  }
+    articles: number;
+    protocols: number;
+    stories: number;
+  };
   activity: {
-    reportsThisWeek: number
-    newUsersThisWeek: number
-    contentThisWeek: number
-  }
+    reportsThisWeek: number;
+    newUsersThisWeek: number;
+    contentThisWeek: number;
+  };
 }
 
 interface RecentActivity {
-  id: string
-  type: 'user_registered' | 'report_submitted' | 'report_approved' | 'content_created'
-  description: string
-  timestamp: string
+  id: string;
+  type:
+    | "user_registered"
+    | "report_submitted"
+    | "report_approved"
+    | "content_created";
+  description: string;
+  timestamp: string;
   user?: {
-    name?: string
-    email: string
-  }
+    name?: string;
+    email: string;
+  };
 }
 
 export default function AdminPage() {
-  const { data: session, status } = useSession()
-  const [isLoading, setIsLoading] = useState(true)
-  const [stats, setStats] = useState<AdminStats | null>(null)
-  const [recentActivity, setRecentActivity] = useState<RecentActivity[]>([])
+  const { data: session, status } = useSession();
+  const [isLoading, setIsLoading] = useState(true);
+  const [stats, setStats] = useState<AdminStats | null>(null);
+  const [recentActivity, setRecentActivity] = useState<RecentActivity[]>([]);
 
-  const canAccess = session?.user?.role === 'ADMIN' || session?.user?.role === 'MODERATOR'
+  const canAccess =
+    session?.user?.role === "ADMIN" || session?.user?.role === "MODERATOR";
 
   useEffect(() => {
     if (canAccess) {
-      loadDashboardData()
+      loadDashboardData();
     }
-  }, [canAccess])
+  }, [canAccess]);
 
   const loadDashboardData = async () => {
     try {
       const [statsRes, activityRes] = await Promise.all([
-        fetch('/api/admin/stats'),
-        fetch('/api/admin/activity')
-      ])
+        fetch("/api/admin/stats"),
+        fetch("/api/admin/activity"),
+      ]);
 
       if (statsRes.ok) {
-        const statsData = await statsRes.json()
-        setStats(statsData)
+        const statsData = await statsRes.json();
+        setStats(statsData);
       }
 
       if (activityRes.ok) {
-        const activityData = await activityRes.json()
-        setRecentActivity(activityData)
+        const activityData = await activityRes.json();
+        setRecentActivity(activityData);
       }
     } catch (error) {
-      console.error('Failed to load dashboard data:', error)
+      console.error("Failed to load dashboard data:", error);
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
-  if (status === 'loading' || (canAccess && isLoading)) {
+  if (status === "loading" || (canAccess && isLoading)) {
     return (
       <div className="container mx-auto px-4 py-8">
         <div className="flex items-center justify-center py-8">
           <Loader2 className="h-8 w-8 animate-spin" />
         </div>
       </div>
-    )
+    );
   }
 
-  if (status === 'unauthenticated') {
+  if (status === "unauthenticated") {
     return (
       <div className="container mx-auto px-4 py-8">
         <Alert>
           <AlertCircle className="h-4 w-4" />
-          <AlertDescription>Please sign in to access the admin panel.</AlertDescription>
+          <AlertDescription>
+            Please sign in to access the admin panel.
+          </AlertDescription>
         </Alert>
       </div>
-    )
+    );
   }
 
   if (!canAccess) {
@@ -130,10 +139,12 @@ export default function AdminPage() {
       <div className="container mx-auto px-4 py-8">
         <Alert>
           <AlertCircle className="h-4 w-4" />
-          <AlertDescription>You do not have permission to access the admin panel.</AlertDescription>
+          <AlertDescription>
+            You do not have permission to access the admin panel.
+          </AlertDescription>
         </Alert>
       </div>
-    )
+    );
   }
 
   return (
@@ -147,7 +158,7 @@ export default function AdminPage() {
             </p>
             <Badge variant={'account'} className="mt-2">{session?.user?.role}</Badge>
           </div>
-          
+
           <div className="flex items-center gap-2">
             <Button variant="white" asChild>
               <Link href="/reports">
@@ -171,7 +182,9 @@ export default function AdminPage() {
               <CardContent className="pt-6">
                 <div className="flex items-center justify-between space-y-0 pb-2">
                   <div className="space-y-1">
-                    <p className="text-sm font-medium leading-none">Total Users</p>
+                    <p className="text-sm font-medium leading-none">
+                      Total Users
+                    </p>
                     <p className="text-2xl font-bold">{stats.users.total}</p>
                   </div>
                   <Users className="h-6 w-6 text-muted-foreground" />
@@ -181,12 +194,14 @@ export default function AdminPage() {
                 </div>
               </CardContent>
             </Card>
-            
+
             <Card>
               <CardContent className="pt-6">
                 <div className="flex items-center justify-between space-y-0 pb-2">
                   <div className="space-y-1">
-                    <p className="text-sm font-medium leading-none">Total Reports</p>
+                    <p className="text-sm font-medium leading-none">
+                      Total Reports
+                    </p>
                     <p className="text-2xl font-bold">{stats.reports.total}</p>
                   </div>
                   <FileText className="h-6 w-6 text-muted-foreground" />
@@ -196,13 +211,17 @@ export default function AdminPage() {
                 </div>
               </CardContent>
             </Card>
-            
+
             <Card>
               <CardContent className="pt-6">
                 <div className="flex items-center justify-between space-y-0 pb-2">
                   <div className="space-y-1">
-                    <p className="text-sm font-medium leading-none">Pending Reports</p>
-                    <p className="text-2xl font-bold">{stats.reports.pending}</p>
+                    <p className="text-sm font-medium leading-none">
+                      Pending Reports
+                    </p>
+                    <p className="text-2xl font-bold">
+                      {stats.reports.pending}
+                    </p>
                   </div>
                   <Activity className="h-6 w-6 text-muted-foreground" />
                 </div>
@@ -211,14 +230,18 @@ export default function AdminPage() {
                 </div>
               </CardContent>
             </Card>
-            
+
             <Card>
               <CardContent className="pt-6">
                 <div className="flex items-center justify-between space-y-0 pb-2">
                   <div className="space-y-1">
-                    <p className="text-sm font-medium leading-none">Hub Content</p>
+                    <p className="text-sm font-medium leading-none">
+                      Hub Content
+                    </p>
                     <p className="text-2xl font-bold">
-                      {stats.hubContent.articles + stats.hubContent.protocols + stats.hubContent.stories}
+                      {stats.hubContent.articles +
+                        stats.hubContent.protocols +
+                        stats.hubContent.stories}
                     </p>
                   </div>
                   <BarChart3 className="h-6 w-6 text-muted-foreground" />
@@ -258,7 +281,10 @@ export default function AdminPage() {
                       </p>
                     ) : (
                       recentActivity.slice(0, 5).map((activity) => (
-                        <div key={activity.id} className="flex items-start space-x-3">
+                        <div
+                          key={activity.id}
+                          className="flex items-start space-x-3"
+                        >
                           <div className="w-2 h-2 rounded-full bg-blue-500 mt-2 flex-shrink-0" />
                           <div className="flex-1 space-y-1">
                             <p className="text-sm">{activity.description}</p>
@@ -330,18 +356,22 @@ export default function AdminPage() {
 
           <TabsContent value="users" className="space-y-4">
             <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-              {stats && Object.entries(stats.users).map(([role, count]) => (
-                role !== 'total' && (
-                  <Card key={role}>
-                    <CardContent className="pt-6">
-                      <div className="text-center">
-                        <p className="text-2xl font-bold">{count}</p>
-                        <p className="text-sm text-muted-foreground capitalize">{role}s</p>
-                      </div>
-                    </CardContent>
-                  </Card>
-                )
-              ))}
+              {stats &&
+                Object.entries(stats.users).map(
+                  ([role, count]) =>
+                    role !== "total" && (
+                      <Card key={role}>
+                        <CardContent className="pt-6">
+                          <div className="text-center">
+                            <p className="text-2xl font-bold">{count}</p>
+                            <p className="text-sm text-muted-foreground capitalize">
+                              {role}
+                            </p>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    )
+                )}
             </div>
           </TabsContent>
 
@@ -458,5 +488,5 @@ export default function AdminPage() {
         </Tabs>
       </div>
     </div>
-  )
+  );
 }

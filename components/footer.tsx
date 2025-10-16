@@ -1,50 +1,72 @@
 
+"use client"
+
 import Link from 'next/link'
+import { useSession } from 'next-auth/react'
+import { useLanguage } from './language-provider'
 
 export function Footer() {
+  const { data: session, status } = useSession()
+  const { t } = useLanguage()
+
+  // Show patient links only to authenticated users with PATIENT role
+  const isPatient = status === 'authenticated' && session?.user?.role === 'PATIENT'
+
   return (
     <footer className="border-t bg-header mt-auto supports-[backdrop-filter]:bg-white/60">
       <div className="container mx-auto px-4 py-8">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div className="space-y-3">
-            <h3 className="text-lg font-semibold">Crohnnected</h3>
-            <p className="text-sm text-muted-foreground">
-              A comprehensive healthcare platform for Crohn's disease patients, doctors, and researchers.
-            </p>
+            <h3 className="text-lg font-semibold">{t('footer.title')}</h3>
+            <p className="text-sm text-muted-foreground">{t('footer.description')}</p>
           </div>
-          
+
+          {isPatient && (
+            <div className="space-y-3">
+              <h4 className="text-sm font-semibold">{t('footer.patients')}</h4>
+              <ul className="space-y-1 text-sm text-muted-foreground">
+                <li>
+                  <Link href="/reports/new" className="hover:underline">
+                    {t('footer.submitReport')}
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/reports" className="hover:underline">
+                    {t('footer.myReports')}
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/hub" className="hover:underline">
+                    {t('footer.educationalHub')}
+                  </Link>
+                </li>
+              </ul>
+            </div>
+          )}
+
           <div className="space-y-3">
-            <h4 className="text-sm font-semibold">For Patients</h4>
+            <h4 className="text-sm font-semibold">{t('footer.healthcare')}</h4>
             <ul className="space-y-1 text-sm text-muted-foreground">
-              <li><Link href="/reports/new" className="hover:underline">Submit Report</Link></li>
-              <li><Link href="/reports" className="hover:underline">My Reports</Link></li>
-              <li><Link href="/hub" className="hover:underline">Educational Hub</Link></li>
+              <li><Link href="/reports" className="hover:underline">{t('footer.reviewReports')}</Link></li>
+              <li><Link href="/hub" className="hover:underline">{t('footer.clinicalResources')}</Link></li>
+              <li><Link href="/map" className="hover:underline">{t('footer.geographicData')}</Link></li>
+              <li><Link href="/contact/doctor" className="hover:underline">{t('footer.contactDoctor')}</Link></li>
             </ul>
           </div>
-          
+
           <div className="space-y-3">
-            <h4 className="text-sm font-semibold">For Healthcare</h4>
+            <h4 className="text-sm font-semibold">{t('footer.legal')}</h4>
             <ul className="space-y-1 text-sm text-muted-foreground">
-              <li><Link href="/reports" className="hover:underline">Review Reports</Link></li>
-              <li><Link href="/hub" className="hover:underline">Clinical Resources</Link></li>
-              <li><Link href="/map" className="hover:underline">Geographic Data</Link></li>
-              <li><Link href="/contact/doctor" className="hover:underline">Contact for Doctors</Link></li>
-            </ul>
-          </div>
-          
-          <div className="space-y-3">
-            <h4 className="text-sm font-semibold">Legal</h4>
-            <ul className="space-y-1 text-sm text-muted-foreground">
-              <li><Link href="/privacy" className="hover:underline">Privacy Policy</Link></li>
-              <li><Link href="/terms" className="hover:underline">Terms of Service</Link></li>
-              <li><Link href="/contact" className="hover:underline">Contact</Link></li>
-              <li><Link href="/buy-me-coffee" className="hover:underline">Buy me a coffee</Link></li>
+              <li><Link href="/privacy" className="hover:underline">{t('footer.privacy')}</Link></li>
+              <li><Link href="/terms" className="hover:underline">{t('footer.terms')}</Link></li>
+              <li><Link href="/contact" className="hover:underline">{t('footer.contact')}</Link></li>
+              <li><Link href="/buy-me-coffee" className="hover:underline">{t('footer.coffee')}</Link></li>
             </ul>
           </div>
         </div>
-        
+
         <div className="border-t mt-8 pt-8 text-center text-sm text-muted-foreground">
-          <p>&copy; {new Date().getFullYear()} Crohnnected. All rights reserved.</p>
+          <p dangerouslySetInnerHTML={{ __html: t('footer.copyright', "&copy; " + new Date().getFullYear() + " Crohnnected. All rights reserved.") }} />
         </div>
       </div>
     </footer>

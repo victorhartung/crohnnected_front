@@ -1,13 +1,12 @@
+import { withAuth } from "@/lib/auth";
+import { prisma } from "@/lib/db";
+import { User } from "@/lib/types";
+import { exportQuerySchema } from "@/lib/validation";
+import { ReportStatus, UserRole } from "@prisma/client";
+import { NextRequest } from "next/server";
+import { ZodError } from "zod";
 
-import { NextRequest } from 'next/server';
-import { prisma } from '@/lib/db';
-import { withAuth } from '@/lib/auth';
-import { exportQuerySchema } from '@/lib/validation';
-import { User } from '@/lib/types';
-import { UserRole, ReportStatus } from '@prisma/client';
-import { ZodError } from 'zod';
-
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 
 // EXPORT reports for researchers (CSV/JSON)
 export const GET = withAuth(
@@ -15,7 +14,7 @@ export const GET = withAuth(
     try {
       const url = new URL(request.url);
       const queryParams = Object.fromEntries(url.searchParams.entries());
-      
+
       // Validate query parameters
       const query = exportQuerySchema.parse(queryParams);
 
@@ -25,10 +24,13 @@ export const GET = withAuth(
       };
 
       // Apply filters
-      if (query.country) where.country = { contains: query.country, mode: 'insensitive' };
-      if (query.state) where.state = { contains: query.state, mode: 'insensitive' };
-      if (query.city) where.city = { contains: query.city, mode: 'insensitive' };
-      
+      if (query.country)
+        where.country = { contains: query.country, mode: "insensitive" };
+      if (query.state)
+        where.state = { contains: query.state, mode: "insensitive" };
+      if (query.city)
+        where.city = { contains: query.city, mode: "insensitive" };
+
       if (query.minAge || query.maxAge) {
         where.ageAtReport = {};
         if (query.minAge) where.ageAtReport.gte = query.minAge;
@@ -49,7 +51,7 @@ export const GET = withAuth(
       if (query.period) {
         const year = query.period.match(/^\d{4}$/);
         const quarter = query.period.match(/^(\d{4})Q([1-4])$/);
-        
+
         if (year) {
           const startDate = new Date(`${year[0]}-01-01`);
           const endDate = new Date(`${parseInt(year[0]) + 1}-01-01`);
@@ -83,7 +85,6 @@ export const GET = withAuth(
           symptomSeverity: true,
           medications: true,
           flareFrequencyPerYear: true,
-          surgeryHistory: true,
           diagnosisDate: true,
           // Workflow data
           status: true,
@@ -94,7 +95,7 @@ export const GET = withAuth(
           // NO notes (may contain personal info)
         },
         orderBy: {
-          createdAt: 'desc',
+          createdAt: "desc",
         },
       });
 
@@ -102,9 +103,9 @@ export const GET = withAuth(
       await prisma.auditLog.create({
         data: {
           actorId: user.id,
-          action: 'EXPORT_DATA',
-          entity: 'Report',
-          entityId: 'bulk_export',
+          action: "EXPORT_DATA",
+          entity: "Report",
+          entityId: "bulk_export",
           meta: {
             format: query.format,
             recordCount: reports.length,
@@ -122,141 +123,156 @@ export const GET = withAuth(
         },
       });
 
-      if (query.format === 'csv') {
-    
-          let requestedFields: string[] = [];
-          if (Array.isArray((query as any).fields)) {
-            requestedFields = (query as any).fields as string[];
-          } else if (typeof (query as any).fields === 'string' && (query as any).fields.length > 0) {
-            requestedFields = (query as any).fields.split(',').map((s: string) => s.trim()).filter(Boolean);
-          }
+      if (query.format === "csv") {
+        let requestedFields: string[] = [];
+        if (Array.isArray((query as any).fields)) {
+          requestedFields = (query as any).fields as string[];
+        } else if (
+          typeof (query as any).fields === "string" &&
+          (query as any).fields.length > 0
+        ) {
+          requestedFields = (query as any).fields
+            .split(",")
+            .map((s: string) => s.trim())
+            .filter(Boolean);
+        }
 
-       // Definir colunas
+        // Definir colunas
         const allowedFields = [
-          'id',
-          'ageAtReport',
-          'sex',
-          'country',
-          'state',
-          'city',
-          'symptoms',
-          'symptomSeverity',
-          'medications',
-          'flareFrequencyPerYear',
-          'surgeryHistory',
-          'diagnosisDate',
-          'status',
-          'approvedAt',
-          'createdAt',
+          "ageAtReport",
+          "sex",
+          "country",
+          "state",
+          "city",
+          "symptoms",
+          "symptomSeverity",
+          "medications",
+          "flareFrequencyPerYear",
+          "diagnosisDate",
+          "status",
+          "approvedAt",
+          "createdAt",
         ];
 
-        const selectedFields: string[] = requestedFields.length > 0
-          ? requestedFields.filter((f: string) => allowedFields.includes(f))
-          : allowedFields.slice();
+        const selectedFields: string[] =
+          requestedFields.length > 0
+            ? requestedFields.filter((f: string) => allowedFields.includes(f))
+            : allowedFields.slice();
 
-
-        if (selectedFields.length === 0) selectedFields.push('id');
+        if (selectedFields.length === 0)
+          selectedFields.push("country", "symptoms");
 
         const formatters: Record<string, (r: any) => string> = {
-          id: (r) => `${r.id ?? ''}`,
-          ageAtReport: (r) => `${r.ageAtReport ?? ''}`,
-          sex: (r) => `${r.sex ?? ''}`,
-          country: (r) => `${r.country ?? ''}`,
-          state: (r) => `${r.state ?? ''}`,
-          city: (r) => `${r.city ?? ''}`,
+          ageAtReport: (r) => `${r.ageAtReport ?? ""}`,
+          sex: (r) => `${r.sex ?? ""}`,
+          country: (r) => `${r.country ?? ""}`,
+          state: (r) => `${r.state ?? ""}`,
+          city: (r) => `${r.city ?? ""}`,
           symptoms: (r) => {
-            if (!r.symptoms) return '';
-            return `"${Array.isArray(r.symptoms) ? (r.symptoms as string[]).join('; ') : String(r.symptoms)}"`;
+            if (!r.symptoms) return "";
+            return `"${
+              Array.isArray(r.symptoms)
+                ? (r.symptoms as string[]).join("; ")
+                : String(r.symptoms)
+            }"`;
           },
-          symptomSeverity: (r) => `${r.symptomSeverity ?? ''}`,
+          symptomSeverity: (r) => `${r.symptomSeverity ?? ""}`,
           medications: (r) => {
-            if (!r.medications) return '';
-            return `"${Array.isArray(r.medications) ? (r.medications as string[]).join('; ') : String(r.medications)}"`;
+            if (!r.medications) return "";
+            return `"${
+              Array.isArray(r.medications)
+                ? (r.medications as string[]).join("; ")
+                : String(r.medications)
+            }"`;
           },
-          flareFrequencyPerYear: (r) => `${r.flareFrequencyPerYear ?? ''}`,
-          surgeryHistory: (r) => {
-            if (!r.surgeryHistory) return '';
-            return `"${Array.isArray(r.surgeryHistory) ? JSON.stringify(r.surgeryHistory) : String(r.surgeryHistory)}"`;
-          },
-          diagnosisDate: (r) => r.diagnosisDate ? new Date(r.diagnosisDate).toISOString().split('T')[0] : '',
-          status: (r) => `${r.status ?? ''}`,
-          approvedAt: (r) => r.approvedAt ? new Date(r.approvedAt).toISOString() : '',
-          createdAt: (r) => r.createdAt ? new Date(r.createdAt).toISOString() : '',
+          flareFrequencyPerYear: (r) => `${r.flareFrequencyPerYear ?? ""}`,
+          diagnosisDate: (r) =>
+            r.diagnosisDate
+              ? new Date(r.diagnosisDate).toISOString().split("T")[0]
+              : "",
+          status: (r) => `${r.status ?? ""}`,
+          approvedAt: (r) =>
+            r.approvedAt ? new Date(r.approvedAt).toISOString() : "",
+          createdAt: (r) =>
+            r.createdAt ? new Date(r.createdAt).toISOString() : "",
         };
 
         const headers = selectedFields;
 
         const csvRows = [
-          headers.join(','),
+          headers.join(","),
           ...reports.map((report) => {
-            return selectedFields.map((field) => {
-              const fn = formatters[field];
-              try {
-                return fn ? fn(report) : '';
-              } catch (e) {
-                return '';
-              }
-            }).join(',');
-          })
+            return selectedFields
+              .map((field) => {
+                const fn = formatters[field];
+                try {
+                  return fn ? fn(report) : "";
+                } catch (e) {
+                  return "";
+                }
+              })
+              .join(",");
+          }),
         ];
 
-        const csvContent = csvRows.join('\n');
-        const timestamp = new Date().toISOString().split('T')[0];
+        const csvContent = csvRows.join("\n");
+        const timestamp = new Date().toISOString().split("T")[0];
 
         return new Response(csvContent, {
           status: 200,
           headers: {
-            'Content-Type': 'text/csv',
-            'Content-Disposition': `attachment; filename="crohnnected-reports-${timestamp}.csv"`,
+            "Content-Type": "text/csv",
+            "Content-Disposition": `attachment; filename="crohnnected-reports-${timestamp}.csv"`,
           },
         });
-
       } else {
         // Return JSON
-        const timestamp = new Date().toISOString().split('T')[0];
-        
-        return Response.json({
-          success: true,
-          data: {
-            reports,
-            exportInfo: {
-              totalRecords: reports.length,
-              exportDate: new Date().toISOString(),
-              filters: {
-                country: query.country,
-                state: query.state,
-                city: query.city,
-                minAge: query.minAge,
-                maxAge: query.maxAge,
-                symptoms: query.symptoms,
-                severity: query.severity,
-                period: query.period,
+        const timestamp = new Date().toISOString().split("T")[0];
+
+        return Response.json(
+          {
+            success: true,
+            data: {
+              reports,
+              exportInfo: {
+                totalRecords: reports.length,
+                exportDate: new Date().toISOString(),
+                filters: {
+                  country: query.country,
+                  state: query.state,
+                  city: query.city,
+                  minAge: query.minAge,
+                  maxAge: query.maxAge,
+                  symptoms: query.symptoms,
+                  severity: query.severity,
+                  period: query.period,
+                },
               },
             },
           },
-        }, {
-          headers: {
-            'Content-Disposition': `attachment; filename="crohnnected-reports-${timestamp}.json"`,
-          },
-        });
+          {
+            headers: {
+              "Content-Disposition": `attachment; filename="crohnnected-reports-${timestamp}.json"`,
+            },
+          }
+        );
       }
-
     } catch (error) {
-      console.error('Export reports error:', error);
+      console.error("Export reports error:", error);
 
       if (error instanceof ZodError) {
         return Response.json(
-          { 
-            success: false, 
-            error: 'Invalid query parameters',
-            details: error.errors
+          {
+            success: false,
+            error: "Invalid query parameters",
+            details: error.errors,
           },
           { status: 400 }
         );
       }
 
       return Response.json(
-        { success: false, error: 'Failed to export reports' },
+        { success: false, error: "Failed to export reports" },
         { status: 500 }
       );
     }

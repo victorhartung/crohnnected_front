@@ -1,16 +1,18 @@
 "use client"
 
 import Image from "next/image"
-import Link from "next/link"
-import { useSession } from "next-auth/react"
-import { Card } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { FileText, Users, BarChart3, Plus, MapPin } from "lucide-react"
 import LogoHome from "@/public/images/logo-home.png"
+import { useSession } from 'next-auth/react'
+import Link from 'next/link'
+import { Card } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { FileText, Users, BarChart3, MapPin, Plus, Eye } from 'lucide-react'
+import { useLanguage } from '@/components/language-provider'
 
 export default function HomePage() {
   const { data: session, status } = useSession()
+  const { t } = useLanguage()
 
   const getRoleSpecificContent = () => {
     if (status === "loading") return null
@@ -20,32 +22,26 @@ export default function HomePage() {
         <div className="div-cards">
           <Card className="p-6">
             <FileText className="card-icons" />
-            <h3 className="card-title">For Patients</h3>
-            <p className="card-text">
-              Submit reports, manage your health data, and access educational resources.
-            </p>
+            <h3 className="card-title">{t('home.forPatientsTitle')}</h3>
+            <p className="card-text">{t('home.subtitle')}</p>
             <Button asChild>
-              <Link href="/register">Get Started</Link>
+              <Link href="/register">{t('home.getStarted')}</Link>
             </Button>
           </Card>
           <Card className="p-6">
             <Users className="card-icons" />
-            <h3 className="card-title">For Doctors</h3>
-            <p className="card-text">
-              Review patient reports, approve submissions, and access clinical protocols.
-            </p>
+            <h3 className="card-title">{t('home.forDoctorsTitle')}</h3>
+            <p className="card-text">{t('home.subtitle')}</p>
             <Button asChild>
-              <Link href="/login">Sign In</Link>
+              <Link href="/login">{t('home.signIn')}</Link>
             </Button>
           </Card>
           <Card className="p-6">
             <BarChart3 className="card-icons" />
-            <h3 className="card-title">For Researchers</h3>
-            <p className="card-text">
-              Access anonymized data, export reports, and analyze trends.
-            </p>
+            <h3 className="card-title">{t('home.forResearchersTitle')}</h3>
+            <p className="card-text">{t('home.subtitle')}</p>
             <Button asChild>
-              <Link href="/register">Join Now</Link>
+              <Link href="/register">{t('home.joinNow')}</Link>
             </Button>
           </Card>
         </div>
@@ -176,28 +172,25 @@ export default function HomePage() {
   return (
     <div className="main-container">
       <div className="main-alignment">
-        <h1 className="main-title">
-          Welcome to
-          <Image
-            src={LogoHome}
-            alt="Crohnnected Logo"
-            width={440}
-            height={360}
-            priority
-            className="mx-auto"
-          />
-          {session?.user && (
-            <span className="main-subtitle-name">
-              Hello, {session.user.name || session.user.email}
-            </span>
-          )}
-        </h1>
-
-        <p className="main-text">
-          A comprehensive healthcare platform connecting Crohn&apos;s disease patients, doctors, 
-          and researchers to improve treatment outcomes and advance research.
-        </p>
-
+          <h1 className="main-title">
+            {t('home.welcome')}
+            <Image
+              src={LogoHome}
+              alt="Crohnnected Logo"
+              width={440}
+              height={360}
+              priority
+              className="mx-auto"
+            />            
+            {session?.user && (
+              <span className="main-subtitle-name">
+                Hello, {session.user.name || session.user.email}
+              </span>
+            )}
+          </h1>
+          <p className="main-text">
+            {t('home.subtitle')}
+          </p>
         {session?.user && (
           <Badge variant="account" className="text-sm">
             {session.user.role} Account
