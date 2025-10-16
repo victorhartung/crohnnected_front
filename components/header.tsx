@@ -100,37 +100,37 @@ export function Header() {
     > = {
       PATIENT: !hasActiveReport
         ? [
-            { label: "My Reports", href: "/reports" },
-            { label: "New Report", href: "/reports/new" },
-            { label: "Hub", href: "/hub" },
-            { label: "Map", href: "/map" },
+            { label: t("header.myReports"), href: "/reports" },
+            { label: t("header.newReport"), href: "/reports/new" },
+            { label: t("header.hub"), href: "/hub" },
+            { label: t("header.map"), href: "/map" },
           ]
         : [
-            { label: "My Reports", href: "/reports" },
-            { label: "Hub", href: "/hub" },
-            { label: "Map", href: "/map" },
+            { label: t("header.myReports"), href: "/reports" },
+            { label: t("header.hub"), href: "/hub" },
+            { label: t("header.map"), href: "/map" },
           ],
       DOCTOR: [
-        { label: "Reports", href: "/reports" },
-        { label: "Hub", href: "/hub" },
-        { label: "Map", href: "/map" },
+        { label: t("header.reports"), href: "/reports" },
+        { label: t("header.hub"), href: "/hub" },
+        { label: t("header.map"), href: "/map" },
       ],
       RESEARCHER: [
-        { label: "Reports", href: "/reports" },
-        { label: "Hub", href: "/hub" },
-        { label: "Map", href: "/map" },
+        { label: t("header.reports"), href: "/reports" },
+        { label: t("header.hub"), href: "/hub" },
+        { label: t("header.map"), href: "/map" },
       ],
       MODERATOR: [
-        { label: "Reports", href: "/reports" },
-        { label: "Hub", href: "/hub" },
-        { label: "Map", href: "/map" },
-        { label: "Admin", href: "/admin" },
+        { label: t("header.reports"), href: "/reports" },
+        { label: t("header.hub"), href: "/hub" },
+        { label: t("header.map"), href: "/map" },
+        { label: t("header.admin"), href: "/admin" },
       ],
       ADMIN: [
-        { label: "Reports", href: "/reports" },
-        { label: "Hub", href: "/hub" },
-        { label: "Map", href: "/map" },
-        { label: "Admin", href: "/admin" },
+        { label: t("header.reports"), href: "/reports" },
+        { label: t("header.hub"), href: "/hub" },
+        { label: t("header.map"), href: "/map" },
+        { label: t("header.admin"), href: "/admin" },
       ],
     };
 

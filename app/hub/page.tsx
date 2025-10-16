@@ -140,7 +140,7 @@ export default function HubPage() {
       ).sort();
       setAllTags(tags);
     } catch (error) {
-      toast.error("Failed to load content");
+      toast.error(t("hub.failedToLoad"));
       console.error("Failed to load hub content:", error);
     } finally {
       setIsLoading(false);
@@ -201,7 +201,7 @@ export default function HubPage() {
         <div className="flex justify-between items-start">
           <div>
             <h1 className="text-3xl font-bold">{t("header.hub")}</h1>
-            <p className="text-muted-foreground">{t("map.readonlyBanner")}</p>
+            <p className="text-muted-foreground">{t("footer.educationalHub")}</p>
           </div>
 
           {canCreateContent() && (
@@ -288,8 +288,8 @@ export default function HubPage() {
                     {getTabIcon(activeTab, "large")}
                     <p className="text-muted-foreground">
                       {searchQuery || selectedTag
-                        ? `No ${activeTab} match your search criteria.`
-                        : `No ${activeTab} available yet.`}
+                        ? t("hub.noMatchingContent", { type: activeTab })
+                        : t("hub.noContentYet", { type: activeTab })}
                     </p>
                   </div>
                   {canCreateContent() && !searchQuery && !selectedTag && (
@@ -366,7 +366,7 @@ export default function HubPage() {
 
                       <Button asChild className="mt-auto w-full">
                         <Link href={`/hub/${activeTab}/${item.id}`}>
-                          Read More
+                          {t("hub.readMore")}
                         </Link>
                       </Button>
                     </CardContent>

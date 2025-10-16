@@ -54,14 +54,14 @@ export default function RegisterPage() {
 
       if (!response.ok) {
         const errorData = await response.json()
-        setError(errorData.message || 'Registration failed')
+        setError(errorData.message || t('auth.registrationFailed'))
         return
       }
 
-      toast.success('Registration successful! Please sign in.')
+      toast.success(t('auth.registrationSuccess'))
       router.push('/login')
     } catch (error) {
-      setError('An unexpected error occurred. Please try again.')
+      setError(t('auth.unexpectedError'))
       console.error('Registration error:', error)
     } finally {
       setIsLoading(false)
@@ -94,11 +94,11 @@ export default function RegisterPage() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">{t('auth.email')}</Label>
               <Input
                 id="email"
                 type="email"
-                placeholder="Enter your email"
+                placeholder={t('auth.emailPlaceholder')}
                 {...form.register('email')}
                 disabled={isLoading}
               />
@@ -110,18 +110,18 @@ export default function RegisterPage() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="role">Role</Label>
+              <Label htmlFor="role">{t('auth.role')}</Label>
               <Select
                 value={form.watch('role')}
                 onValueChange={(value) => form.setValue('role', value as 'PATIENT' | 'RESEARCHER')}
                 disabled={isLoading}
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="Select your role" />
+                  <SelectValue placeholder={t('auth.selectRole')} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="PATIENT">Patient</SelectItem>
-                  <SelectItem value="RESEARCHER">Researcher</SelectItem>
+                  <SelectItem value="PATIENT">{t('auth.rolePatient')}</SelectItem>
+                  <SelectItem value="RESEARCHER">{t('auth.roleResearcher')}</SelectItem>
                 </SelectContent>
               </Select>
               {form.formState.errors.role && (
@@ -132,11 +132,11 @@ export default function RegisterPage() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password">{t('auth.password')}</Label>
               <Input
                 id="password"
                 type="password"
-                placeholder="Enter your password"
+                placeholder={t('auth.passwordPlaceholder')}
                 {...form.register('password')}
                 disabled={isLoading}
               />
@@ -148,11 +148,11 @@ export default function RegisterPage() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="confirmPassword">Confirm Password</Label>
+              <Label htmlFor="confirmPassword">{t('auth.confirmPassword')}</Label>
               <Input
                 id="confirmPassword"
                 type="password"
-                placeholder="Confirm your password"
+                placeholder={t('auth.confirmPasswordPlaceholder')}
                 {...form.register('confirmPassword')}
                 disabled={isLoading}
               />

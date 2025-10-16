@@ -87,34 +87,33 @@ export default function HomePage() {
               {!hasActiveReport && (
                 <Card className="p-6 w-80 flex flex-col">
                   <Plus className="card-icons" />
-                  <h3 className="card-title">Submit New Report</h3>
+                  <h3 className="card-title">{t("home.submitNewReport")}</h3>
                   <p className="card-text flex-grow">
-                    Share your health information and attach supporting
-                    documents.
+                    {t("home.submitNewReportDesc")}
                   </p>
                   <Button asChild className="mt-4">
-                    <Link href="/reports/new">Create Report</Link>
+                    <Link href="/reports/new">{t("home.createReport")}</Link>
                   </Button>
                 </Card>
               )}
               <Card className="p-6 w-80 flex flex-col">
                 <FileText className="card-icons" />
-                <h3 className="card-title">My Reports</h3>
+                <h3 className="card-title">{t("home.myReportsTitle")}</h3>
                 <p className="card-text flex-grow">
-                  View and manage your submitted reports and their status.
+                  {t("home.myReportsDesc")}
                 </p>
                 <Button variant="default" asChild className="mt-4">
-                  <Link href="/reports">View Reports</Link>
+                  <Link href="/reports">{t("home.viewReports")}</Link>
                 </Button>
               </Card>
               <Card className="p-6 w-80 flex flex-col">
                 <MapPin className="card-icons" />
-                <h3 className="card-title">Geographic Data</h3>
+                <h3 className="card-title">{t("home.geographicData")}</h3>
                 <p className="card-text">
-                  Explore geographic patterns and patient distribution.
+                  {t("home.geographicDataDesc")}
                 </p>
                 <Button variant="default" asChild className="mt-4">
-                  <Link href="/map">View Map</Link>
+                  <Link href="/map">{t("home.viewMap")}</Link>
                 </Button>
               </Card>
             </div>
@@ -126,12 +125,12 @@ export default function HomePage() {
           <div className="div-cards">
             <Card className="p-6">
               <FileText className="card-icons" />
-              <h3 className="card-title">Review Reports</h3>
+              <h3 className="card-title">{t("home.reviewReports")}</h3>
               <p className="card-text">
-                Review patient submissions and approve or reject reports.
+                {t("home.reviewReportsDesc")}
               </p>
               <Button asChild>
-                <Link href="/reports">Review Reports</Link>
+                <Link href="/reports">{t("home.reviewReports")}</Link>
               </Button>
             </Card>
             <Card className="p-6">
@@ -152,22 +151,22 @@ export default function HomePage() {
           <div className="div-cards">
             <Card className="p-6">
               <BarChart3 className="card-icons" />
-              <h3 className="card-title">Analyze Data</h3>
+              <h3 className="card-title">{t("home.analyzeData")}</h3>
               <p className="card-text">
-                Access approved reports and export data for research.
+                {t("home.analyzeDataDesc")}
               </p>
               <Button asChild>
-                <Link href="/reports">View Data</Link>
+                <Link href="/reports">{t("home.viewData")}</Link>
               </Button>
             </Card>
             <Card className="p-6">
               <MapPin className="card-icons" />
-              <h3 className="card-title">Geographic Insights</h3>
+              <h3 className="card-title">{t("home.geographicInsights")}</h3>
               <p className="card-text">
-                Explore disease patterns and incidence data by location.
+                {t("home.geographicInsightsDesc")}
               </p>
               <Button variant="outline" asChild>
-                <Link href="/map">Explore Map</Link>
+                <Link href="/map">{t("home.exploreMap")}</Link>
               </Button>
             </Card>
           </div>
@@ -178,32 +177,32 @@ export default function HomePage() {
           <div className="div-cards">
             <Card className="p-6">
               <FileText className="card-icons" />
-              <h3 className="card-title">Manage Reports</h3>
+              <h3 className="card-title">{t("home.manageReports")}</h3>
               <p className="card-text">
-                Oversee all reports and manage platform content.
+                {t("home.manageReportsDesc")}
               </p>
               <Button variant="default" asChild>
-                <Link href="/reports">Manage Reports</Link>
+                <Link href="/reports">{t("home.manageReports")}</Link>
               </Button>
             </Card>
             <Card className="p-6">
               <Users className="card-icons" />
-              <h3 className="card-title">Hub Management</h3>
+              <h3 className="card-title">{t("home.hubManagement")}</h3>
               <p className="card-text">
-                Manage educational content and community resources.
+                {t("home.hubManagementDesc")}
               </p>
               <Button variant="default" asChild>
-                <Link href="/hub">Manage Hub</Link>
+                <Link href="/hub">{t("home.manageHub")}</Link>
               </Button>
             </Card>
             <Card className="p-6">
               <MapPin className="card-icons" />
-              <h3 className="card-title">Analytics</h3>
+              <h3 className="card-title">{t("home.analytics")}</h3>
               <p className="card-text">
-                View platform analytics and geographic insights.
+                {t("home.analyticsDesc")}
               </p>
               <Button variant="default" asChild>
-                <Link href="/map">View Analytics</Link>
+                <Link href="/map">{t("home.viewAnalytics")}</Link>
               </Button>
             </Card>
           </div>
@@ -226,14 +225,14 @@ export default function HomePage() {
           />
           {session?.user && (
             <span className="main-subtitle-name">
-              Hello, {session.user.name || session.user.email}
+              {t("home.helloUser", { name: session.user.name || session.user.email })}
             </span>
           )}
         </h1>
         <p className="main-text">{t("home.subtitle")}</p>
         {session?.user && (
           <Badge variant="account" className="text-sm">
-            {session.user.role} Account
+            {t("home.accountBadge", { role: session.user.role })}
           </Badge>
         )}
       </div>
@@ -243,21 +242,21 @@ export default function HomePage() {
       <div className="stats-alignment">
         <div className="stats">
           <div>
-            <h4 className="stat-title">Secure</h4>
+            <h4 className="stat-title">{t("home.secureTitle")}</h4>
             <p className="stat-text">
-              HIPAA-compliant platform with end-to-end encryption
+              {t("home.secureDesc")}
             </p>
           </div>
           <div>
-            <h4 className="stat-title">Collaborative</h4>
+            <h4 className="stat-title">{t("home.collaborativeTitle")}</h4>
             <p className="stat-text">
-              Connecting patients, doctors, and researchers worldwide
+              {t("home.collaborativeDesc")}
             </p>
           </div>
           <div>
-            <h4 className="stat-title">Impactful</h4>
+            <h4 className="stat-title">{t("home.impactfulTitle")}</h4>
             <p className="stat-text">
-              Contributing to better understanding of Crohn&apos;s disease
+              {t("home.impactfulDesc")}
             </p>
           </div>
         </div>

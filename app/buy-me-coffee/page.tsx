@@ -12,6 +12,7 @@ import {
 import { Check, Copy } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
 import { useState } from "react";
+import { useLanguage } from "@/components/language-provider";
 
 // Função para gerar o payload PIX no formato EMV
 function generatePixPayload(
@@ -90,6 +91,7 @@ function calculateCRC16(payload: string): string {
 }
 
 function PixQr({ pixKey }: { pixKey: string }) {
+  const { t } = useLanguage();
   const [copied, setCopied] = useState(false);
   const [copiedPayload, setCopiedPayload] = useState(false);
 
@@ -119,10 +121,9 @@ function PixQr({ pixKey }: { pixKey: string }) {
     <div className="flex flex-col items-center space-y-6 max-w-2xl mx-auto">
       <Card className="w-full">
         <CardHeader>
-          <CardTitle>QR Code PIX</CardTitle>
+          <CardTitle>{t("coffee.qrCodeTitle")}</CardTitle>
           <CardDescription>
-            Escaneie o QR Code abaixo com o aplicativo do seu banco ou copie a
-            chave PIX
+            {t("coffee.qrCodeDesc")}
           </CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col items-center space-y-6">
@@ -133,7 +134,7 @@ function PixQr({ pixKey }: { pixKey: string }) {
 
           {/* Chave PIX */}
           <div className="w-full space-y-2">
-            <p className="text-sm font-medium text-center">Chave PIX:</p>
+            <p className="text-sm font-medium text-center">{t("coffee.pixKey")}</p>
             <div className="flex items-center gap-2">
               <div className="flex-1 p-3 bg-muted rounded-md">
                 <p className="font-mono text-sm break-all text-center">
@@ -144,7 +145,7 @@ function PixQr({ pixKey }: { pixKey: string }) {
                 variant="outline"
                 size="icon"
                 onClick={handleCopyKey}
-                title="Copiar chave PIX"
+title={t("coffee.copyPixKey")}
               >
                 {copied ? (
                   <Check className="h-4 w-4 text-green-600" />
@@ -155,7 +156,7 @@ function PixQr({ pixKey }: { pixKey: string }) {
             </div>
             {copied && (
               <p className="text-xs text-green-600 text-center">
-                Chave copiada!
+                {t("coffee.keyCopied")}
               </p>
             )}
           </div>
@@ -163,7 +164,7 @@ function PixQr({ pixKey }: { pixKey: string }) {
           {/* Código PIX Copia e Cola */}
           <div className="w-full space-y-2">
             <p className="text-sm font-medium text-center">
-              Código PIX Copia e Cola:
+              {t("coffee.pixCodeCopyPaste")}
             </p>
             <div className="flex items-center gap-2">
               <div className="flex-1 p-3 bg-muted rounded-md max-h-24 overflow-y-auto">
@@ -173,7 +174,7 @@ function PixQr({ pixKey }: { pixKey: string }) {
                 variant="outline"
                 size="icon"
                 onClick={handleCopyPayload}
-                title="Copiar código PIX"
+title={t("coffee.copyPixCode")}
               >
                 {copiedPayload ? (
                   <Check className="h-4 w-4 text-green-600" />
@@ -184,16 +185,14 @@ function PixQr({ pixKey }: { pixKey: string }) {
             </div>
             {copiedPayload && (
               <p className="text-xs text-green-600 text-center">
-                Código copiado!
+                {t("coffee.codeCopied")}
               </p>
             )}
           </div>
 
           <Alert>
             <AlertDescription className="text-sm">
-              💡 <strong>Como usar:</strong> Abra o app do seu banco, escolha a
-              opção PIX, escaneie o QR Code acima ou cole o código PIX Copia e
-              Cola.
+              💡 <strong>{t("coffee.howToUse")}</strong> {t("coffee.howToUseDesc")}
             </AlertDescription>
           </Alert>
         </CardContent>
@@ -203,16 +202,16 @@ function PixQr({ pixKey }: { pixKey: string }) {
 }
 
 export default function BuyMeCoffeePage() {
+  const { t } = useLanguage();
   const pixKey = process.env.NEXT_PUBLIC_PIX_KEY || "";
 
   return (
     <main className="container mx-auto px-4 py-12">
       <div className="max-w-2xl mx-auto space-y-6">
         <div className="text-center space-y-2">
-          <h1 className="text-3xl font-bold">Apoie o Crohnnected</h1>
+          <h1 className="text-3xl font-bold">{t("coffee.title")}</h1>
           <p className="text-muted-foreground">
-            Se você gostaria de apoiar este projeto, pode fazer uma pequena
-            doação via PIX.
+            {t("coffee.description")}
           </p>
         </div>
 
@@ -224,19 +223,13 @@ export default function BuyMeCoffeePage() {
               <Alert>
                 <AlertDescription>
                   <p className="font-medium mb-2">
-                    Nenhuma chave PIX configurada.
+                    {t("coffee.noPixKey")}
                   </p>
                   <p className="text-sm">
-                    Para habilitar doações, configure a variável de ambiente{" "}
-                    <code className="bg-muted px-1 py-0.5 rounded">
-                      NEXT_PUBLIC_PIX_KEY
-                    </code>{" "}
-                    com seu identificador PIX (email, telefone ou chave
-                    aleatória).
+                    {t("coffee.noPixKeyDesc", { env: '<code class="bg-muted px-1 py-0.5 rounded">NEXT_PUBLIC_PIX_KEY</code>' })}
                   </p>
                   <p className="text-sm mt-2">
-                    Uma vez configurado, esta página renderizará um QR Code para
-                    pagamentos rápidos.
+                    {t("coffee.noPixKeyInfo")}
                   </p>
                 </AlertDescription>
               </Alert>
@@ -245,8 +238,7 @@ export default function BuyMeCoffeePage() {
         )}
 
         <p className="text-sm text-muted-foreground text-center">
-          Obrigado por apoiar o Crohnnected. Sua contribuição ajuda a manter o
-          projeto ativo! ❤️
+          {t("coffee.thankYou")}
         </p>
       </div>
     </main>

@@ -43,14 +43,14 @@ export default function LoginPage() {
       })
 
       if (result?.error) {
-        setError('Invalid email or password')
+        setError(t('auth.invalidCredentials'))
       } else {
-        toast.success('Welcome back!')
+        toast.success(t('auth.welcomeBack'))
         router.push('/')
         router.refresh()
       }
     } catch (error) {
-      setError('An unexpected error occurred. Please try again.')
+      setError(t('auth.unexpectedError'))
       console.error('Login error:', error)
     } finally {
       setIsLoading(false)
@@ -67,11 +67,11 @@ export default function LoginPage() {
         <CardContent>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">{t('auth.email')}</Label>
               <Input
                 id="email"
                 type="email"
-                placeholder="Enter your email"
+                placeholder={t('auth.emailPlaceholder')}
                 {...form.register('email')}
                 disabled={isLoading}
               />
@@ -83,11 +83,11 @@ export default function LoginPage() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password">{t('auth.password')}</Label>
               <Input
                 id="password"
                 type="password"
-                placeholder="Enter your password"
+                placeholder={t('auth.passwordPlaceholder')}
                 {...form.register('password')}
                 disabled={isLoading}
               />

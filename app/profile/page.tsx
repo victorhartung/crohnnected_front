@@ -135,15 +135,15 @@ export default function ProfilePage() {
 
       if (!response.ok) {
         const errorData = await response.json();
-        setError(errorData.message || "Failed to update profile");
+        setError(errorData.message || t("profile.updateFailed"));
         return;
       }
 
-      toast.success("Profile updated successfully!");
+      toast.success(t("profile.profileUpdated"));
       await update(); // Refresh session
       loadProfile(); // Reload profile data
     } catch (error) {
-      setError("An unexpected error occurred. Please try again.");
+      setError(t("auth.unexpectedError"));
       console.error("Profile update error:", error);
     } finally {
       setIsLoading(false);
@@ -166,7 +166,7 @@ export default function ProfilePage() {
         <Alert>
           <AlertCircle className="h-4 w-4" />
           <AlertDescription>
-            Please sign in to view your profile.
+            {t("profile.signInToView")}
           </AlertDescription>
         </Alert>
       </div>
@@ -189,12 +189,12 @@ export default function ProfilePage() {
             {(isPatient || isDoctor) && (
               <TabsTrigger value="profile">
                 <User className="w-4 h-4 mr-2" />
-                Profile Information
+                {t("profile.profileInformation")}
               </TabsTrigger>
             )}
             <TabsTrigger value="account">
               <Shield className="w-4 h-4 mr-2" />
-              Account Details
+              {t("profile.accountDetails")}
             </TabsTrigger>
           </TabsList>
 
@@ -202,9 +202,9 @@ export default function ProfilePage() {
             <TabsContent value="profile">
               <Card>
                 <CardHeader>
-                  <CardTitle>Profile Information</CardTitle>
+                  <CardTitle>{t("profile.profileInformation")}</CardTitle>
                   <CardDescription>
-                    Update your profile information and preferences.
+                    {t("profile.updateProfileDesc")}
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -217,11 +217,11 @@ export default function ProfilePage() {
                     className="space-y-4"
                   >
                     <div className="space-y-2">
-                      <Label htmlFor="name">Full Name</Label>
+                      <Label htmlFor="name">{t("profile.fullName")}</Label>
                       <Input
                         id="name"
                         type="text"
-                        placeholder="Enter your full name"
+                        placeholder={t("profile.enterFullName")}
                         {...(isPatient
                           ? patientForm.register("name")
                           : doctorForm.register("name"))}
@@ -242,7 +242,7 @@ export default function ProfilePage() {
                       <>
                         <div className="grid grid-cols-2 gap-4">
                           <div className="space-y-2">
-                            <Label htmlFor="birthDate">Birth Date</Label>
+                            <Label htmlFor="birthDate">{t("profile.birthDate")}</Label>
                             <Input
                               id="birthDate"
                               type="date"
@@ -251,7 +251,7 @@ export default function ProfilePage() {
                             />
                           </div>
                           <div className="space-y-2">
-                            <Label htmlFor="sex">Sex</Label>
+                            <Label htmlFor="sex">{t("profile.sex")}</Label>
                             <Select
                               value={patientForm.watch("sex") || ""}
                               onValueChange={(value) =>
@@ -260,17 +260,17 @@ export default function ProfilePage() {
                               disabled={isLoading}
                             >
                               <SelectTrigger>
-                                <SelectValue placeholder="Select sex" />
+                                <SelectValue placeholder={t("profile.selectSex")} />
                               </SelectTrigger>
                               <SelectContent>
-                                <SelectItem value="FEMALE">Female</SelectItem>
-                                <SelectItem value="MALE">Male</SelectItem>
+                                <SelectItem value="FEMALE">{t("profile.female")}</SelectItem>
+                                <SelectItem value="MALE">{t("profile.male")}</SelectItem>
                                 <SelectItem value="INTERSEX">
-                                  Intersex
+                                  {t("profile.intersex")}
                                 </SelectItem>
-                                <SelectItem value="OTHER">Other</SelectItem>
+                                <SelectItem value="OTHER">{t("profile.other")}</SelectItem>
                                 <SelectItem value="UNSPECIFIED">
-                                  Prefer not to say
+                                  {t("profile.preferNotToSay")}
                                 </SelectItem>
                               </SelectContent>
                             </Select>
@@ -278,7 +278,7 @@ export default function ProfilePage() {
                         </div>
 
                         <div className="space-y-2">
-                          <Label htmlFor="diagnosisDate">Diagnosis Date</Label>
+                          <Label htmlFor="diagnosisDate">{t("profile.diagnosisDate")}</Label>
                           <Input
                             id="diagnosisDate"
                             type="date"
@@ -292,11 +292,11 @@ export default function ProfilePage() {
                     {isDoctor && (
                       <>
                         <div className="space-y-2">
-                          <Label htmlFor="licenseNumber">License Number</Label>
+                          <Label htmlFor="licenseNumber">{t("profile.licenseNumber")}</Label>
                           <Input
                             id="licenseNumber"
                             type="text"
-                            placeholder="Enter your license number"
+                            placeholder={t("profile.enterLicenseNumber")}
                             {...doctorForm.register("licenseNumber")}
                             disabled={isLoading}
                           />
@@ -311,11 +311,11 @@ export default function ProfilePage() {
                         </div>
 
                         <div className="space-y-2">
-                          <Label htmlFor="specialty">Specialty</Label>
+                          <Label htmlFor="specialty">{t("profile.specialty")}</Label>
                           <Input
                             id="specialty"
                             type="text"
-                            placeholder="Enter your specialty"
+                            placeholder={t("profile.enterSpecialty")}
                             {...doctorForm.register("specialty")}
                             disabled={isLoading}
                           />
@@ -325,11 +325,11 @@ export default function ProfilePage() {
 
                     <div className="grid grid-cols-3 gap-4">
                       <div className="space-y-2">
-                        <Label htmlFor="country">Country</Label>
+                        <Label htmlFor="country">{t("profile.country")}</Label>
                         <Input
                           id="country"
                           type="text"
-                          placeholder="Country"
+                          placeholder={t("profile.countryPlaceholder")}
                           {...(isPatient
                             ? patientForm.register("country")
                             : doctorForm.register("country"))}
@@ -337,11 +337,11 @@ export default function ProfilePage() {
                         />
                       </div>
                       <div className="space-y-2">
-                        <Label htmlFor="state">State/Province</Label>
+                        <Label htmlFor="state">{t("profile.state")}</Label>
                         <Input
                           id="state"
                           type="text"
-                          placeholder="State/Province"
+                          placeholder={t("profile.statePlaceholder")}
                           {...(isPatient
                             ? patientForm.register("state")
                             : doctorForm.register("state"))}
@@ -349,11 +349,11 @@ export default function ProfilePage() {
                         />
                       </div>
                       <div className="space-y-2">
-                        <Label htmlFor="city">City</Label>
+                        <Label htmlFor="city">{t("profile.city")}</Label>
                         <Input
                           id="city"
                           type="text"
-                          placeholder="City"
+                          placeholder={t("profile.cityPlaceholder")}
                           {...(isPatient
                             ? patientForm.register("city")
                             : doctorForm.register("city"))}
@@ -373,7 +373,7 @@ export default function ProfilePage() {
                       {isLoading && (
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                       )}
-                      Save Changes
+                      {t("profile.saveChanges")}
                     </Button>
                   </form>
                 </CardContent>
@@ -384,27 +384,27 @@ export default function ProfilePage() {
           <TabsContent value="account">
             <Card>
               <CardHeader>
-                <CardTitle>Account Details</CardTitle>
+                <CardTitle>{t("profile.accountDetails")}</CardTitle>
                 <CardDescription>
-                  View your account information and role.
+                  {t("profile.viewAccountDesc")}
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
                   <div>
-                    <Label>Email Address</Label>
+                    <Label>{t("profile.emailAddress")}</Label>
                     <p className="text-sm text-muted-foreground mt-1">
                       {session?.user?.email}
                     </p>
                   </div>
                   <div>
-                    <Label>Role</Label>
+                    <Label>{t("profile.roleLabel")}</Label>
                     <p className="text-sm text-muted-foreground mt-1">
                       {session?.user?.role}
                     </p>
                   </div>
                   <div>
-                    <Label>Member Since</Label>
+                    <Label>{t("profile.memberSince")}</Label>
                     <p className="text-sm text-muted-foreground mt-1">
                       {profileData?.createdAt
                         ? new Date(profileData.createdAt).toLocaleDateString()
