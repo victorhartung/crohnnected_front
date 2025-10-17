@@ -1,0 +1,12 @@
+{
+  "/reports/[id]/page": "app/reports/[id]/page.js",
+  "/hub/page": "app/hub/page.js",
+  "/api/hub/articles/route": "app/api/hub/articles/route.js",
+  "/api/hub/stories/route": "app/api/hub/stories/route.js",
+  "/api/hub/protocols/route": "app/api/hub/protocols/route.js",
+  "/hub/stories/[slug]/page": "app/hub/stories/[slug]/page.js",
+  "/hub/articles/[slug]/page": "app/hub/articles/[slug]/page.js",
+  "/profile/page": "app/profile/page.js",
+  "/page": "app/page.js",
+  "/api/users/me/route": "app/api/users/me/route.js"
+}

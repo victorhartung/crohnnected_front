@@ -1,0 +1,235 @@
+generator client {
+    provider = "prisma-client-js"
+    binaryTargets = ["native", "linux-musl-arm64-openssl-3.0.x"]
+}
+
+datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+}
+
+// Enums
+enum UserRole {
+  PATIENT
+  DOCTOR
+  RESEARCHER
+  MODERATOR
+  ADMIN
+}
+
+enum Sex {
+  FEMALE
+  MALE
+  INTERSEX
+  OTHER
+  UNSPECIFIED
+}
+
+enum SymptomSeverity {
+  MILD
+  MODERATE
+  SEVERE
+}
+
+enum ReportStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+// Core Tables
+model User {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  passwordHash String   @map("password_hash")
+  role         UserRole @default(PATIENT)
+  name         String?
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  // Relationships
+  patientProfile PatientProfile?
+  doctorProfile  DoctorProfile?
+  reports        Report[]        @relation("PatientReports")
+  approvals      Report[]        @relation("DoctorApprovals")
+  articles       Article[]
+  protocols      Protocol[]
+  stories        Story[]
+  auditLogs      AuditLog[]
+
+  @@map("users")
+}
+
+model PatientProfile {
+  id            String    @id @default(uuid())
+  userId        String    @unique @map("user_id")
+  birthDate     DateTime? @map("birth_date") @db.Date
+  sex           Sex?
+  country       String?
+  state         String?
+  city          String?
+  lat           Decimal?  @db.Decimal(9, 6)
+  lng           Decimal?  @db.Decimal(9, 6)
+  diagnosisDate DateTime? @map("diagnosis_date") @db.Date
+
+  // Relationships
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("patient_profiles")
+}
+
+model DoctorProfile {
+  id            String  @id @default(uuid())
+  userId        String  @unique @map("user_id")
+  licenseNumber String  @unique @map("license_number")
+  specialty     String?
+  country       String?
+  state         String?
+  city          String?
+
+  // Relationships
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("doctor_profiles")
+}
+
+model Report {
+  id                     String            @id @default(uuid())
+  patientId              String            @map("patient_id")
+  
+  // Document fields
+  documentBase64         String?           @map("document_base64") @db.Text
+  documentOriginalName   String?           @map("document_original_name")
+  documentMime           String?           @map("document_mime")
+  documentSizeBytes      Int?              @map("document_size_bytes")
+  
+  // Self data snapshot (denormalized for research consistency)
+  ageAtReport            Int?              @map("age_at_report")
+  sex                    Sex?
+  country                String?
+  state                  String?
+  city                   String?
+  lat                    Decimal?          @db.Decimal(9, 6)
+  lng                    Decimal?          @db.Decimal(9, 6)
+  
+  // Disease data
+  symptoms               Json              // array of strings
+  symptomSeverity        SymptomSeverity   @map("symptom_severity")
+  medications            Json?             // array of strings
+  flareFrequencyPerYear  Int?              @map("flare_frequency_per_year")
+  surgeryHistory         Json?             @map("surgery_history") // array of objects
+  notes                  String?           @db.Text
+  diagnosisDate          DateTime?         @map("diagnosis_date") @db.Date
+  
+  // Workflow
+  status                 ReportStatus      @default(PENDING)
+  approvedById           String?           @map("approved_by_id")
+  approvedAt             DateTime?         @map("approved_at")
+  rejectionReason        String?           @map("rejection_reason") @db.Text
+  
+  createdAt              DateTime          @default(now()) @map("created_at")
+  updatedAt              DateTime          @updatedAt @map("updated_at")
+
+  // Relationships
+  patient    User  @relation("PatientReports", fields: [patientId], references: [id], onDelete: Cascade)
+  approvedBy User? @relation("DoctorApprovals", fields: [approvedById], references: [id])
+
+  // Indexes
+  @@index([country, state, city])
+  @@index([createdAt])
+  @@index([status])
+  @@index([patientId])
+  @@map("reports")
+}
+
+model Article {
+  id          String   @id @default(uuid())
+  title       String
+  slug        String   @unique
+  summary     String?  @db.Text
+  content     String   @db.Text // markdown
+  tags        Json?    // array of strings
+  isPublic    Boolean  @default(true) @map("is_public")
+  createdById String   @map("created_by_id")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  // Relationships
+  createdBy User @relation(fields: [createdById], references: [id], onDelete: Cascade)
+
+  @@map("articles")
+}
+
+model Protocol {
+  id          String   @id @default(uuid())
+  title       String
+  slug        String   @unique
+  summary     String?  @db.Text
+  content     String   @db.Text // markdown
+  tags        Json?    // array of strings
+  isPublic    Boolean  @default(true) @map("is_public")
+  createdById String   @map("created_by_id")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  // Relationships
+  createdBy User @relation(fields: [createdById], references: [id], onDelete: Cascade)
+
+  @@map("protocols")
+}
+
+model Story {
+  id          String   @id @default(uuid())
+  title       String
+  summary     String?  @db.Text
+  content     String?  @db.Text // markdown/html content
+  tags        Json?    // array of strings
+  isPublic    Boolean  @default(true) @map("is_public")
+  createdById String   @map("created_by_id")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  // Relationships
+  createdBy User @relation(fields: [createdById], references: [id], onDelete: Cascade)
+
+  @@map("stories")
+}
+
+model IncidenceStat {
+  id         String   @id @default(uuid())
+  regionCode String   @map("region_code")
+  regionName String   @map("region_name")
+  country    String?
+  state      String?
+  city       String?
+  lat        Decimal  @db.Decimal(9, 6)
+  lng        Decimal  @db.Decimal(9, 6)
+  period     String   // e.g., "2025Q1" or "2025"
+  cases      Int      @default(0)
+  source     String?
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  // Indexes
+  @@index([country, state, city, period])
+  @@index([period])
+  @@map("incidence_stats")
+}
+
+model AuditLog {
+  id        String   @id @default(uuid())
+  actorId   String   @map("actor_id")
+  action    String   // e.g., "APPROVE_REPORT", "EXPORT_DATA"
+  entity    String   // e.g., "Report", "User"
+  entityId  String   @map("entity_id")
+  meta      Json?    // additional context data
+  createdAt DateTime @default(now()) @map("created_at")
+
+  // Relationships
+  actor User @relation(fields: [actorId], references: [id], onDelete: Cascade)
+
+  // Indexes
+  @@index([actorId])
+  @@index([createdAt])
+  @@index([entity, entityId])
+  @@map("audit_logs")
+}

@@ -1,0 +1,81 @@
+{
+  "map": {
+    "readonlyBanner": "Você está visualizando o mapa em modo somente leitura. Faça login para acessar recursos adicionais como exportação de dados."
+  },
+  "header": {
+    "home": "Início",
+    "hub": "Hub",
+    "map": "Mapa",
+     "login": "Login",
+    "register": "Registrar",
+    "profile": "Perfil",
+    "logout": "Log out"
+  }
+
+  ,"footer": {
+    "title": "Crohnnected",
+    "description": "Uma plataforma de saúde abrangente para pacientes com doença de Crohn, médicos e pesquisadores.",
+    "patients": "Para Pacientes",
+    "submitReport": "Enviar Relatório",
+    "myReports": "Meus Relatórios",
+    "educationalHub": "Hub Educacional",
+    "healthcare": "Para Profissionais de Saúde",
+    "reviewReports": "Analisar Relatórios",
+    "clinicalResources": "Recursos Clínicos",
+    "geographicData": "Dados Geográficos",
+    "contactDoctor": "Contato para Médicos",
+    "legal": "Legal",
+    "privacy": "Política de Privacidade",
+    "terms": "Termos de Serviço",
+    "contact": "Contato",
+    "coffee": "Me ofereça um café",
+    "copyright": "&copy; {year} Crohnnected. Todos os direitos reservados."
+  }
+  ,"home": {
+    "welcome": "Bem-vindo ao",
+    "subtitle": "Uma plataforma de saúde abrangente que conecta pacientes com doença de Crohn, médicos e pesquisadores para melhorar os resultados do tratamento e avançar a pesquisa.",
+    "forPatientsTitle": "Para Pacientes",
+    "forDoctorsTitle": "Para Médicos",
+    "forResearchersTitle": "Para Pesquisadores",
+    "getStarted": "Começar",
+    "signIn": "Entrar",
+    "joinNow": "Junte-se agora"
+  },
+  "auth": {
+    "createAccount": "Criar conta",
+    "createAccountDesc": "Insira suas informações para criar sua conta",
+    "enterInfo": "Nome Completo",
+    "alreadyHave": "Já tem uma conta?",
+    "dontHave": "Não tem uma conta?",
+    "signIn": "Entrar",
+    "signUp": "Registrar-se"
+  }
+  ,"hub": {
+    "searchPlaceholder": "Pesquisar conteúdo...",
+    "allTopics": "Todos os tópicos",
+    "articlesLabel": "Artigos",
+    "protocolsLabel": "Protocolos",
+    "storiesLabel": "Histórias",
+    "newArticle": "Novo Artigo",
+    "newProtocol": "Novo Protocolo",
+    "newStory": "Nova História",
+    "createFirstArticle": "Criar o primeiro artigo",
+    "createFirstProtocol": "Criar o primeiro protocolo",
+    "createFirstStory": "Criar a primeira história"
+  }
+    ,"reports": {
+      "title": "Relatórios",
+      "submitNew": "Enviar novo relatório",
+      "myReports": "Meus relatórios",
+      "reviewReports": "Analisar relatórios",
+      "viewReports": "Ver relatórios"
+    },
+    "profile": {
+      "title": "Perfil",
+      "manageAccount": "Gerencie as configurações da sua conta e as informações do perfil.",
+      "profileInformation": "Informações do perfil",
+      "accountDetails": "Detalhes da conta",
+      "fullName": "Nome completo",
+      "birthDate": "Data de nascimento"
+    }
+}
