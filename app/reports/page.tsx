@@ -516,11 +516,11 @@ export default function ReportsPage() {
                   <SelectItem value="all">
                     {t("reports.allSeverities")}
                   </SelectItem>
-                  <SelectItem value="MILD">{t("severity.mild")}</SelectItem>
+                  <SelectItem value="MILD">{t("reports.severityMild")}</SelectItem>
                   <SelectItem value="MODERATE">
-                    {t("severity.moderate")}
+                    {t("reports.severityModerate")}
                   </SelectItem>
-                  <SelectItem value="SEVERE">{t("severity.severe")}</SelectItem>
+                  <SelectItem value="SEVERE">{t("reports.severitySevere")}</SelectItem>
                 </SelectContent>
               </Select>
 
