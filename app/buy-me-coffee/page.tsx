@@ -141,7 +141,7 @@ function PixQr({ pixKey }: { pixKey: string }) {
                 </p>
               </div>
               <Button
-                variant="outline"
+                variant="whiteline"
                 size="icon"
                 onClick={handleCopyKey}
                 title="Copiar chave PIX"
@@ -170,7 +170,7 @@ function PixQr({ pixKey }: { pixKey: string }) {
                 <p className="font-mono text-xs break-all">{pixPayload}</p>
               </div>
               <Button
-                variant="outline"
+                variant="whiteline"
                 size="icon"
                 onClick={handleCopyPayload}
                 title="Copiar código PIX"
@@ -190,7 +190,7 @@ function PixQr({ pixKey }: { pixKey: string }) {
           </div>
 
           <Alert>
-            <AlertDescription className="text-sm">
+            <AlertDescription className="text-sm" >
               💡 <strong>Como usar:</strong> Abra o app do seu banco, escolha a
               opção PIX, escaneie o QR Code acima ou cole o código PIX Copia e
               Cola.
