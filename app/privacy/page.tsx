@@ -1,3 +1,6 @@
+"use client";
+
+import { useLanguage } from "@/components/language-provider";
 import React from "react";
 
 export default function PrivacyPage() {
@@ -34,11 +37,12 @@ export default function PrivacyPage() {
           {t("privacy.contactTitle")}
         </h2>
         <p className="max-w-none main-text mb-6 mt-2">
-          {t("privacy.contactDesc", {
-            link: `<a href="/contact" class="underline">${t(
+          {t(
+            "privacy.contactDesc",
+            `<a href="/contact" class="underline">${t(
               "privacy.contactLink"
-            )}</a>`,
-          })}
+            )}</a>`
+          )}
         </p>
       </section>
     </main>
