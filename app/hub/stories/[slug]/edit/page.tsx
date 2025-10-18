@@ -214,8 +214,9 @@ export default function EditStoryPage() {
               <div className="flex gap-4">
                 <Button type="submit">{t("hub.saveChanges")}</Button>
                 <Button
+                  type="button"
                   variant="destructive"
-                  onClick={() => router.push("/hub")}
+                  onClick={() => router.push("/hub?tab=stories")}
                 >
                   {t("common.cancel")}
                 </Button>

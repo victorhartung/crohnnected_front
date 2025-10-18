@@ -122,9 +122,7 @@ function PixQr({ pixKey }: { pixKey: string }) {
       <Card className="w-full">
         <CardHeader>
           <CardTitle>{t("coffee.qrCodeTitle")}</CardTitle>
-          <CardDescription>
-            {t("coffee.qrCodeDesc")}
-          </CardDescription>
+          <CardDescription>{t("coffee.qrCodeDesc")}</CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col items-center space-y-6">
           {/* QR Code */}
@@ -134,7 +132,9 @@ function PixQr({ pixKey }: { pixKey: string }) {
 
           {/* Chave PIX */}
           <div className="w-full space-y-2">
-            <p className="text-sm font-medium text-center">{t("coffee.pixKey")}</p>
+            <p className="text-sm font-medium text-center">
+              {t("coffee.pixKey")}
+            </p>
             <div className="flex items-center gap-2">
               <div className="flex-1 p-3 bg-muted rounded-md">
                 <p className="font-mono text-sm break-all text-center">
@@ -142,10 +142,10 @@ function PixQr({ pixKey }: { pixKey: string }) {
                 </p>
               </div>
               <Button
-                variant="outline"
+                variant="whiteline"
                 size="icon"
                 onClick={handleCopyKey}
-title={t("coffee.copyPixKey")}
+                title={t("coffee.copyPixKey")}
               >
                 {copied ? (
                   <Check className="h-4 w-4 text-green-600" />
@@ -171,10 +171,10 @@ title={t("coffee.copyPixKey")}
                 <p className="font-mono text-xs break-all">{pixPayload}</p>
               </div>
               <Button
-                variant="outline"
+                variant="whiteline"
                 size="icon"
                 onClick={handleCopyPayload}
-title={t("coffee.copyPixCode")}
+                title={t("coffee.copyPixCode")}
               >
                 {copiedPayload ? (
                   <Check className="h-4 w-4 text-green-600" />
@@ -192,7 +192,8 @@ title={t("coffee.copyPixCode")}
 
           <Alert>
             <AlertDescription className="text-sm">
-              💡 <strong>{t("coffee.howToUse")}</strong> {t("coffee.howToUseDesc")}
+              💡 <strong>{t("coffee.howToUse")}</strong>{" "}
+              {t("coffee.howToUseDesc")}
             </AlertDescription>
           </Alert>
         </CardContent>
@@ -210,9 +211,7 @@ export default function BuyMeCoffeePage() {
       <div className="max-w-2xl mx-auto space-y-6">
         <div className="text-center space-y-2">
           <h1 className="text-3xl font-bold">{t("coffee.title")}</h1>
-          <p className="text-muted-foreground">
-            {t("coffee.description")}
-          </p>
+          <p className="text-muted-foreground">{t("coffee.description")}</p>
         </div>
 
         {pixKey ? (
@@ -222,15 +221,13 @@ export default function BuyMeCoffeePage() {
             <CardContent className="pt-6">
               <Alert>
                 <AlertDescription>
-                  <p className="font-medium mb-2">
-                    {t("coffee.noPixKey")}
-                  </p>
+                  <p className="font-medium mb-2">{t("coffee.noPixKey")}</p>
                   <p className="text-sm">
-                    {t("coffee.noPixKeyDesc", { env: '<code class="bg-muted px-1 py-0.5 rounded">NEXT_PUBLIC_PIX_KEY</code>' })}
+                    {t("coffee.noPixKeyDesc", {
+                      env: '<code class="bg-muted px-1 py-0.5 rounded">NEXT_PUBLIC_PIX_KEY</code>',
+                    })}
                   </p>
-                  <p className="text-sm mt-2">
-                    {t("coffee.noPixKeyInfo")}
-                  </p>
+                  <p className="text-sm mt-2">{t("coffee.noPixKeyInfo")}</p>
                 </AlertDescription>
               </Alert>
             </CardContent>

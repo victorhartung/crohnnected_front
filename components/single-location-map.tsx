@@ -85,6 +85,7 @@ export default function SingleLocationMap({
         height,
         borderRadius: "0.5rem",
         border: "1px solid hsl(var(--border))",
+        zIndex: 0,
       }}
     />
   );
