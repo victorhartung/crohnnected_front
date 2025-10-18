@@ -1,4 +1,5 @@
 import React from 'react'
+import { useLanguage } from '@/components/language-provider'
 
 export default function ContactPage() {
   const { t } = useLanguage()

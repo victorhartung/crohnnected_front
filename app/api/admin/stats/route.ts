@@ -127,7 +127,7 @@ export const GET = withAuth(
     } catch (error) {
       console.error("Failed to fetch admin stats:", error);
       return Response.json(
-        { success: false, error: "Failed to fetch statistics" },
+        { success: false, error: "Falha ao buscar estatísticas" },
         { status: 500 }
       );
     }

@@ -18,7 +18,7 @@ export const GET = withAuth(
 
       if (!reportId) {
         return Response.json(
-          { success: false, error: "Report ID is required" },
+          { success: false, error: "ID do relatório é obrigatório" },
           { status: 400 }
         );
       }
@@ -97,7 +97,7 @@ export const GET = withAuth(
 
       if (!report) {
         return Response.json(
-          { success: false, error: "Report not found" },
+          { success: false, error: "Relatório não encontrado" },
           { status: 404 }
         );
       }
@@ -118,7 +118,7 @@ export const GET = withAuth(
       console.error("Get report error:", error);
 
       return Response.json(
-        { success: false, error: "Failed to fetch report" },
+        { success: false, error: "Falha ao buscar relatório" },
         { status: 500 }
       );
     }

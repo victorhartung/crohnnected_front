@@ -24,6 +24,7 @@ import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { useLanguage } from "@/components/language-provider";
 
 interface Article {
   id: string;
@@ -43,6 +44,7 @@ interface Article {
 
 export default function ArticleDetailPage() {
   const { data: session } = useSession();
+  const { t } = useLanguage();
   const params = useParams();
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(true);
@@ -72,9 +74,9 @@ export default function ArticleDetailPage() {
 
       if (!response.ok) {
         if (response.status === 404) {
-          setError("Article not found");
+          setError(t("hub.articleNotFound"));
         } else {
-          setError(`Failed to load article: ${response.status}`);
+          setError(`${t("hub.failedToLoad")}: ${response.status}`);
         }
         return;
       }
@@ -83,7 +85,7 @@ export default function ArticleDetailPage() {
       console.log("Article data loaded:", data);
       setArticle(data);
     } catch (error) {
-      setError("An unexpected error occurred");
+      setError(t("common.unexpectedError"));
       console.error("Failed to load article:", error);
     } finally {
       setIsLoading(false);
@@ -106,7 +108,7 @@ export default function ArticleDetailPage() {
         <div className="max-w-4xl mx-auto space-y-6">
           <Button variant="ghost" onClick={() => router.back()}>
             <ArrowLeft className="mr-2 h-4 w-4" />
-            Back
+            {t("common.back")}
           </Button>
 
           <Alert variant="destructive">
@@ -118,11 +120,10 @@ export default function ArticleDetailPage() {
             <Card>
               <CardContent className="pt-6">
                 <p className="text-muted-foreground mb-4">
-                  The article you're looking for might have been moved or
-                  deleted.
+                  {t("hub.notFoundDesc").replace("{type}", "article")}
                 </p>
                 <Button asChild>
-                  <Link href="/hub">Return to Information Hub</Link>
+                  <Link href="/hub">{t("hub.returnToHub")}</Link>
                 </Button>
               </CardContent>
             </Card>
@@ -137,7 +138,7 @@ export default function ArticleDetailPage() {
       <div className="container mx-auto px-4 py-8">
         <Alert>
           <AlertCircle className="h-4 w-4" />
-          <AlertDescription>Article not found</AlertDescription>
+          <AlertDescription>{t("hub.articleNotFound")}</AlertDescription>
         </Alert>
       </div>
     );
@@ -151,7 +152,7 @@ export default function ArticleDetailPage() {
           <Button asChild variant="ghost" className="mb-4">
             <Link href="/hub?tab=articles">
               <ArrowLeft className="mr-2 h-4 w-4" />
-              Back to Articles
+              {t("hub.backToArticles")}
             </Link>
           </Button>
 
@@ -159,7 +160,7 @@ export default function ArticleDetailPage() {
             <Button asChild>
               <Link href={`/hub/articles/${article.id}/edit`}>
                 <Edit className="mr-2 h-4 w-4" />
-                Edit Article
+                {t("hub.editArticle")}
               </Link>
             </Button>
           )}
@@ -183,7 +184,7 @@ export default function ArticleDetailPage() {
               </div>
               <div className="flex items-center gap-1">
                 <Calendar className="h-4 w-4" />
-                {formatDate(article.createdAt)}
+                {formatDate(article.createdAt, t)}
               </div>
             </div>
 

@@ -1,10 +1,9 @@
+import { NextRequest } from "next/server";
+import { prisma } from "@/lib/db";
+import { withAuth } from "@/lib/auth";
+import { User } from "@/lib/types";
 
-import { NextRequest } from 'next/server';
-import { prisma } from '@/lib/db';
-import { withAuth } from '@/lib/auth';
-import { User } from '@/lib/types';
-
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 
 export const GET = withAuth(async (request: NextRequest, user: User) => {
   try {
@@ -46,7 +45,7 @@ export const GET = withAuth(async (request: NextRequest, user: User) => {
 
     if (!userData) {
       return Response.json(
-        { success: false, error: 'User not found' },
+        { success: false, error: "Usuário não encontrado" },
         { status: 404 }
       );
     }
@@ -57,12 +56,11 @@ export const GET = withAuth(async (request: NextRequest, user: User) => {
         user: userData,
       },
     });
-
   } catch (error) {
-    console.error('Get user error:', error);
+    console.error("Get user error:", error);
 
     return Response.json(
-      { success: false, error: 'Failed to fetch user data' },
+      { success: false, error: "Falha ao buscar dados de usuário" },
       { status: 500 }
     );
   }
@@ -83,7 +81,7 @@ export const PATCH = withAuth(async (request: NextRequest, user: User) => {
 
     if (!currentUser) {
       return Response.json(
-        { success: false, error: 'User not found' },
+        { success: false, error: "Usuário não encontrado" },
         { status: 404 }
       );
     }
@@ -101,18 +99,20 @@ export const PATCH = withAuth(async (request: NextRequest, user: User) => {
     });
 
     // Handle profile updates based on user role
-    if (currentUser.role === 'PATIENT') {
+    if (currentUser.role === "PATIENT") {
       const profileData = {
         birthDate: body.birthDate ? new Date(body.birthDate) : undefined,
         sex: body.sex || undefined,
         country: body.country || undefined,
         state: body.state || undefined,
         city: body.city || undefined,
-        diagnosisDate: body.diagnosisDate ? new Date(body.diagnosisDate) : undefined,
+        diagnosisDate: body.diagnosisDate
+          ? new Date(body.diagnosisDate)
+          : undefined,
       };
 
       // Remove undefined values
-      Object.keys(profileData).forEach(key => {
+      Object.keys(profileData).forEach((key) => {
         if ((profileData as any)[key] === undefined) {
           delete (profileData as any)[key];
         }
@@ -133,7 +133,7 @@ export const PATCH = withAuth(async (request: NextRequest, user: User) => {
           },
         });
       }
-    } else if (currentUser.role === 'DOCTOR') {
+    } else if (currentUser.role === "DOCTOR") {
       const profileData = {
         licenseNumber: body.licenseNumber || undefined,
         specialty: body.specialty || undefined,
@@ -143,7 +143,7 @@ export const PATCH = withAuth(async (request: NextRequest, user: User) => {
       };
 
       // Remove undefined values
-      Object.keys(profileData).forEach(key => {
+      Object.keys(profileData).forEach((key) => {
         if ((profileData as any)[key] === undefined) {
           delete (profileData as any)[key];
         }
@@ -168,14 +168,13 @@ export const PATCH = withAuth(async (request: NextRequest, user: User) => {
 
     return Response.json({
       success: true,
-      message: 'Profile updated successfully',
+      message: "Perfil atualizado com sucesso",
     });
-
   } catch (error) {
-    console.error('Update user error:', error);
+    console.error("Update user error:", error);
 
     return Response.json(
-      { success: false, error: 'Failed to update profile' },
+      { success: false, error: "Falha ao atualizar perfil" },
       { status: 500 }
     );
   }

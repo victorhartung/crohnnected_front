@@ -1,28 +1,38 @@
+import {
+  checkRateLimit,
+  generateAccessToken,
+  generateRefreshToken,
+  getRateLimitKey,
+  hashPassword,
+} from "@/lib/auth";
+import { prisma } from "@/lib/db";
+import { registerSchema } from "@/lib/validation";
+import { UserRole } from "@prisma/client";
+import { NextRequest } from "next/server";
+import { ZodError } from "zod";
 
-import { NextRequest } from 'next/server';
-import { prisma } from '@/lib/db';
-import { registerSchema } from '@/lib/validation';
-import { hashPassword, generateAccessToken, generateRefreshToken, checkRateLimit, getRateLimitKey } from '@/lib/auth';
-import { UserRole } from '@prisma/client';
-import { ZodError } from 'zod';
-
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 
 export async function POST(request: NextRequest) {
   try {
     // Rate limiting for registration attempts
-    const rateLimitKey = getRateLimitKey(request, 'register');
-    if (!checkRateLimit(rateLimitKey, 3, 15 * 60 * 1000)) { // 3 attempts per 15 minutes
+    const rateLimitKey = getRateLimitKey(request, "register");
+    if (!checkRateLimit(rateLimitKey, 3, 15 * 60 * 1000)) {
+      // 3 attempts per 15 minutes
       return Response.json(
-        { success: false, error: 'Too many registration attempts. Please try again later.' },
+        {
+          success: false,
+          error:
+            "Muitas tentativas de registro. Por favor, tente novamente mais tarde.",
+        },
         { status: 429 }
       );
     }
 
     const body = await request.json();
-    
+
     // Validate input
-    const validatedData = registerSchema.parse(body);
+    const validatedData = registerSchema(() => "").parse(body);
     const { email, password, name, role } = validatedData;
 
     // Check if user already exists
@@ -32,7 +42,7 @@ export async function POST(request: NextRequest) {
 
     if (existingUser) {
       return Response.json(
-        { success: false, error: 'User already exists with this email' },
+        { success: false, error: "Usuário já existe com esse email" },
         { status: 409 }
       );
     }
@@ -104,28 +114,33 @@ export async function POST(request: NextRequest) {
     });
 
     // Set refresh token cookie
-    response.headers.set('Set-Cookie', 
-      `refreshToken=${refreshToken}; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age=${7 * 24 * 60 * 60}`
+    response.headers.set(
+      "Set-Cookie",
+      `refreshToken=${refreshToken}; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age=${
+        7 * 24 * 60 * 60
+      }`
     );
 
     return response;
-
   } catch (error) {
-    console.error('Registration error:', error);
+    console.error("Registration error:", error);
 
     if (error instanceof ZodError) {
       return Response.json(
-        { 
-          success: false, 
-          error: 'Validation failed',
-          details: error.errors
+        {
+          success: false,
+          error: "Validation failed",
+          details: error.errors,
         },
         { status: 400 }
       );
     }
 
     return Response.json(
-      { success: false, error: 'Registration failed. Please try again.' },
+      {
+        success: false,
+        error: "Falha ao realizar registro. Por favor, tente novamente.",
+      },
       { status: 500 }
     );
   }

@@ -27,16 +27,6 @@ function LanguageFlags() {
   return (
     <div className="flex items-center space-x-2">
       <button
-        aria-label="English"
-        title="English"
-        className={`p-1 rounded ${
-          locale === "en" ? "ring-2 ring-offset-1" : ""
-        }`}
-        onClick={() => setLocale("en")}
-      >
-        🇬🇧
-      </button>
-      <button
         aria-label="Português"
         title="Português"
         className={`p-1 rounded ${
@@ -45,6 +35,16 @@ function LanguageFlags() {
         onClick={() => setLocale("pt")}
       >
         🇧🇷
+      </button>
+      <button
+        aria-label="English"
+        title="English"
+        className={`p-1 rounded ${
+          locale === "en" ? "ring-2 ring-offset-1" : ""
+        }`}
+        onClick={() => setLocale("en")}
+      >
+        🇬🇧
       </button>
     </div>
   );

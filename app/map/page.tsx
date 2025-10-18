@@ -82,25 +82,24 @@ interface MapData {
 
 export default function MapPage() {
   const { data: session, status } = useSession();
+  const { t } = useLanguage();
   const [isLoading, setIsLoading] = useState(true);
   const [mapData, setMapData] = useState<MapData | null>(null);
   const [availableCountries, setAvailableCountries] = useState<string[]>([]);
   const [availableSymptoms, setAvailableSymptoms] = useState<string[]>([]);
   // Fields that can be exported (keep in sync with backend allowedFields)
   const availableExportFields: Option[] = [
-    { label: "Age", value: "ageAtReport" },
-    { label: "Sex", value: "sex" },
-    { label: "Country", value: "country" },
-    { label: "State", value: "state" },
-    { label: "City", value: "city" },
-    { label: "Symptoms", value: "symptoms" },
-    { label: "Symptom severity", value: "symptomSeverity" },
-    { label: "Medications", value: "medications" },
-    { label: "Flare frequency", value: "flareFrequencyPerYear" },
-    { label: "Diagnosis date", value: "diagnosisDate" },
-    { label: "Status", value: "status" },
-    { label: "Approved at", value: "approvedAt" },
-    { label: "Created at", value: "createdAt" },
+    { label: t("map.age"), value: "ageAtReport" },
+    { label: t("map.sex"), value: "sex" },
+    { label: t("map.country"), value: "country" },
+    { label: t("map.state"), value: "state" },
+    { label: t("map.city"), value: "city" },
+    { label: t("map.symptoms"), value: "symptoms" },
+    { label: t("map.symptomSeverity"), value: "symptomSeverity" },
+    { label: t("map.medications"), value: "medications" },
+    { label: t("map.flareFrequency"), value: "flareFrequencyPerYear" },
+    { label: t("map.diagnosisDate"), value: "diagnosisDate" },
+    { label: t("map.status"), value: "status" },
   ];
   const [selectedExportFields, setSelectedExportFields] = useState<string[]>([
     // Seleção padrão
@@ -242,7 +241,7 @@ export default function MapPage() {
       setAvailableSymptoms(symptoms);
     } catch (error) {
       console.error("Failed to load map data:", error);
-      toast.error("Failed to load map data");
+      toast.error(t("map.loadMapDataFailed"));
     } finally {
       setIsLoading(false);
     }
@@ -277,7 +276,7 @@ export default function MapPage() {
 
   const handleExportData = async () => {
     if (!canExport) {
-      toast.error("You do not have permission to export data");
+      toast.error(t("map.exportPermissionDenied"));
       return;
     }
 
@@ -320,10 +319,10 @@ export default function MapPage() {
       a.click();
       window.URL.revokeObjectURL(url);
 
-      toast.success("Data exported successfully");
+      toast.success(t("map.exportSuccess"));
     } catch (error) {
       console.error("Export error:", error);
-      toast.error("Failed to export data");
+      toast.error(t("map.exportFailed"));
     }
   };
 
@@ -352,7 +351,7 @@ export default function MapPage() {
       <div className="container mx-auto px-4 py-8">
         <div className="flex items-center justify-center py-8">
           <Loader2 className="h-8 w-8 animate-spin" />
-          <span className="ml-2">Loading map data...</span>
+          <span className="ml-2">{t("map.loadingMapData")}</span>
         </div>
       </div>
     );
@@ -365,10 +364,9 @@ export default function MapPage() {
       <div className="space-y-6">
         <div className="flex justify-between items-center">
           <div>
-            <h1 className="text-3xl font-bold">Geographic Map</h1>
+            <h1 className="text-3xl font-bold">{t("map.geographicMap")}</h1>
             <p className="text-muted-foreground">
-              Explore geographic distribution of Crohn's disease reports and
-              incidence data.
+              {t("map.geographicMapDesc")}
             </p>
           </div>
           {status === 'unauthenticated' && (
@@ -377,7 +375,7 @@ export default function MapPage() {
           {hasActiveFilters && (
             <Button variant="outline" onClick={clearFilters}>
               <X className="mr-2 h-4 w-4" />
-              Clear Filters
+              {t("map.clearFilters")}
             </Button>
           )}
         </div>
@@ -391,7 +389,7 @@ export default function MapPage() {
                   <MapPin className="h-6 w-6 text-muted-foreground" />
                   <div className="space-y-1">
                     <p className="text-sm text-muted-foreground">
-                      Total Reports
+                      {t("map.totalReports")}
                     </p>
                     <p className="text-2xl font-bold">
                       {mapData.summary.totalReports}
@@ -405,7 +403,7 @@ export default function MapPage() {
                 <div className="flex items-center space-x-2">
                   <BarChart3 className="h-6 w-6 text-muted-foreground" />
                   <div className="space-y-1">
-                    <p className="text-sm text-muted-foreground">Approved</p>
+                    <p className="text-sm text-muted-foreground">{t("map.approved")}</p>
                     <p className="text-2xl font-bold">
                       {mapData.summary.approvedReports}
                     </p>
@@ -418,7 +416,7 @@ export default function MapPage() {
                 <div className="flex items-center space-x-2">
                   <MapPin className="h-6 w-6 text-muted-foreground" />
                   <div className="space-y-1">
-                    <p className="text-sm text-muted-foreground">Countries</p>
+                    <p className="text-sm text-muted-foreground">{t("map.countries")}</p>
                     <p className="text-2xl font-bold">
                       {mapData.summary.countries}
                     </p>
@@ -431,7 +429,7 @@ export default function MapPage() {
                 <div className="flex items-center space-x-2">
                   <Info className="h-6 w-6 text-muted-foreground" />
                   <div className="space-y-1">
-                    <p className="text-sm text-muted-foreground">Avg Age</p>
+                    <p className="text-sm text-muted-foreground">{t("map.avgAge")}</p>
                     <p className="text-2xl font-bold">
                       {mapData.summary.avgAge}
                     </p>
@@ -448,25 +446,25 @@ export default function MapPage() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Filter className="h-5 w-5" />
-                Filters
+                {t("map.filters")}
               </CardTitle>
               <CardDescription>
-                Filter map data by various criteria
+                {t("map.filterMapData")}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               {/* Countries Filter */}
               <div className="space-y-2">
-                <label className="text-sm font-medium">Country</label>
+                <label className="text-sm font-medium">{t("map.country")}</label>
                 <Select
                   value={filters.country}
                   onValueChange={(value) => updateFilter("country", value)}
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Select country" />
+                    <SelectValue placeholder={t("map.selectCountry")} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">All Countries</SelectItem>
+                    <SelectItem value="all">{t("map.allCountries")}</SelectItem>
                     {availableCountries.map((country) => (
                       <SelectItem key={country} value={country}>
                         {country}
@@ -478,35 +476,35 @@ export default function MapPage() {
 
               {/* Severity Filter */}
               <div className="space-y-2">
-                <label className="text-sm font-medium">Severity</label>
+                <label className="text-sm font-medium">{t("map.severity")}</label>
                 <Select
                   value={filters.severity}
                   onValueChange={(value) => updateFilter("severity", value)}
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Select severity" />
+                    <SelectValue placeholder={t("map.selectSeverity")} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">All Severities</SelectItem>
-                    <SelectItem value="MILD">Mild</SelectItem>
-                    <SelectItem value="MODERATE">Moderate</SelectItem>
-                    <SelectItem value="SEVERE">Severe</SelectItem>
+                    <SelectItem value="all">{t("map.allSeverities")}</SelectItem>
+                    <SelectItem value="MILD">{t("map.mild")}</SelectItem>
+                    <SelectItem value="MODERATE">{t("map.moderate")}</SelectItem>
+                    <SelectItem value="SEVERE">{t("map.severe")}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
 
               {/* Symptoms Filter */}
               <div className="space-y-2">
-                <label className="text-sm font-medium">Symptom</label>
+                <label className="text-sm font-medium">{t("map.symptom")}</label>
                 <Select
                   value={filters.symptom}
                   onValueChange={(value) => updateFilter("symptom", value)}
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Select symptom" />
+                    <SelectValue placeholder={t("map.selectSymptom")} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">All Symptoms</SelectItem>
+                    <SelectItem value="all">{t("map.allSymptoms")}</SelectItem>
                     {availableSymptoms.map((symptom) => (
                       <SelectItem key={symptom} value={symptom}>
                         {symptom}
@@ -519,18 +517,17 @@ export default function MapPage() {
               {/* Export fields selector (only for roles that can export) */}
               {canExport && (
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">Export fields</label>
+                  <label className="text-sm font-medium">{t("map.exportFields")}</label>
                   <MultiSelect
                     options={availableExportFields}
                     value={selectedExportFields}
                     onChange={(v) => setSelectedExportFields(v)}
-                    placeholder="Select fields to export"
-                    searchPlaceholder="Search fields..."
-                    emptyText="No fields"
+                    placeholder={t("map.selectFieldsToExport")}
+                    searchPlaceholder={t("map.searchFields")}
+                    emptyText={t("map.noFields")}
                   />
                   <p className="text-xs text-muted-foreground">
-                    Pick which columns appear in the CSV. Leave empty to use the
-                    server defaults.
+                    {t("map.exportFieldsDesc")}
                   </p>
                 </div>
               )}
@@ -551,7 +548,7 @@ export default function MapPage() {
                     htmlFor="approvedOnly"
                     className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                   >
-                    Approved reports only
+                    {t("map.approvedReportsOnly")}
                   </label>
                 </div>
 
@@ -567,7 +564,7 @@ export default function MapPage() {
                     htmlFor="showHeatmap"
                     className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                   >
-                    Show heatmap
+                    {t("map.showHeatmap")}
                   </label>
                 </div>
               </div>
@@ -578,7 +575,7 @@ export default function MapPage() {
               {canExport && (
                 <Button onClick={handleExportData} className="w-full">
                   <Download className="mr-2 h-4 w-4" />
-                  Export Data
+                  {t("map.exportData")}
                 </Button>
               )}
             </CardContent>
@@ -590,12 +587,12 @@ export default function MapPage() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Layers className="h-5 w-5" />
-                  Interactive Map
+                  {t("map.interactiveMap")}
                 </CardTitle>
                 <CardDescription>
                   {filters.country !== "all"
-                    ? `Showing data for: ${filters.country}`
-                    : "Showing data for all countries"}
+                    ? `${t("map.showingDataFor").replace("{country}", filters.country)}`
+                    : t("map.showingAllCountries")}
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -612,12 +609,12 @@ export default function MapPage() {
                         <MapPin className="h-12 w-12 text-muted-foreground mx-auto mb-2" />
                         <p className="text-muted-foreground">
                           {filters.country !== "all"
-                            ? `No data available for ${filters.country}`
-                            : "No map data available"}
+                            ? t("map.noDataFor").replace("{country}", filters.country)
+                            : t("map.noMapData")}
                         </p>
                         <Button onClick={loadMapData} className="mt-4">
                           <Loader2 className="mr-2 h-4 w-4" />
-                          Reload Data
+                          {t("map.reloadData")}
                         </Button>
                       </div>
                     </div>

@@ -1,48 +1,59 @@
+"use client";
 
-'use client'
-
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import Link from 'next/link'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Alert, AlertDescription } from '@/components/ui/alert'
-import { Loader2, AlertCircle } from 'lucide-react'
-import { registerSchema, type RegisterInput } from '@/lib/validations'
-import { toast } from 'sonner'
-import { useLanguage } from '@/components/language-provider'
+import { useLanguage } from "@/components/language-provider";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { registerSchema, type RegisterInput } from "@/lib/validations";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { AlertCircle, Loader2 } from "lucide-react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 
 export default function RegisterPage() {
-  const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState('')
-  const router = useRouter()
-  const { t } = useLanguage()
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
+  const router = useRouter();
+  const { t } = useLanguage();
 
   const form = useForm<RegisterInput>({
-    resolver: zodResolver(registerSchema),
+    resolver: zodResolver(registerSchema(t)),
     defaultValues: {
-      email: '',
-      password: '',
-      confirmPassword: '',
-      name: '',
-      role: 'PATIENT',
+      email: "",
+      password: "",
+      confirmPassword: "",
+      name: "",
+      role: "PATIENT",
     },
-  })
+  });
 
   const onSubmit = async (data: RegisterInput) => {
-    setIsLoading(true)
-    setError('')
+    setIsLoading(true);
+    setError("");
 
     try {
-      const response = await fetch('/api/auth/register', {
-        method: 'POST',
+      const response = await fetch("/api/auth/register", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           email: data.email,
@@ -50,40 +61,44 @@ export default function RegisterPage() {
           name: data.name,
           role: data.role,
         }),
-      })
+      });
 
       if (!response.ok) {
-        const errorData = await response.json()
-        setError(errorData.message || t('auth.registrationFailed'))
-        return
+        const errorData = await response.json();
+        setError(errorData.message || t("auth.registrationFailed"));
+        return;
       }
 
-      toast.success(t('auth.registrationSuccess'))
-      router.push('/login')
+      toast.success(t("auth.registrationSuccess"));
+      router.push("/login");
     } catch (error) {
-      setError(t('auth.unexpectedError'))
-      console.error('Registration error:', error)
+      setError(t("auth.unexpectedError"));
+      console.error("Registration error:", error);
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-md">
       <Card>
         <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl text-center">{t('auth.createAccount')}</CardTitle>
-          <CardDescription className="text-center">{t('auth.createAccountDesc')}</CardDescription>
+          <CardTitle className="text-2xl text-center">
+            {t("auth.createAccount")}
+          </CardTitle>
+          <CardDescription className="text-center">
+            {t("auth.createAccountDesc")}
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="name">{t('auth.enterInfo')}</Label>
+              <Label htmlFor="name">{t("auth.enterInfo")}</Label>
               <Input
                 id="name"
                 type="text"
-                placeholder={t('auth.enterInfo')}
-                {...form.register('name')}
+                placeholder={t("auth.enterInfo")}
+                {...form.register("name")}
                 disabled={isLoading}
               />
               {form.formState.errors.name && (
@@ -94,12 +109,12 @@ export default function RegisterPage() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="email">{t('auth.email')}</Label>
+              <Label htmlFor="email">{t("auth.email")}</Label>
               <Input
                 id="email"
                 type="email"
-                placeholder={t('auth.emailPlaceholder')}
-                {...form.register('email')}
+                placeholder={t("auth.emailPlaceholder")}
+                {...form.register("email")}
                 disabled={isLoading}
               />
               {form.formState.errors.email && (
@@ -110,18 +125,24 @@ export default function RegisterPage() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="role">{t('auth.role')}</Label>
+              <Label htmlFor="role">{t("auth.role")}</Label>
               <Select
-                value={form.watch('role')}
-                onValueChange={(value) => form.setValue('role', value as 'PATIENT' | 'RESEARCHER')}
+                value={form.watch("role")}
+                onValueChange={(value) =>
+                  form.setValue("role", value as "PATIENT" | "RESEARCHER")
+                }
                 disabled={isLoading}
               >
                 <SelectTrigger>
-                  <SelectValue placeholder={t('auth.selectRole')} />
+                  <SelectValue placeholder={t("auth.selectRole")} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="PATIENT">{t('auth.rolePatient')}</SelectItem>
-                  <SelectItem value="RESEARCHER">{t('auth.roleResearcher')}</SelectItem>
+                  <SelectItem value="PATIENT">
+                    {t("auth.rolePatient")}
+                  </SelectItem>
+                  <SelectItem value="RESEARCHER">
+                    {t("auth.roleResearcher")}
+                  </SelectItem>
                 </SelectContent>
               </Select>
               {form.formState.errors.role && (
@@ -132,12 +153,12 @@ export default function RegisterPage() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="password">{t('auth.password')}</Label>
+              <Label htmlFor="password">{t("auth.password")}</Label>
               <Input
                 id="password"
                 type="password"
-                placeholder={t('auth.passwordPlaceholder')}
-                {...form.register('password')}
+                placeholder={t("auth.passwordPlaceholder")}
+                {...form.register("password")}
                 disabled={isLoading}
               />
               {form.formState.errors.password && (
@@ -148,12 +169,14 @@ export default function RegisterPage() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="confirmPassword">{t('auth.confirmPassword')}</Label>
+              <Label htmlFor="confirmPassword">
+                {t("auth.confirmPassword")}
+              </Label>
               <Input
                 id="confirmPassword"
                 type="password"
-                placeholder={t('auth.confirmPasswordPlaceholder')}
-                {...form.register('confirmPassword')}
+                placeholder={t("auth.confirmPasswordPlaceholder")}
+                {...form.register("confirmPassword")}
                 disabled={isLoading}
               />
               {form.formState.errors.confirmPassword && (
@@ -172,18 +195,20 @@ export default function RegisterPage() {
 
             <Button type="submit" className="w-full" disabled={isLoading}>
               {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              {t('auth.createAccount')}
+              {t("auth.createAccount")}
             </Button>
           </form>
 
           <div className="mt-6 text-center text-sm">
-            <span className="text-muted-foreground">{t('auth.alreadyHave')} </span>
+            <span className="text-muted-foreground">
+              {t("auth.alreadyHave")}{" "}
+            </span>
             <Link href="/login" className="text-primary hover:underline">
-              {t('auth.signIn')}
+              {t("auth.signIn")}
             </Link>
           </div>
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

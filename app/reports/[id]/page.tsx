@@ -45,6 +45,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
+import { useLanguage } from "@/components/language-provider";
 
 // Importa o componente de mapa dinamicamente (client-side only)
 const SingleLocationMap = dynamic(
@@ -89,6 +90,7 @@ interface Report {
 }
 
 export default function ReportDetailPage() {
+  const { t } = useLanguage();
   const { data: session, status } = useSession();
   const params = useParams();
   const router = useRouter();
@@ -100,13 +102,12 @@ export default function ReportDetailPage() {
 
   const reportId = params?.id as string;
 
-  const isPatient = session?.user?.role === "PATIENT";
   const canApprove =
     session?.user?.role === "DOCTOR" || session?.user?.role === "ADMIN";
   const canViewDocument = session?.user?.role !== "RESEARCHER"; // Researchers can't access PDFs
 
   const rejectForm = useForm<RejectReportInput>({
-    resolver: zodResolver(rejectReportSchema),
+    resolver: zodResolver(rejectReportSchema(t)),
     defaultValues: {
       reason: "",
     },
@@ -126,12 +127,12 @@ export default function ReportDetailPage() {
       const response = await fetch(`/api/reports/${reportId}`);
       if (!response.ok) {
         if (response.status === 404) {
-          setError("Report not found");
+          setError(t("reports.reportNotFound"));
         } else if (response.status === 403) {
-          setError("You do not have permission to view this report");
+          setError(t("reports.noPermissionToView"));
         } else {
           const errorData = await response.json();
-          setError(errorData.message || "Failed to load report");
+          setError(errorData.message || t("reports.failedToLoad"));
         }
         return;
       }
@@ -140,7 +141,7 @@ export default function ReportDetailPage() {
       // API retorna { success: true, data: { report } }
       setReport(data?.data?.report ?? null);
     } catch (error) {
-      setError("An unexpected error occurred");
+      setError(t("auth.unexpectedError"));
       console.error("Failed to load report:", error);
     } finally {
       setIsLoading(false);
@@ -160,15 +161,14 @@ export default function ReportDetailPage() {
       });
 
       if (!response.ok) {
-        const errorData = await response.json();
-        toast.error(errorData.message || "Failed to approve report");
+        toast.error(t("reports.failedToApprove"));
         return;
       }
 
-      toast.success("Report approved successfully");
+      toast.success(t("reports.reportApproved"));
       loadReport(); // Refresh the report
     } catch (error) {
-      toast.error("Failed to approve report");
+      toast.error(t("reports.failedToApprove"));
       console.error("Approve report error:", error);
     }
   };
@@ -186,17 +186,16 @@ export default function ReportDetailPage() {
       });
 
       if (!response.ok) {
-        const errorData = await response.json();
-        toast.error(errorData.message || "Failed to reject report");
+        toast.error(t("reports.failedToReject"));
         return;
       }
 
-      toast.success("Report rejected");
+      toast.success(t("reports.reportRejected"));
       setRejectDialogOpen(false);
       rejectForm.reset();
       loadReport(); // Refresh the report
     } catch (error) {
-      toast.error("Failed to reject report");
+      toast.error(t("reports.failedToReject"));
       console.error("Reject report error:", error);
     }
   };
@@ -209,17 +208,16 @@ export default function ReportDetailPage() {
     try {
       const response = await fetch(`/api/reports/${report.id}/document`);
       if (!response.ok) {
-        const errorData = await response.json();
-        toast.error(errorData.error || "Failed to download document");
+        toast.error(t("reports.failedToDownload"));
         return;
       }
 
       const data = await response.json();
       const doc = data?.data ?? {};
       downloadPDFFromBase64(doc.documentBase64, doc.documentOriginalName);
-      toast.success("Document downloaded successfully");
+      toast.success(t("reports.documentDownloaded"));
     } catch (error) {
-      toast.error("Failed to download document");
+      toast.error(t("reports.failedToDownload"));
       console.error("Download error:", error);
     } finally {
       setIsDownloading(false);
@@ -241,9 +239,7 @@ export default function ReportDetailPage() {
       <div className="container mx-auto px-4 py-8">
         <Alert>
           <AlertCircle className="h-4 w-4" />
-          <AlertDescription>
-            Please sign in to view this report.
-          </AlertDescription>
+          <AlertDescription>{t("profile.signInToView")}</AlertDescription>
         </Alert>
       </div>
     );
@@ -255,11 +251,13 @@ export default function ReportDetailPage() {
         <div className="space-y-4">
           <Button variant="ghost" onClick={() => router.back()}>
             <ArrowLeft className="mr-2 h-4 w-4" />
-            Back
+            {t("common.back")}
           </Button>
           <Alert variant="destructive">
             <AlertCircle className="h-4 w-4" />
-            <AlertDescription>{error || "Report not found"}</AlertDescription>
+            <AlertDescription>
+              {error || t("reports.reportNotFound")}
+            </AlertDescription>
           </Alert>
         </div>
       </div>
@@ -272,14 +270,14 @@ export default function ReportDetailPage() {
         <div className="flex items-center justify-between">
           <Button variant="ghost" onClick={() => router.back()}>
             <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Reports
+            {t("reports.backToReports")}
           </Button>
 
           {canApprove && report.status === "PENDING" && (
             <div className="flex gap-2">
               <Button onClick={handleApproveReport}>
                 <CheckCircle className="mr-2 h-4 w-4" />
-                Approve
+                {t("reports.approveReport")}
               </Button>
               <Dialog
                 open={rejectDialogOpen}
@@ -288,23 +286,25 @@ export default function ReportDetailPage() {
                 <DialogTrigger asChild>
                   <Button variant="destructive">
                     <XCircle className="mr-2 h-4 w-4" />
-                    Reject
+                    {t("reports.rejectReport")}
                   </Button>
                 </DialogTrigger>
                 <DialogContent>
                   <DialogHeader>
-                    <DialogTitle>Reject Report</DialogTitle>
+                    <DialogTitle>{t("reports.confirmRejection")}</DialogTitle>
                     <DialogDescription>
-                      Please provide a reason for rejecting this report.
+                      {t("reports.confirmRejectionDesc")}
                     </DialogDescription>
                   </DialogHeader>
                   <form onSubmit={rejectForm.handleSubmit(handleRejectReport)}>
                     <div className="space-y-4 py-4">
                       <div className="space-y-2">
-                        <Label htmlFor="reason">Rejection Reason</Label>
+                        <Label htmlFor="reason">
+                          {t("reports.reasonLabel")}
+                        </Label>
                         <Textarea
                           id="reason"
-                          placeholder="Enter the reason for rejection..."
+                          placeholder={t("reports.reasonPlaceholder")}
                           {...rejectForm.register("reason")}
                           rows={3}
                         />
@@ -321,10 +321,10 @@ export default function ReportDetailPage() {
                         variant="outline"
                         onClick={() => setRejectDialogOpen(false)}
                       >
-                        Cancel
+                        {t("common.cancel")}
                       </Button>
                       <Button type="submit" variant="destructive">
-                        Reject Report
+                        {t("reports.rejectReport")}
                       </Button>
                     </DialogFooter>
                   </form>
@@ -340,17 +340,18 @@ export default function ReportDetailPage() {
             <div className="flex justify-between items-start">
               <div className="space-y-2">
                 <CardTitle className="text-2xl">
-                  Report #{report.id ? report.id.slice(-8) : "N/A"}
+                  {t("reports.reportDetails")} #
+                  {report.id ? report.id.slice(-8) : "N/A"}
                 </CardTitle>
                 <div className="flex items-center gap-4 text-sm text-muted-foreground font-semibold">
                   <div className="flex items-center gap-1">
                     <Calendar className="h-4 w-4" />
-                    Submitted {formatDate(report.createdAt)}
+                    {t("reports.submittedOn")} {formatDate(report.createdAt, t)}
                   </div>
                   {report.ageAtReport && (
                     <div className="flex items-center gap-1">
                       <User className="h-4 w-4" />
-                      Age: {report.ageAtReport}
+                      {t("reports.ageAtReport")}: {report.ageAtReport}
                     </div>
                   )}
                 </div>
@@ -360,13 +361,14 @@ export default function ReportDetailPage() {
                   variant={"none"}
                   className={getStatusColor(report.status)}
                 >
-                  {report.status}
+                  {t(`reports.${report.status.toLowerCase()}`)}
                 </Badge>
                 <Badge
                   variant={"none"}
                   className={getSeverityColor(report.symptomSeverity)}
                 >
-                  {report.symptomSeverity} Severity
+                  {t(`reports.${report.symptomSeverity.toLowerCase()}`)}{" "}
+                  {t("reports.severity")}
                 </Badge>
               </div>
             </div>
@@ -379,25 +381,31 @@ export default function ReportDetailPage() {
             <CardHeader>
               <CardTitle className="text-lg flex items-center gap-2">
                 <Clock className="h-5 w-5" />
-                Status Information
+                {t("reports.statusInformation")}
               </CardTitle>
             </CardHeader>
             <CardContent>
               {report.status === "APPROVED" && (
                 <div className="space-y-2">
                   <p className="text-sm text-muted-foreground">
-                    <span className="font-medium text-black">Approved by:</span>{" "}
+                    <span className="font-medium text-black">
+                      {t("reports.approvedBy")}:
+                    </span>{" "}
                     {report.approvedBy?.name || report.approvedBy?.email}
                   </p>
                   <p className="text-sm text-muted-foreground">
-                    <span className="font-medium text-black">Approved on:</span>{" "}
-                    {report.approvedAt && formatDateTime(report.approvedAt)}
+                    <span className="font-medium text-black">
+                      {t("reports.approvedOn")}:
+                    </span>{" "}
+                    {report.approvedAt && formatDateTime(report.approvedAt, t)}
                   </p>
                 </div>
               )}
               {report.status === "REJECTED" && report.rejectionReason && (
                 <div className="space-y-2">
-                  <p className="text-sm font-medium">Rejection Reason:</p>
+                  <p className="text-sm font-medium">
+                    {t("reports.rejectionReason")}
+                  </p>
                   <p className="text-sm bg-destructive/10 p-3 rounded-md">
                     {report.rejectionReason}
                   </p>
@@ -413,29 +421,37 @@ export default function ReportDetailPage() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <User className="h-5 w-5" />
-                Personal Information
+                {t("reports.patientInformation")}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
               {report.ageAtReport && (
                 <div>
-                  <span className="text-sm font-medium">Age at Report:</span>
+                  <span className="text-sm font-medium">
+                    {t("reports.ageAtReport")}:
+                  </span>
                   <p className="text-sm text-muted-foreground">
-                    {report.ageAtReport} years
+                    {report.ageAtReport} {t("reports.years")}
                   </p>
                 </div>
               )}
               {report.sex && (
                 <div>
-                  <span className="text-sm font-medium">Sex:</span>
-                  <p className="text-sm text-muted-foreground">{report.sex}</p>
+                  <span className="text-sm font-medium">
+                    {t("reports.sex")}:
+                  </span>
+                  <p className="text-sm text-muted-foreground">
+                    {t(`reports.${report.sex.toLowerCase()}`)}
+                  </p>
                 </div>
               )}
               {report.diagnosisDate && (
                 <div>
-                  <span className="text-sm font-medium">Diagnosis Date:</span>
+                  <span className="text-sm font-medium">
+                    {t("reports.diagnosisDate")}:
+                  </span>
                   <p className="text-sm text-muted-foreground">
-                    {formatDate(report.diagnosisDate)}
+                    {formatDate(report.diagnosisDate, t)}
                   </p>
                 </div>
               )}
@@ -447,7 +463,7 @@ export default function ReportDetailPage() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <MapPin className="h-5 w-5" />
-                Location
+                {t("reports.locationInfo")}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
@@ -481,12 +497,14 @@ export default function ReportDetailPage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Stethoscope className="h-5 w-5" />
-              Medical Information
+              {t("reports.medicalInformation")}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
             <div>
-              <span className="text-sm font-medium block mb-2">Symptoms:</span>
+              <span className="text-sm font-medium block mb-2">
+                {t("reports.symptoms")}:
+              </span>
               <div className="flex flex-wrap gap-2">
                 {(report.symptoms || []).map((symptom) => (
                   <Badge key={symptom} variant="outline">
@@ -499,7 +517,7 @@ export default function ReportDetailPage() {
             {report.medications && report.medications.length > 0 && (
               <div>
                 <span className="text-sm font-medium block mb-2">
-                  Current Medications:
+                  {t("reports.medications")}:
                 </span>
                 <div className="flex flex-wrap gap-2">
                   {report.medications.map((medication) => (
@@ -513,9 +531,11 @@ export default function ReportDetailPage() {
 
             {report.flareFrequencyPerYear && (
               <div>
-                <span className="text-sm font-medium">Flare Frequency:</span>
+                <span className="text-sm font-medium">
+                  {t("reports.flareFrequency")}:
+                </span>
                 <p className="text-sm text-muted-foreground">
-                  {report.flareFrequencyPerYear} flares per year
+                  {report.flareFrequencyPerYear} {t("reports.timesPerYear")}
                 </p>
               </div>
             )}
@@ -523,7 +543,7 @@ export default function ReportDetailPage() {
             {report.surgeryHistory && report.surgeryHistory.length > 0 && (
               <div>
                 <span className="text-sm font-medium block mb-2">
-                  Surgery History:
+                  {t("reports.surgeryHistory")}:
                 </span>
                 <div className="space-y-2">
                   {report.surgeryHistory.map((surgery, index) => (
@@ -551,7 +571,7 @@ export default function ReportDetailPage() {
             {report.notes && (
               <div>
                 <span className="text-sm font-medium block mb-2">
-                  Additional Notes:
+                  {t("reports.additionalNotes")}:
                 </span>
                 <div className="bg-muted/50 p-3 rounded-md">
                   <p className="text-sm text-muted-foreground">
@@ -569,7 +589,7 @@ export default function ReportDetailPage() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <FileText className="h-5 w-5" />
-                Supporting Documentation
+                {t("reports.supportingDocument")}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -595,10 +615,14 @@ export default function ReportDetailPage() {
                     ) : (
                       <Download className="mr-2 h-4 w-4" />
                     )}
-                    Download
+                    {isDownloading
+                      ? t("reports.downloading")
+                      : t("reports.downloadDocument")}
                   </Button>
                 ) : (
-                  <Badge variant="secondary">Access Restricted</Badge>
+                  <Badge variant="secondary">
+                    {t("reports.documentNotAvailable")}
+                  </Badge>
                 )}
               </div>
             </CardContent>

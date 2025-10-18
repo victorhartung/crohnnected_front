@@ -1,31 +1,34 @@
+import { withAuth } from "@/lib/auth";
+import { prisma } from "@/lib/db";
+import { User } from "@/lib/types";
+import { approveReportSchema } from "@/lib/validation";
+import { ReportStatus, UserRole } from "@prisma/client";
+import { NextRequest } from "next/server";
+import { ZodError } from "zod";
 
-import { NextRequest } from 'next/server';
-import { prisma } from '@/lib/db';
-import { withAuth } from '@/lib/auth';
-import { approveReportSchema } from '@/lib/validation';
-import { User } from '@/lib/types';
-import { UserRole, ReportStatus } from '@prisma/client';
-import { ZodError } from 'zod';
-
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 
 // APPROVE report (doctors only)
 export const PATCH = withAuth(
-  async (request: NextRequest, user: User, { params }: { params: { id: string } }) => {
+  async (
+    request: NextRequest,
+    user: User,
+    { params }: { params: { id: string } }
+  ) => {
     try {
       const reportId = params.id;
 
       if (!reportId) {
         return Response.json(
-          { success: false, error: 'Report ID is required' },
+          { success: false, error: "ID do relatório é obrigatório" },
           { status: 400 }
         );
       }
 
       const body = await request.json();
-      
+
       // Validate input
-      const validatedData = approveReportSchema.parse(body);
+      const validatedData = approveReportSchema(() => "").parse(body);
       const { notes } = validatedData;
 
       // Find the report
@@ -36,14 +39,17 @@ export const PATCH = withAuth(
 
       if (!existingReport) {
         return Response.json(
-          { success: false, error: 'Report not found' },
+          { success: false, error: "Relatório não encontrado" },
           { status: 404 }
         );
       }
 
       if (existingReport.status !== ReportStatus.PENDING) {
         return Response.json(
-          { success: false, error: 'Only pending reports can be approved' },
+          {
+            success: false,
+            error: "Apenas relatórios pendentes podem ser aprovados",
+          },
           { status: 400 }
         );
       }
@@ -76,8 +82,8 @@ export const PATCH = withAuth(
       await prisma.auditLog.create({
         data: {
           actorId: user.id,
-          action: 'APPROVE_REPORT',
-          entity: 'Report',
+          action: "APPROVE_REPORT",
+          entity: "Report",
           entityId: reportId,
           meta: {
             reportId,
@@ -93,25 +99,24 @@ export const PATCH = withAuth(
         data: {
           report: updatedReport,
         },
-        message: 'Report approved successfully',
+        message: "Relatório aprovado com sucesso",
       });
-
     } catch (error) {
-      console.error('Approve report error:', error);
+      console.error("Approve report error:", error);
 
       if (error instanceof ZodError) {
         return Response.json(
-          { 
-            success: false, 
-            error: 'Validation failed',
-            details: error.errors
+          {
+            success: false,
+            error: "Validação falhou",
+            details: error.errors,
           },
           { status: 400 }
         );
       }
 
       return Response.json(
-        { success: false, error: 'Failed to approve report' },
+        { success: false, error: "Falha ao aprovar relatório" },
         { status: 500 }
       );
     }

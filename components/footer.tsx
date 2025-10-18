@@ -139,7 +139,7 @@ export function Footer() {
                 "&copy; " +
                   new Date().getFullYear() +
                   " Crohnnected. All rights reserved."
-              ),
+              ).replace("{year}", new Date().getFullYear().toString()),
             }}
           />
         </div>

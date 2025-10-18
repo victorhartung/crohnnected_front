@@ -1,20 +1,23 @@
+import { NextRequest } from "next/server";
+import { prisma } from "@/lib/db";
+import {
+  verifyToken,
+  generateAccessToken,
+  generateRefreshToken,
+} from "@/lib/auth";
 
-import { NextRequest } from 'next/server';
-import { prisma } from '@/lib/db';
-import { verifyToken, generateAccessToken, generateRefreshToken } from '@/lib/auth';
-
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 
 export async function POST(request: NextRequest) {
   try {
     // Get refresh token from cookie
-    const cookies = request.headers.get('Cookie');
+    const cookies = request.headers.get("Cookie");
     const refreshTokenMatch = cookies?.match(/refreshToken=([^;]+)/);
     const refreshToken = refreshTokenMatch?.[1];
 
     if (!refreshToken) {
       return Response.json(
-        { success: false, error: 'No refresh token provided' },
+        { success: false, error: "Token de atualização não fornecido" },
         { status: 401 }
       );
     }
@@ -29,7 +32,7 @@ export async function POST(request: NextRequest) {
 
     if (!user) {
       return Response.json(
-        { success: false, error: 'User not found' },
+        { success: false, error: "Usuário não encontrado" },
         { status: 401 }
       );
     }
@@ -61,17 +64,19 @@ export async function POST(request: NextRequest) {
     });
 
     // Set new refresh token cookie
-    response.headers.set('Set-Cookie', 
-      `refreshToken=${newRefreshToken}; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age=${7 * 24 * 60 * 60}`
+    response.headers.set(
+      "Set-Cookie",
+      `refreshToken=${newRefreshToken}; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age=${
+        7 * 24 * 60 * 60
+      }`
     );
 
     return response;
-
   } catch (error) {
-    console.error('Refresh token error:', error);
+    console.error("Refresh token error:", error);
 
     return Response.json(
-      { success: false, error: 'Invalid refresh token' },
+      { success: false, error: "Token de atualização inválido" },
       { status: 401 }
     );
   }

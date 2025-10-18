@@ -18,7 +18,7 @@ export const POST = withAuth(async (request: NextRequest, user: User) => {
     // Only patients can create reports
     if (user.role !== UserRole.PATIENT) {
       return Response.json(
-        { success: false, error: "Only patients can create reports" },
+        { success: false, error: "Apenas pacientes podem gerar relatórios" },
         { status: 403 }
       );
     }
@@ -34,7 +34,7 @@ export const POST = withAuth(async (request: NextRequest, user: User) => {
     });
     if (existing) {
       return Response.json(
-        { success: false, error: "Patient already has an active report" },
+        { success: false, error: "Paciente já tem um relatório ativo" },
         { status: 400 }
       );
     }
@@ -46,7 +46,8 @@ export const POST = withAuth(async (request: NextRequest, user: User) => {
       return Response.json(
         {
           success: false,
-          error: "Too many report creation attempts. Please try again later.",
+          error:
+            "Muitas tentativas de geração de relatório. Por favor, tente mais tarde.",
         },
         { status: 429 }
       );
@@ -55,7 +56,7 @@ export const POST = withAuth(async (request: NextRequest, user: User) => {
     const body = await request.json();
 
     // Validate input
-    const validatedData = createReportSchema.parse(body);
+    const validatedData = createReportSchema(() => "").parse(body);
 
     // For patient-created reports, require a supporting document
     if (user.role === UserRole.PATIENT) {
@@ -65,7 +66,7 @@ export const POST = withAuth(async (request: NextRequest, user: User) => {
         !!validatedData.documentMime;
       if (!hasDocument) {
         return Response.json(
-          { success: false, error: "Supporting document (PDF) is required" },
+          { success: false, error: "Documento de apoio (PDF) é obrigatório" },
           { status: 400 }
         );
       }
@@ -115,7 +116,7 @@ export const POST = withAuth(async (request: NextRequest, user: User) => {
       return Response.json(
         {
           success: false,
-          error: "Validation failed",
+          error: "Validação falhou",
           details: error.errors,
         },
         { status: 400 }
@@ -123,7 +124,7 @@ export const POST = withAuth(async (request: NextRequest, user: User) => {
     }
 
     return Response.json(
-      { success: false, error: "Failed to create report" },
+      { success: false, error: "Falha ao gerar relatório" },
       { status: 500 }
     );
   }
@@ -416,7 +417,7 @@ export const GET = withAuth(async (request: NextRequest, user: User) => {
       return Response.json(
         {
           success: false,
-          error: "Invalid query parameters",
+          error: "Parâmetros de busca inválidos",
           details: error.errors,
         },
         { status: 400 }
@@ -424,7 +425,7 @@ export const GET = withAuth(async (request: NextRequest, user: User) => {
     }
 
     return Response.json(
-      { success: false, error: "Failed to fetch reports" },
+      { success: false, error: "Falha ao buscar relatórios" },
       { status: 500 }
     );
   }

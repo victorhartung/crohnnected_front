@@ -1,59 +1,62 @@
+"use client";
 
-"use client"
-
-import * as React from "react"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/popover"
-import { Check, ChevronsUpDown, X } from "lucide-react"
-import { cn } from "@/lib/utils"
+} from "@/components/ui/popover";
+import { cn } from "@/lib/utils";
+import { Check, ChevronsUpDown, X } from "lucide-react";
+import * as React from "react";
+import { useLanguage } from "./language-provider";
 
 export interface Option {
-  label: string
-  value: string
+  label: string;
+  value: string;
 }
 
 interface MultiSelectProps {
-  options: Option[]
-  value: string[]
-  onChange: (value: string[]) => void
-  placeholder?: string
-  searchPlaceholder?: string
-  emptyText?: string
-  disabled?: boolean
-  maxItems?: number
+  options: Option[];
+  value: string[];
+  onChange: (value: string[]) => void;
+  placeholder?: string;
+  searchPlaceholder?: string;
+  emptyText?: string;
+  disabled?: boolean;
+  maxItems?: number;
 }
 
 export function MultiSelect({
   options,
   value,
   onChange,
-  placeholder = "Select items...",
-  searchPlaceholder = "Search...",
-  emptyText = "No items found",
+  placeholder,
+  searchPlaceholder,
+  emptyText,
   disabled = false,
   maxItems,
 }: MultiSelectProps) {
-  const [open, setOpen] = React.useState(false)
-  const [search, setSearch] = React.useState('')
+  const { t } = useLanguage();
+  const [open, setOpen] = React.useState(false);
+  const [search, setSearch] = React.useState("");
 
   const handleUnselect = (item: string) => {
-    onChange(value.filter((i) => i !== item))
-  }
+    onChange(value.filter((i) => i !== item));
+  };
 
   const handleSelect = (item: string) => {
     if (value.includes(item)) {
-      handleUnselect(item)
+      handleUnselect(item);
     } else if (!maxItems || value.length < maxItems) {
-      onChange([...value, item])
+      onChange([...value, item]);
     }
-  }
+  };
 
-  const selectedOptions = options.filter((option) => (value || []).includes(option.value))
+  const selectedOptions = options.filter((option) =>
+    (value || []).includes(option.value)
+  );
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -88,7 +91,7 @@ export function MultiSelect({
                   )}
                 </>
               ) : (
-                placeholder
+                placeholder || t("common.selectPlaceholder")
               )}
             </div>
 
@@ -102,47 +105,60 @@ export function MultiSelect({
         <div className="p-2">
           <input
             className="w-full rounded-md border px-3 py-2 text-sm outline-none bg-slate-50"
-            placeholder={searchPlaceholder}
+            placeholder={searchPlaceholder || t("common.searchPlaceholder")}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
         </div>
-        
+
         <div className="max-h-60 overflow-y-auto">
-          {options.filter(opt => opt.label.toLowerCase().includes(search.toLowerCase())).length === 0 ? (
-            <div className="p-3 text-sm text-muted-foreground">{emptyText}</div>
+          {options.filter((opt) =>
+            opt.label.toLowerCase().includes(search.toLowerCase())
+          ).length === 0 ? (
+            <div className="p-3 text-sm text-muted-foreground">
+              {emptyText || t("common.emptyTextPlaceholder")}
+            </div>
           ) : (
             <div className="p-1">
-              {options.filter(opt => opt.label.toLowerCase().includes(search.toLowerCase())).map((option) => {
-                const selected = value.includes(option.value)
-                return (
-                  <button
-                    key={option.value}
-                    type="button"
-                    onClick={() => handleSelect(option.value)}
-                    className={cn(
-                      "w-full flex items-center justify-start gap-2 px-3 py-2 text-sm rounded-md hover:bg-accent",
-                      selected ? 'bg-accent/20' : ''
-                    )}
-                  >
-                    <Check className={cn('h-4 w-4', selected ? 'opacity-100' : 'opacity-0')} />
-                    <span className="flex-1 text-left">{option.label}</span>
-                    {maxItems && selected && (
-                      <X
-                        className="ml-2 h-4 w-4 text-muted-foreground hover:text-foreground"
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          handleUnselect(option.value)
-                        }}
-                      />
-                    )}
-                  </button>
+              {options
+                .filter((opt) =>
+                  opt.label.toLowerCase().includes(search.toLowerCase())
                 )
-              })}
+                .map((option) => {
+                  const selected = value.includes(option.value);
+                  return (
+                    <button
+                      key={option.value}
+                      type="button"
+                      onClick={() => handleSelect(option.value)}
+                      className={cn(
+                        "w-full flex items-center justify-start gap-2 px-3 py-2 text-sm rounded-md hover:bg-accent",
+                        selected ? "bg-accent/20" : ""
+                      )}
+                    >
+                      <Check
+                        className={cn(
+                          "h-4 w-4",
+                          selected ? "opacity-100" : "opacity-0"
+                        )}
+                      />
+                      <span className="flex-1 text-left">{option.label}</span>
+                      {maxItems && selected && (
+                        <X
+                          className="ml-2 h-4 w-4 text-muted-foreground hover:text-foreground"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleUnselect(option.value);
+                          }}
+                        />
+                      )}
+                    </button>
+                  );
+                })}
             </div>
           )}
         </div>
       </PopoverContent>
     </Popover>
-  )
+  );
 }

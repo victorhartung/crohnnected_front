@@ -5,6 +5,7 @@ import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { Loader2, MapPin } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import { useLanguage } from "@/components/language-provider";
 
 export interface LocationData {
   lat: number;
@@ -26,6 +27,7 @@ export default function LocationPicker({
   initialLocation,
   height = "400px",
 }: LocationPickerProps) {
+  const { t } = useLanguage();
   const mapRef = useRef<HTMLDivElement>(null);
   const leafletMapRef = useRef<L.Map | null>(null);
   const markerRef = useRef<L.Marker | null>(null);
@@ -184,16 +186,16 @@ export default function LocationPicker({
       );
 
       if (!response.ok) {
-        throw new Error("Failed to fetch location data");
+        throw new Error(t("common.failedToFetchLocation"));
       }
 
       const data = await response.json();
 
-      if (!data || !data.address) {
-        throw new Error("No address data found for this location");
-      }
-
       const address = data.address;
+
+      if (!address) {
+        throw new Error(t("common.noAddressFound"));
+      }
 
       // Extrai país, estado e cidade
       const country =
@@ -217,7 +219,7 @@ export default function LocationPicker({
       // Valida que pelo menos o país foi encontrado
       if (!country) {
         throw new Error(
-          "Could not determine country for this location. Please select a different location."
+          t("common.couldNotDetermineCountry")
         );
       }
 
@@ -233,7 +235,7 @@ export default function LocationPicker({
       return locationData;
     } catch (err) {
       const errorMessage =
-        err instanceof Error ? err.message : "Failed to get location data";
+        err instanceof Error ? err.message : t("common.failedToGetLocationData");
       setError(errorMessage);
       return null;
     } finally {
@@ -277,7 +279,7 @@ export default function LocationPicker({
           <div className="absolute inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center rounded-lg">
             <div className="flex items-center gap-2 text-sm">
               <Loader2 className="h-4 w-4 animate-spin" />
-              <span>Getting location data...</span>
+              <span>{t("common.gettingLocationData")}</span>
             </div>
           </div>
         )}
@@ -292,8 +294,7 @@ export default function LocationPicker({
       <div className="flex items-start gap-2 text-sm text-muted-foreground">
         <MapPin className="h-4 w-4 mt-0.5 flex-shrink-0" />
         <p>
-          Click anywhere on the map to select your location. The system will
-          automatically detect the country, state, and city.
+          {t("common.clickMapToSelect")}
         </p>
       </div>
     </div>

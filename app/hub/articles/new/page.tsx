@@ -1,130 +1,149 @@
+"use client";
 
-'use client'
-
-import { useState } from 'react'
-import { useSession } from 'next-auth/react'
-import { useRouter } from 'next/navigation'
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Textarea } from '@/components/ui/textarea'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Switch } from '@/components/ui/switch'
-import { Alert, AlertDescription } from '@/components/ui/alert'
-import { Loader2, AlertCircle, ArrowLeft, BookOpen, X } from 'lucide-react'
-import { createArticleSchema, type CreateArticleInput } from '@/lib/validation'
-import { toast } from 'sonner'
+import { useLanguage } from "@/components/language-provider";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
+import { Textarea } from "@/components/ui/textarea";
+import { createArticleSchema, type CreateArticleInput } from "@/lib/validation";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { AlertCircle, ArrowLeft, BookOpen, Loader2, X } from "lucide-react";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 
 const COMMON_TAGS = [
-  'Treatment', 'Symptoms', 'Diet', 'Medication', 'Surgery', 
-  'Research', 'Lifestyle', 'Mental Health', 'Pediatric', 'Women\'s Health'
-]
+  "Treatment",
+  "Symptoms",
+  "Diet",
+  "Medication",
+  "Surgery",
+  "Research",
+  "Lifestyle",
+  "Mental Health",
+  "Pediatric",
+  "Women's Health",
+];
 
 export default function NewArticlePage() {
-  const { data: session, status } = useSession()
-  const router = useRouter()
-  const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState('')
-  const [selectedTags, setSelectedTags] = useState<string[]>([])
-  const [tagInput, setTagInput] = useState('')
+  const { data: session, status } = useSession();
+  const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [tagInput, setTagInput] = useState("");
+  const { t } = useLanguage();
 
   const form = useForm<CreateArticleInput>({
-    resolver: zodResolver(createArticleSchema),
+    resolver: zodResolver(createArticleSchema(t)),
     defaultValues: {
-      title: '',
-      slug: '',
-      summary: '',
-      content: '',
+      title: "",
+      slug: "",
+      summary: "",
+      content: "",
       tags: [],
       isPublic: true,
     },
-  })
+  });
 
-  const canCreate = ['MODERATOR', 'ADMIN', 'DOCTOR'].includes(session?.user?.role || '')
+  const canCreate = ["MODERATOR", "ADMIN", "DOCTOR"].includes(
+    session?.user?.role || ""
+  );
 
   const addTag = (tag: string) => {
-    const trimmedTag = tag.trim()
+    const trimmedTag = tag.trim();
     if (trimmedTag && !selectedTags.includes(trimmedTag)) {
-      setSelectedTags([...selectedTags, trimmedTag])
-      setTagInput('')
+      setSelectedTags([...selectedTags, trimmedTag]);
+      setTagInput("");
     }
-  }
+  };
 
   const removeTag = (tagToRemove: string) => {
-    setSelectedTags(selectedTags.filter(tag => tag !== tagToRemove))
-  }
+    setSelectedTags(selectedTags.filter((tag) => tag !== tagToRemove));
+  };
 
   const handleTagInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
-      e.preventDefault()
-      addTag(tagInput)
+    if (e.key === "Enter") {
+      e.preventDefault();
+      addTag(tagInput);
     }
-  }
+  };
 
   const addCommonTag = (tag: string) => {
     if (!selectedTags.includes(tag)) {
-      setSelectedTags([...selectedTags, tag])
+      setSelectedTags([...selectedTags, tag]);
     }
-  }
+  };
 
   const onSubmit = async (data: CreateArticleInput) => {
     if (!canCreate) {
-      setError('You do not have permission to create articles')
-      return
+      setError("You do not have permission to create articles");
+      return;
     }
 
-    setIsLoading(true)
-    setError('')
+    setIsLoading(true);
+    setError("");
 
     try {
-      const response = await fetch('/api/hub/articles', {
-        method: 'POST',
+      const response = await fetch("/api/hub/articles", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           ...data,
           tags: selectedTags,
         }),
-      })
+      });
 
       if (!response.ok) {
-        const errorData = await response.json()
-        setError(errorData.error || 'Failed to create article')
-        return
+        const errorData = await response.json();
+        setError(errorData.error || "Failed to create article");
+        return;
       }
 
-      toast.success('Article created successfully!')
-      router.push('/hub')
+      toast.success(t("hub.addArticle"));
+      router.push("/hub");
     } catch (error) {
-      setError('An unexpected error occurred')
-      console.error('Article creation error:', error)
+      setError("An unexpected error occurred");
+      console.error("Article creation error:", error);
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
-  if (status === 'loading') {
+  if (status === "loading") {
     return (
       <div className="container mx-auto px-4 py-8">
         <div className="flex items-center justify-center py-8">
           <Loader2 className="h-8 w-8 animate-spin" />
         </div>
       </div>
-    )
+    );
   }
 
-  if (status === 'unauthenticated') {
+  if (status === "unauthenticated") {
     return (
       <div className="container mx-auto px-4 py-8">
         <Alert>
           <AlertCircle className="h-4 w-4" />
-          <AlertDescription>Please sign in to create articles.</AlertDescription>
+          <AlertDescription>
+            Please sign in to create articles.
+          </AlertDescription>
         </Alert>
       </div>
-    )
+    );
   }
 
   if (!canCreate) {
@@ -132,10 +151,12 @@ export default function NewArticlePage() {
       <div className="container mx-auto px-4 py-8">
         <Alert>
           <AlertCircle className="h-4 w-4" />
-          <AlertDescription>You do not have permission to create articles.</AlertDescription>
+          <AlertDescription>
+            You do not have permission to create articles.
+          </AlertDescription>
         </Alert>
       </div>
-    )
+    );
   }
 
   return (
@@ -172,7 +193,7 @@ export default function NewArticlePage() {
                 <Input
                   id="title"
                   placeholder="Enter article title"
-                  {...form.register('title')}
+                  {...form.register("title")}
                   disabled={isLoading}
                 />
                 {form.formState.errors.title && (
@@ -187,7 +208,7 @@ export default function NewArticlePage() {
                 <Input
                   id="slug"
                   placeholder="article-url-slug"
-                  {...form.register('slug')}
+                  {...form.register("slug")}
                   disabled={isLoading}
                 />
                 <p className="text-sm text-muted-foreground">
@@ -200,7 +221,7 @@ export default function NewArticlePage() {
                 <Textarea
                   id="summary"
                   placeholder="Brief summary of the article..."
-                  {...form.register('summary')}
+                  {...form.register("summary")}
                   disabled={isLoading}
                   rows={3}
                 />
@@ -208,7 +229,7 @@ export default function NewArticlePage() {
 
               <div className="space-y-4">
                 <Label>Tags</Label>
-                
+
                 <div className="space-y-2">
                   <Input
                     placeholder="Type a tag and press Enter..."
@@ -225,8 +246,16 @@ export default function NewArticlePage() {
                 <div className="space-y-2">
                   <p className="text-sm text-muted-foreground">Common tags:</p>
                   <div className="flex flex-wrap gap-2">
-                    {COMMON_TAGS.map(tag => (
-                      <Button key={tag} type="button" variant="whiteline" size="sm" onClick={() => addCommonTag(tag)} disabled={isLoading || selectedTags.includes(tag)} className="text-xs">
+                    {COMMON_TAGS.map((tag) => (
+                      <Button
+                        key={tag}
+                        type="button"
+                        variant="whiteline"
+                        size="sm"
+                        onClick={() => addCommonTag(tag)}
+                        disabled={isLoading || selectedTags.includes(tag)}
+                        className="text-xs"
+                      >
                         {tag}
                       </Button>
                     ))}
@@ -235,12 +264,22 @@ export default function NewArticlePage() {
 
                 {selectedTags.length > 0 && (
                   <div className="space-y-2">
-                    <p className="text-sm text-muted-foreground">Selected tags:</p>
+                    <p className="text-sm text-muted-foreground">
+                      Selected tags:
+                    </p>
                     <div className="flex flex-wrap gap-2">
-                      {selectedTags.map(tag => (
-                        <div key={tag} className="flex items-center gap-1 bg-secondary text-secondary-foreground px-3 py-1 rounded-full text-sm border">
+                      {selectedTags.map((tag) => (
+                        <div
+                          key={tag}
+                          className="flex items-center gap-1 bg-secondary text-secondary-foreground px-3 py-1 rounded-full text-sm border"
+                        >
                           {tag}
-                          <button type="button" onClick={() => removeTag(tag)} disabled={isLoading} className="hover:bg-destructive hover:text-destructive-foreground rounded-full p-0.5">
+                          <button
+                            type="button"
+                            onClick={() => removeTag(tag)}
+                            disabled={isLoading}
+                            className="hover:bg-destructive hover:text-destructive-foreground rounded-full p-0.5"
+                          >
                             <X className="h-3 w-3" />
                           </button>
                         </div>
@@ -255,7 +294,7 @@ export default function NewArticlePage() {
                 <Textarea
                   id="content"
                   placeholder="Write your article content here..."
-                  {...form.register('content')}
+                  {...form.register("content")}
                   disabled={isLoading}
                   rows={12}
                   className="min-h-[300px]"
@@ -270,8 +309,10 @@ export default function NewArticlePage() {
               <div className="flex items-center space-x-2">
                 <Switch
                   id="isPublic"
-                  checked={form.watch('isPublic')}
-                  onCheckedChange={(checked) => form.setValue('isPublic', checked)}
+                  checked={form.watch("isPublic")}
+                  onCheckedChange={(checked) =>
+                    form.setValue("isPublic", checked)
+                  }
                   disabled={isLoading}
                 />
                 <Label htmlFor="isPublic">Make this article public</Label>
@@ -286,13 +327,15 @@ export default function NewArticlePage() {
 
               <div className="flex gap-4">
                 <Button type="submit" disabled={isLoading}>
-                  {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                  {isLoading && (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  )}
                   Create Article
                 </Button>
                 <Button
                   type="button"
                   variant="destructive"
-                  onClick={() => router.push('/hub')}
+                  onClick={() => router.push("/hub")}
                   disabled={isLoading}
                 >
                   Cancel
@@ -303,5 +346,5 @@ export default function NewArticlePage() {
         </Card>
       </div>
     </div>
-  )
+  );
 }

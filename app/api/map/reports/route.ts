@@ -104,7 +104,7 @@ export async function GET(request: NextRequest) {
       return Response.json(
         {
           success: false,
-          error: "Invalid query parameters",
+          error: "Parâmetros de busca inválidos",
           details: error.errors,
         },
         { status: 400 }
@@ -112,7 +112,10 @@ export async function GET(request: NextRequest) {
     }
 
     return Response.json(
-      { success: false, error: "Failed to fetch map data" },
+      {
+        success: false,
+        error: "Falha ao busca dados de mapeamento geoespacial",
+      },
       { status: 500 }
     );
   }

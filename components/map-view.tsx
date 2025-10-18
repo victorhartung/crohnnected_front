@@ -1,13 +1,14 @@
 "use client";
 
-import { useEffect, useMemo, useRef } from "react";
+import { formatDate, getSeverityColor } from "@/lib/utils";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
-import { formatDate, getSeverityColor } from "@/lib/utils";
+import { useEffect, useMemo, useRef } from "react";
 
 // Importa o plugin leaflet.heat
 // @ts-ignore
 import "leaflet.heat";
+import { useLanguage } from "./language-provider";
 
 type ReportFeature = {
   geometry: { coordinates: [number, number] }; // [lng, lat]
@@ -35,6 +36,7 @@ export default function MapView({
   showHeatmap = false,
   approvedOnly = false,
 }: MapViewProps) {
+  const { t } = useLanguage();
   const mapRef = useRef<HTMLDivElement>(null);
   const leafletMapRef = useRef<L.Map | null>(null);
   const heatLayerRef = useRef<any>(null);
@@ -116,7 +118,7 @@ export default function MapView({
             report.properties.severity
           )}">${report.properties.severity}</span><br/>
           Age: ${report.properties.ageAtReport ?? "-"}<br/>
-          Date: ${formatDate(report.properties.createdAt)}
+          Date: ${formatDate(report.properties.createdAt, t)}
         </div>
       `;
       L.marker([lat, lng], { icon }).bindPopup(popupHtml).addTo(markersLayer);

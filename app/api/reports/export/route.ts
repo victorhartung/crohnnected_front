@@ -264,7 +264,7 @@ export const GET = withAuth(
         return Response.json(
           {
             success: false,
-            error: "Invalid query parameters",
+            error: "Parâmetros de busca inválidos",
             details: error.errors,
           },
           { status: 400 }
@@ -272,7 +272,7 @@ export const GET = withAuth(
       }
 
       return Response.json(
-        { success: false, error: "Failed to export reports" },
+        { success: false, error: "Falha ao exportar reltórios" },
         { status: 500 }
       );
     }

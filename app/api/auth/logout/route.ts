@@ -1,28 +1,27 @@
+import { NextRequest } from "next/server";
 
-import { NextRequest } from 'next/server';
-
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 
 export async function POST(request: NextRequest) {
   try {
     // Create response
     const response = Response.json({
       success: true,
-      message: 'Logged out successfully',
+      message: "Logout realizado com sucesso",
     });
 
     // Clear refresh token cookie
-    response.headers.set('Set-Cookie', 
-      'refreshToken=; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age=0'
+    response.headers.set(
+      "Set-Cookie",
+      "refreshToken=; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age=0"
     );
 
     return response;
-
   } catch (error) {
-    console.error('Logout error:', error);
+    console.error("Logout error:", error);
 
     return Response.json(
-      { success: false, error: 'Logout failed' },
+      { success: false, error: "Falha ao realizar logout" },
       { status: 500 }
     );
   }

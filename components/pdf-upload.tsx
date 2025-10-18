@@ -1,4 +1,3 @@
-
 'use client'
 
 import { useState, useRef } from 'react'
@@ -9,6 +8,7 @@ import { Card } from '@/components/ui/card'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Upload, FileText, X, AlertCircle } from 'lucide-react'
 import { toast } from 'sonner'
+import { useLanguage } from '@/components/language-provider'
 
 interface PDFUploadProps {
   onFileChange: (file: {
@@ -25,6 +25,7 @@ interface PDFUploadProps {
 }
 
 export function PDFUpload({ onFileChange, currentFile, disabled }: PDFUploadProps) {
+  const { t } = useLanguage()
   const [dragActive, setDragActive] = useState(false)
   const [error, setError] = useState('')
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -33,13 +34,13 @@ export function PDFUpload({ onFileChange, currentFile, disabled }: PDFUploadProp
 
   const validateFile = (file: File): string | null => {
     if (file.type !== 'application/pdf') {
-      return 'Please select a PDF file'
+      return t('common.pleaseSelectPdf')
     }
-    
+
     if (file.size > MAX_FILE_SIZE) {
-      return `File size must be less than ${MAX_FILE_SIZE / (1024 * 1024)}MB`
+      return t('common.fileSizeTooLarge').replace('{size}', String(MAX_FILE_SIZE / (1024 * 1024)))
     }
-    
+
     return null
   }
 
@@ -65,15 +66,15 @@ export function PDFUpload({ onFileChange, currentFile, disabled }: PDFUploadProp
             mime: file.type,
             sizeBytes: file.size,
           })
-          toast.success('PDF uploaded successfully')
+          toast.success(t('common.pdfUploadSuccess'))
         }
       }
       reader.onerror = () => {
-        setError('Failed to read file')
+        setError(t('common.failedToReadFile'))
       }
       reader.readAsDataURL(file)
     } catch (error) {
-      setError('Failed to process file')
+      setError(t('common.failedToProcessFile'))
       console.error('File processing error:', error)
     }
   }
@@ -114,7 +115,7 @@ export function PDFUpload({ onFileChange, currentFile, disabled }: PDFUploadProp
       fileInputRef.current.value = ''
     }
     setError('')
-    toast.success('PDF removed')
+    toast.success(t('common.pdfRemoved'))
   }
 
   const formatFileSize = (bytes: number) => {
@@ -128,9 +129,9 @@ export function PDFUpload({ onFileChange, currentFile, disabled }: PDFUploadProp
   return (
     <div className="space-y-4">
       <div>
-        <Label>PDF Document</Label>
+        <Label>{t('common.pdfDocument')}</Label>
         <p className="text-sm text-muted-foreground">
-          Upload a PDF file (max {MAX_FILE_SIZE / (1024 * 1024)}MB)
+          {t('common.uploadPdfMax').replace('{size}', String(MAX_FILE_SIZE / (1024 * 1024)))}
         </p>
       </div>
 
@@ -146,9 +147,9 @@ export function PDFUpload({ onFileChange, currentFile, disabled }: PDFUploadProp
         >
           <div className="mx-auto flex max-w-[420px] flex-col items-center justify-center text-center">
             <Upload className="h-10 w-10 text-muted-foreground mb-4" />
-            <h3 className="font-semibold">Upload PDF</h3>
+            <h3 className="font-semibold">{t('common.uploadPdf')}</h3>
             <p className="text-sm text-muted-foreground mb-4">
-              Drag and drop your PDF here, or click to select
+              {t('common.dragDropPdf')}
             </p>
             <Button
               type="button"
@@ -156,7 +157,7 @@ export function PDFUpload({ onFileChange, currentFile, disabled }: PDFUploadProp
               onClick={() => fileInputRef.current?.click()}
               disabled={disabled}
             >
-              Select File
+              {t('common.selectFile')}
             </Button>
           </div>
           <Input

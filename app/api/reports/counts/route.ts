@@ -383,7 +383,7 @@ export const GET = withAuth(async (request: NextRequest, user: User) => {
   } catch (error) {
     console.error("Reports counts error:", error);
     return Response.json(
-      { success: false, error: "Failed to fetch report counts" },
+      { success: false, error: "Falha ao buscar contagem de relatórios" },
       { status: 500 }
     );
   }

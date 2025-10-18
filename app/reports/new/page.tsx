@@ -34,11 +34,14 @@ import { Report } from "@/interfaces/report";
 import { COMMON_MEDICATIONS, COMMON_SYMPTOMS } from "@/lib/constants";
 import { reportSchema, type ReportInput } from "@/lib/validations";
 import {
+  Activity,
   AlertCircle,
   FileText,
   Loader2,
   MapPin,
+  Send,
   Stethoscope,
+  Upload,
 } from "lucide-react";
 import dynamic from "next/dynamic";
 import { toast } from "sonner";
@@ -72,7 +75,7 @@ export default function NewReportPage() {
   );
 
   const form = useForm<ReportInput>({
-    resolver: zodResolver(reportSchema),
+    resolver: zodResolver(reportSchema(t)),
     defaultValues: {
       ageAtReport: undefined,
       sex: undefined,
@@ -170,13 +173,13 @@ export default function NewReportPage() {
 
   const onSubmit = async (data: ReportInput) => {
     if (session?.user?.role !== "PATIENT") {
-      setError("Only patients can submit reports");
+      setError(t("reports.onlyPatientsCanSubmit"));
       return;
     }
 
     // Valida que a localização foi selecionada
     if (!selectedLocation || !data.country) {
-      setError("Please select a location on the map");
+      setError(t("reports.pleaseSelectLocation"));
       return;
     }
 
@@ -186,9 +189,7 @@ export default function NewReportPage() {
 
     // Require PDF/document for patient submissions
     if (!pdfFile) {
-      setPdfError(
-        "Please attach a supporting document (PDF) before submitting."
-      );
+      setPdfError(t("reports.pleaseAttachDocument"));
       return;
     }
 
@@ -213,15 +214,15 @@ export default function NewReportPage() {
 
       if (!response.ok) {
         const errorData = await response.json();
-        setError(errorData.message || "Failed to submit report");
+        setError(errorData.message || t("common.error"));
         return;
       }
 
       refreshReports();
-      toast.success("Report submitted successfully!");
+      toast.success(t("reports.reportSubmittedSuccess"));
       router.push("/reports");
     } catch (error) {
-      setError("An unexpected error occurred. Please try again.");
+      setError(t("reports.unexpectedError"));
       console.error("Report submission error:", error);
     } finally {
       setIsLoading(false);
@@ -243,7 +244,9 @@ export default function NewReportPage() {
       <div className="container mx-auto px-4 py-8">
         <Alert>
           <AlertCircle className="h-4 w-4" />
-          <AlertDescription>{t("reports.submitNew")}</AlertDescription>
+          <AlertDescription>
+            {t("reports.onlyPatientsCanSubmit")}
+          </AlertDescription>
         </Alert>
       </div>
     );
@@ -254,7 +257,9 @@ export default function NewReportPage() {
       <div className="container mx-auto px-4 py-8">
         <Alert>
           <AlertCircle className="h-4 w-4" />
-          <AlertDescription>Only patients can submit reports.</AlertDescription>
+          <AlertDescription>
+            {t("reports.onlyPatientsCanSubmitDesc")}
+          </AlertDescription>
         </Alert>
       </div>
     );
@@ -265,10 +270,7 @@ export default function NewReportPage() {
       <div className="space-y-6">
         <div>
           <h1 className="text-3xl font-bold">{t("reports.submitNew")}</h1>
-          <p className="text-muted-foreground">
-            {t("reports.submitNew")}
-            documentation.
-          </p>
+          <p className="text-muted-foreground">{t("reports.submitNewDesc")}</p>
         </div>
 
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
@@ -277,20 +279,22 @@ export default function NewReportPage() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <FileText className="h-5 w-5" />
-                Personal Information
+                {t("reports.personalInformation")}
               </CardTitle>
               <CardDescription>
-                Basic demographic information for this report.
+                {t("reports.personalInformationDesc")}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="ageAtReport">Age at Report</Label>
+                  <Label htmlFor="ageAtReport">
+                    {t("reports.ageAtReportLabel")}
+                  </Label>
                   <Input
                     id="ageAtReport"
                     type="number"
-                    placeholder="Enter your age"
+                    placeholder={t("reports.enterYourAge")}
                     {...form.register("ageAtReport", { valueAsNumber: true })}
                     disabled={isLoading}
                   />
@@ -302,7 +306,7 @@ export default function NewReportPage() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="sex">Sex</Label>
+                  <Label htmlFor="sex">{t("reports.sexLabel")}</Label>
                   <Select
                     value={form.watch("sex") || ""}
                     onValueChange={(value) =>
@@ -311,15 +315,21 @@ export default function NewReportPage() {
                     disabled={isLoading}
                   >
                     <SelectTrigger>
-                      <SelectValue placeholder="Select sex" />
+                      <SelectValue placeholder={t("reports.selectSex")} />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="FEMALE">Female</SelectItem>
-                      <SelectItem value="MALE">Male</SelectItem>
-                      <SelectItem value="INTERSEX">Intersex</SelectItem>
-                      <SelectItem value="OTHER">Other</SelectItem>
+                      <SelectItem value="FEMALE">
+                        {t("reports.female")}
+                      </SelectItem>
+                      <SelectItem value="MALE">{t("reports.male")}</SelectItem>
+                      <SelectItem value="INTERSEX">
+                        {t("reports.intersex")}
+                      </SelectItem>
+                      <SelectItem value="OTHER">
+                        {t("reports.other")}
+                      </SelectItem>
                       <SelectItem value="UNSPECIFIED">
-                        Prefer not to say
+                        {t("reports.unspecified")}
                       </SelectItem>
                     </SelectContent>
                   </Select>
@@ -327,7 +337,9 @@ export default function NewReportPage() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="diagnosisDate">Diagnosis Date</Label>
+                <Label htmlFor="diagnosisDate">
+                  {t("reports.diagnosisDateLabel")}
+                </Label>
                 <Input
                   id="diagnosisDate"
                   type="date"
@@ -343,11 +355,10 @@ export default function NewReportPage() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <MapPin className="h-5 w-5" />
-                Location Information
+                {t("reports.locationInformation")}
               </CardTitle>
               <CardDescription>
-                Click on the map to select your location. The system will
-                automatically detect your country, state, and city.
+                {t("reports.locationInformationDesc")}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -362,20 +373,20 @@ export default function NewReportPage() {
                   <div className="flex items-center gap-2">
                     <MapPin className="h-4 w-4 text-muted-foreground" />
                     <span className="text-sm font-medium">
-                      Selected Location
+                      {t("reports.selectedLocation")}
                     </span>
                   </div>
                   <div className="grid grid-cols-3 gap-4 text-sm">
                     <div>
                       <Label className="text-xs text-muted-foreground">
-                        Country *
+                        {t("reports.country")} *
                       </Label>
                       <p className="font-medium">{selectedLocation.country}</p>
                     </div>
                     {selectedLocation.state && (
                       <div>
                         <Label className="text-xs text-muted-foreground">
-                          State/Province
+                          {t("reports.stateProvince")}
                         </Label>
                         <p className="font-medium">{selectedLocation.state}</p>
                       </div>
@@ -383,14 +394,15 @@ export default function NewReportPage() {
                     {selectedLocation.city && (
                       <div>
                         <Label className="text-xs text-muted-foreground">
-                          City
+                          {t("reports.city")}
                         </Label>
                         <p className="font-medium">{selectedLocation.city}</p>
                       </div>
                     )}
                   </div>
                   <div className="text-xs text-muted-foreground">
-                    Coordinates: {selectedLocation.lat.toFixed(6)},{" "}
+                    {t("reports.coordinates")}:{" "}
+                    {selectedLocation.lat.toFixed(6)},{" "}
                     {selectedLocation.lng.toFixed(6)}
                   </div>
                 </div>
@@ -411,28 +423,27 @@ export default function NewReportPage() {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Stethoscope className="h-5 w-5" />
-                Medical Information
+                <Activity className="h-5 w-5" />
+                {t("reports.medicalInformation")}
               </CardTitle>
               <CardDescription>
-                Details about your symptoms, medications, and medical history.
+                {t("reports.medicalInformationDesc")}
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-6">
+            <CardContent className="space-y-4">
+              {/* Symptoms */}
               <div className="space-y-2">
-                <Label>Symptoms *</Label>
+                <Label htmlFor="symptoms">{t("reports.symptomsLabel")}</Label>
                 <MultiSelect
-                  options={symptomOptions}
-                  value={watchedSymptoms}
-                  onChange={(value) =>
-                    form.setValue("symptoms", value, {
-                      shouldValidate: true,
-                      shouldDirty: true,
-                    })
-                  }
-                  placeholder="Select symptoms..."
-                  searchPlaceholder="Search symptoms..."
-                  emptyText="No symptoms found"
+                  options={COMMON_SYMPTOMS.map((symptom) => ({
+                    label: symptom,
+                    value: symptom,
+                  }))}
+                  value={form.watch("symptoms") || []}
+                  onChange={(values) => form.setValue("symptoms", values)}
+                  placeholder={t("reports.selectSymptoms")}
+                  searchPlaceholder={t("reports.searchSymptoms")}
+                  emptyText={t("reports.noSymptomsFound")}
                   disabled={isLoading}
                 />
                 {form.formState.errors.symptoms && (
@@ -442,8 +453,11 @@ export default function NewReportPage() {
                 )}
               </div>
 
+              {/* Symptom Severity */}
               <div className="space-y-2">
-                <Label htmlFor="symptomSeverity">Symptom Severity *</Label>
+                <Label htmlFor="symptomSeverity">
+                  {t("reports.symptomSeverityLabel")}
+                </Label>
                 <Select
                   value={form.watch("symptomSeverity") || ""}
                   onValueChange={(value) =>
@@ -452,12 +466,18 @@ export default function NewReportPage() {
                   disabled={isLoading}
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Select severity" />
+                    <SelectValue
+                      placeholder={t("reports.selectSeverityPlaceholder")}
+                    />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="MILD">Mild</SelectItem>
-                    <SelectItem value="MODERATE">Moderate</SelectItem>
-                    <SelectItem value="SEVERE">Severe</SelectItem>
+                    <SelectItem value="MILD">{t("reports.mild")}</SelectItem>
+                    <SelectItem value="MODERATE">
+                      {t("reports.moderate")}
+                    </SelectItem>
+                    <SelectItem value="SEVERE">
+                      {t("reports.severe")}
+                    </SelectItem>
                   </SelectContent>
                 </Select>
                 {form.formState.errors.symptomSeverity && (
@@ -467,32 +487,34 @@ export default function NewReportPage() {
                 )}
               </div>
 
+              {/* Medications */}
               <div className="space-y-2">
-                <Label>Current Medications</Label>
+                <Label htmlFor="medications">
+                  {t("reports.currentMedications")}
+                </Label>
                 <MultiSelect
-                  options={medicationOptions}
-                  value={watchedMedications}
-                  onChange={(value) =>
-                    form.setValue("medications", value, {
-                      shouldValidate: true,
-                      shouldDirty: true,
-                    })
-                  }
-                  placeholder="Select medications..."
-                  searchPlaceholder="Search medications..."
-                  emptyText="No medications found"
+                  options={COMMON_MEDICATIONS.map((med) => ({
+                    label: med,
+                    value: med,
+                  }))}
+                  value={form.watch("medications") || []}
+                  onChange={(values) => form.setValue("medications", values)}
+                  placeholder={t("reports.selectMedications")}
+                  searchPlaceholder={t("reports.searchMedications")}
+                  emptyText={t("reports.noMedicationsFound")}
                   disabled={isLoading}
                 />
               </div>
 
+              {/* Flare Frequency */}
               <div className="space-y-2">
                 <Label htmlFor="flareFrequencyPerYear">
-                  Flare Frequency per Year
+                  {t("reports.flareFrequencyLabel")}
                 </Label>
                 <Input
                   id="flareFrequencyPerYear"
                   type="number"
-                  placeholder="Number of flares per year"
+                  placeholder={t("reports.flareFrequencyPlaceholder")}
                   {...form.register("flareFrequencyPerYear", {
                     valueAsNumber: true,
                   })}
@@ -500,11 +522,14 @@ export default function NewReportPage() {
                 />
               </div>
 
+              {/* Additional Notes */}
               <div className="space-y-2">
-                <Label htmlFor="notes">Additional Notes</Label>
+                <Label htmlFor="notes">
+                  {t("reports.additionalNotesLabel")}
+                </Label>
                 <Textarea
                   id="notes"
-                  placeholder="Any additional information about your condition, symptoms, or treatment..."
+                  placeholder={t("reports.additionalNotesPlaceholder")}
                   {...form.register("notes")}
                   disabled={isLoading}
                   rows={4}
@@ -513,32 +538,43 @@ export default function NewReportPage() {
             </CardContent>
           </Card>
 
-          {/* PDF Upload */}
+          {/* Supporting Documentation */}
           <Card>
             <CardHeader>
-              <CardTitle>Supporting Documentation</CardTitle>
+              <CardTitle className="flex items-center gap-2">
+                <Upload className="h-5 w-5" />
+                {t("reports.supportingDocumentation")}
+              </CardTitle>
               <CardDescription>
-                Upload medical reports, test results, or other supporting
-                documents.
+                {t("reports.supportingDocumentationDesc")}
               </CardDescription>
             </CardHeader>
             <CardContent>
               <PDFUpload
-                onFileChange={setPdfFile}
-                currentFile={pdfFile}
+                onFileChange={(file) => {
+                  setPdfFile(file);
+                  setPdfError("");
+                }}
+                currentFile={
+                  pdfFile
+                    ? {
+                        originalName: pdfFile.originalName,
+                        sizeBytes: pdfFile.sizeBytes,
+                      }
+                    : null
+                }
                 disabled={isLoading}
               />
               {pdfError && (
-                <div className="mt-2">
-                  <Alert variant="destructive">
-                    <AlertCircle className="h-4 w-4" />
-                    <AlertDescription>{pdfError}</AlertDescription>
-                  </Alert>
-                </div>
+                <Alert variant="destructive" className="mt-4">
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertDescription>{pdfError}</AlertDescription>
+                </Alert>
               )}
             </CardContent>
           </Card>
 
+          {/* Error Display */}
           {error && (
             <Alert variant="destructive">
               <AlertCircle className="h-4 w-4" />
@@ -546,18 +582,20 @@ export default function NewReportPage() {
             </Alert>
           )}
 
-          <div className="flex gap-4">
-            <Button type="submit" disabled={isLoading || !selectedLocation}>
-              {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Submit Report
-            </Button>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => router.push("/reports")}
-              disabled={isLoading}
-            >
-              Cancel
+          {/* Submit Button */}
+          <div className="flex justify-end">
+            <Button type="submit" size="lg" disabled={isLoading}>
+              {isLoading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  {t("common.submitting")}
+                </>
+              ) : (
+                <>
+                  <Send className="mr-2 h-4 w-4" />
+                  {t("reports.submitReport")}
+                </>
+              )}
             </Button>
           </div>
         </form>

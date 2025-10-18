@@ -1,5 +1,6 @@
 "use client";
 
+import { useLanguage } from "@/components/language-provider";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import {
@@ -29,7 +30,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { AlertCircle, Loader2, Shield, User } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
-import { useLanguage } from '@/components/language-provider'
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
@@ -38,13 +38,13 @@ export default function ProfilePage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [profileData, setProfileData] = useState<any>(null);
-  const { t } = useLanguage()
+  const { t } = useLanguage();
 
   const isPatient = session?.user?.role === "PATIENT";
   const isDoctor = session?.user?.role === "DOCTOR";
 
   const patientForm = useForm<PatientProfileInput>({
-    resolver: zodResolver(patientProfileSchema),
+    resolver: zodResolver(patientProfileSchema(t)),
     defaultValues: {
       name: "",
       birthDate: "",
@@ -57,7 +57,7 @@ export default function ProfilePage() {
   });
 
   const doctorForm = useForm<DoctorProfileInput>({
-    resolver: zodResolver(doctorProfileSchema),
+    resolver: zodResolver(doctorProfileSchema(t)),
     defaultValues: {
       name: "",
       licenseNumber: "",
@@ -165,9 +165,7 @@ export default function ProfilePage() {
       <div className="container mx-auto px-4 py-8 max-w-2xl">
         <Alert>
           <AlertCircle className="h-4 w-4" />
-          <AlertDescription>
-            {t("profile.signInToView")}
-          </AlertDescription>
+          <AlertDescription>{t("profile.signInToView")}</AlertDescription>
         </Alert>
       </div>
     );
@@ -177,8 +175,8 @@ export default function ProfilePage() {
     <div className="container mx-auto px-4 py-8 max-w-2xl">
       <div className="space-y-6">
         <div>
-          <h1 className="text-3xl font-bold">{t('profile.title')}</h1>
-          <p className="text-muted-foreground">{t('profile.manageAccount')}</p>
+          <h1 className="text-3xl font-bold">{t("profile.title")}</h1>
+          <p className="text-muted-foreground">{t("profile.manageAccount")}</p>
         </div>
 
         <Tabs
@@ -242,7 +240,9 @@ export default function ProfilePage() {
                       <>
                         <div className="grid grid-cols-2 gap-4">
                           <div className="space-y-2">
-                            <Label htmlFor="birthDate">{t("profile.birthDate")}</Label>
+                            <Label htmlFor="birthDate">
+                              {t("profile.birthDate")}
+                            </Label>
                             <Input
                               id="birthDate"
                               type="date"
@@ -260,15 +260,23 @@ export default function ProfilePage() {
                               disabled={isLoading}
                             >
                               <SelectTrigger>
-                                <SelectValue placeholder={t("profile.selectSex")} />
+                                <SelectValue
+                                  placeholder={t("profile.selectSex")}
+                                />
                               </SelectTrigger>
                               <SelectContent>
-                                <SelectItem value="FEMALE">{t("profile.female")}</SelectItem>
-                                <SelectItem value="MALE">{t("profile.male")}</SelectItem>
+                                <SelectItem value="FEMALE">
+                                  {t("profile.female")}
+                                </SelectItem>
+                                <SelectItem value="MALE">
+                                  {t("profile.male")}
+                                </SelectItem>
                                 <SelectItem value="INTERSEX">
                                   {t("profile.intersex")}
                                 </SelectItem>
-                                <SelectItem value="OTHER">{t("profile.other")}</SelectItem>
+                                <SelectItem value="OTHER">
+                                  {t("profile.other")}
+                                </SelectItem>
                                 <SelectItem value="UNSPECIFIED">
                                   {t("profile.preferNotToSay")}
                                 </SelectItem>
@@ -278,7 +286,9 @@ export default function ProfilePage() {
                         </div>
 
                         <div className="space-y-2">
-                          <Label htmlFor="diagnosisDate">{t("profile.diagnosisDate")}</Label>
+                          <Label htmlFor="diagnosisDate">
+                            {t("profile.diagnosisDate")}
+                          </Label>
                           <Input
                             id="diagnosisDate"
                             type="date"
@@ -292,7 +302,9 @@ export default function ProfilePage() {
                     {isDoctor && (
                       <>
                         <div className="space-y-2">
-                          <Label htmlFor="licenseNumber">{t("profile.licenseNumber")}</Label>
+                          <Label htmlFor="licenseNumber">
+                            {t("profile.licenseNumber")}
+                          </Label>
                           <Input
                             id="licenseNumber"
                             type="text"
@@ -311,7 +323,9 @@ export default function ProfilePage() {
                         </div>
 
                         <div className="space-y-2">
-                          <Label htmlFor="specialty">{t("profile.specialty")}</Label>
+                          <Label htmlFor="specialty">
+                            {t("profile.specialty")}
+                          </Label>
                           <Input
                             id="specialty"
                             type="text"

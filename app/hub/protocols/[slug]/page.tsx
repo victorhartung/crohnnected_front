@@ -10,6 +10,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { useLanguage } from "@/components/language-provider";
 import { formatDate } from "@/lib/utils";
 import {
   AlertCircle,
@@ -42,6 +43,7 @@ interface Protocol {
 }
 
 export default function ProtocolDetailPage() {
+  const { t } = useLanguage();
   const { data: session } = useSession();
   const params = useParams();
   const router = useRouter();
@@ -73,9 +75,9 @@ export default function ProtocolDetailPage() {
         const errorData = await response.json().catch(() => ({}));
 
         if (response.status === 404) {
-          setError("Protocol not found");
+          setError(t("hub.protocolNotFound"));
         } else {
-          setError(`Failed to load protocol: ${response.status}`);
+          setError(t("hub.failedToLoad"));
         }
         return;
       }
@@ -84,7 +86,7 @@ export default function ProtocolDetailPage() {
       setProtocol(data);
     } catch (error) {
       console.error("Failed to load protocol:", error);
-      setError("An unexpected error occurred");
+      setError(t("auth.unexpectedError"));
     } finally {
       setIsLoading(false);
     }
@@ -106,7 +108,7 @@ export default function ProtocolDetailPage() {
         <div className="max-w-4xl mx-auto space-y-6">
           <Button variant="outline" onClick={() => router.back()}>
             <ArrowLeft className="mr-2 h-4 w-4" />
-            Back
+            {t("common.back")}
           </Button>
 
           <Alert variant="destructive">
@@ -114,15 +116,14 @@ export default function ProtocolDetailPage() {
             <AlertDescription>{error}</AlertDescription>
           </Alert>
 
-          {error.includes("not found") && (
+          {(error.includes(t("hub.protocolNotFound").toLowerCase()) || error.toLowerCase().includes("not found")) && (
             <Card>
               <CardContent className="pt-6">
                 <p className="text-muted-foreground mb-4">
-                  The protocol you're looking for might have been moved or
-                  deleted.
+                  {t("hub.notFoundDesc").replace("{type}", t("hub.protocolsLabel").toLowerCase().slice(0, -1))}
                 </p>
                 <Button asChild>
-                  <Link href="/hub?tab=protocols">Return to Protocols</Link>
+                  <Link href="/hub?tab=protocols">{t("hub.returnToHub")}</Link>
                 </Button>
               </CardContent>
             </Card>
@@ -137,7 +138,7 @@ export default function ProtocolDetailPage() {
       <div className="container mx-auto px-4 py-8">
         <Alert>
           <AlertCircle className="h-4 w-4" />
-          <AlertDescription>Protocol not found</AlertDescription>
+          <AlertDescription>{t("hub.protocolNotFound")}</AlertDescription>
         </Alert>
       </div>
     );
@@ -151,7 +152,7 @@ export default function ProtocolDetailPage() {
           <Button asChild variant="outline">
             <Link href="/hub?tab=protocols">
               <ArrowLeft className="mr-2 h-4 w-4" />
-              Back to Protocols
+              {t("hub.backToProtocols")}
             </Link>
           </Button>
 
@@ -159,7 +160,7 @@ export default function ProtocolDetailPage() {
             <Button asChild>
               <Link href={`/hub/protocols/${protocol.id}/edit`}>
                 <Edit className="mr-2 h-4 w-4" />
-                Edit Protocol
+                {t("hub.editProtocol")}
               </Link>
             </Button>
           )}
@@ -183,7 +184,7 @@ export default function ProtocolDetailPage() {
               </div>
               <div className="flex items-center gap-1">
                 <Calendar className="h-4 w-4" />
-                {formatDate(protocol.createdAt)}
+                {formatDate(protocol.createdAt, t)}
               </div>
             </div>
 

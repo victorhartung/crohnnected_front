@@ -1,5 +1,6 @@
 "use client";
 
+import { useLanguage } from "@/components/language-provider";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -44,6 +45,7 @@ type TabState = {
 };
 
 export default function ReportsPage() {
+  const { t } = useLanguage();
   const { data: session, status } = useSession();
 
   const isPatient = session?.user?.role === "PATIENT";
@@ -358,14 +360,13 @@ export default function ReportsPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ notes: "Approved by doctor" }),
       });
-      const data = await response.json();
 
       if (!response.ok) {
-        toast.error(data?.message || "Failed to approve report");
+        toast.error(t("reports.failedToApprove"));
         return;
       }
 
-      toast.success("Report approved successfully");
+      toast.success(t("reports.reportApproved"));
       // Atualiza counts + listas relevantes
       await fetchCounts();
       fetchTab(activeTab, { page: tabs[activeTab].page });
@@ -375,7 +376,7 @@ export default function ReportsPage() {
         fetchTab("pending", { page: tabs.pending.page });
       fetchTab("all", { page: tabs.all.page });
     } catch (error) {
-      toast.error("Failed to approve report");
+      toast.error(t("reports.failedToApprove"));
       console.error("Approve report error:", error);
     }
   };
@@ -387,10 +388,9 @@ export default function ReportsPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ reason }),
       });
-      const data = await response.json();
 
       if (!response.ok) {
-        toast.error(data?.message || "Failed to reject report");
+        toast.error(t("reports.failedToReject"));
         return;
       }
 
@@ -430,7 +430,7 @@ export default function ReportsPage() {
       <div className="container mx-auto px-4 py-8">
         <Alert>
           <AlertCircle className="h-4 w-4" />
-          <AlertDescription>Please sign in to view reports.</AlertDescription>
+          <AlertDescription>{t("auth.pleaseSignIn")}</AlertDescription>
         </Alert>
       </div>
     );
@@ -444,12 +444,12 @@ export default function ReportsPage() {
         <div className="flex justify-between items-center">
           <div>
             <h1 className="text-3xl font-bold">
-              {isPatient ? "My Reports" : "Reports"}
+              {isPatient ? t("reports.myReports") : t("reports.title")}
             </h1>
             <p className="text-muted-foreground">
               {isPatient
-                ? "View and manage your submitted reports"
-                : "Review and manage patient reports"}
+                ? t("reports.viewManageReports")
+                : t("reports.reviewManageReports")}
             </p>
           </div>
 
@@ -458,7 +458,7 @@ export default function ReportsPage() {
             <Button asChild>
               <Link href="/reports/new">
                 <Plus className="mr-2 h-4 w-4" />
-                New Report
+                {t("reports.submitNew")}
               </Link>
             </Button>
           )}
@@ -469,7 +469,7 @@ export default function ReportsPage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Filter className="h-5 w-5" />
-              Filters
+              {t("reports.filters")}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -478,7 +478,7 @@ export default function ReportsPage() {
                 <div className="relative">
                   <Search className="search-alignment" />
                   <Input
-                    placeholder="Search by location, symptoms, medications..."
+                    placeholder={t("reports.searchByLocation")}
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className="pl-10"
@@ -491,10 +491,12 @@ export default function ReportsPage() {
                 onValueChange={setSelectedCountry}
               >
                 <SelectTrigger className="w-[200px]">
-                  <SelectValue placeholder="All Countries" />
+                  <SelectValue placeholder={t("reports.allCountries")} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">All Countries</SelectItem>
+                  <SelectItem value="all">
+                    {t("reports.allCountries")}
+                  </SelectItem>
                   {uniqueCountries.map((country) => (
                     <SelectItem key={country} value={country}>
                       {country}
@@ -508,13 +510,17 @@ export default function ReportsPage() {
                 onValueChange={setSelectedSeverity}
               >
                 <SelectTrigger className="w-[150px]">
-                  <SelectValue placeholder="All Severities" />
+                  <SelectValue placeholder={t("reports.allSeverities")} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">All Severities</SelectItem>
-                  <SelectItem value="MILD">Mild</SelectItem>
-                  <SelectItem value="MODERATE">Moderate</SelectItem>
-                  <SelectItem value="SEVERE">Severe</SelectItem>
+                  <SelectItem value="all">
+                    {t("reports.allSeverities")}
+                  </SelectItem>
+                  <SelectItem value="MILD">{t("severity.mild")}</SelectItem>
+                  <SelectItem value="MODERATE">
+                    {t("severity.moderate")}
+                  </SelectItem>
+                  <SelectItem value="SEVERE">{t("severity.severe")}</SelectItem>
                 </SelectContent>
               </Select>
 
@@ -526,18 +532,18 @@ export default function ReportsPage() {
                   setSelectedSeverity("all");
                 }}
               >
-                Clear Filters
+                {t("reports.clearFilters")}
               </Button>
             </div>
 
             {countsLoading && (
               <div className="text-xs text-muted-foreground mt-2">
-                Updating counters…
+                {t("reports.updatingCounters")}
               </div>
             )}
             {countsError && (
               <div className="text-xs text-destructive mt-2">
-                Failed to load counters: {countsError}
+                {t("reports.failedToLoadCounters")}: {countsError}
               </div>
             )}
           </CardContent>
@@ -550,22 +556,24 @@ export default function ReportsPage() {
         >
           <TabsList>
             {isNotResearcher && (
-              <TabsTrigger value="all">All ({statusCounts.all})</TabsTrigger>
+              <TabsTrigger value="all">
+                {t("reports.allReports")} ({statusCounts.all})
+              </TabsTrigger>
             )}
 
             {isNotResearcher && (
               <TabsTrigger value="pending">
-                Pending ({statusCounts.pending})
+                {t("reports.pending")} ({statusCounts.pending})
               </TabsTrigger>
             )}
 
             <TabsTrigger value="approved">
-              Approved ({statusCounts.approved})
+              {t("reports.approved")} ({statusCounts.approved})
             </TabsTrigger>
 
             {isNotResearcher && (
               <TabsTrigger value="rejected">
-                Rejected ({statusCounts.rejected})
+                {t("reports.rejected")} ({statusCounts.rejected})
               </TabsTrigger>
             )}
           </TabsList>
@@ -584,10 +592,14 @@ export default function ReportsPage() {
               <Card>
                 <CardContent className="py-8 text-center">
                   <FileText className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                  <p className="text-muted-foreground">No reports found.</p>
+                  <p className="text-muted-foreground">
+                    {t("reports.noReportsFound")}
+                  </p>
                   {isPatient && !hasActiveReport && (
                     <Button asChild className="mt-4">
-                      <Link href="/reports/new">Submit your first report</Link>
+                      <Link href="/reports/new">
+                        {t("reports.createFirstReport")}
+                      </Link>
                     </Button>
                   )}
                 </CardContent>
@@ -600,13 +612,19 @@ export default function ReportsPage() {
                       <div className="flex justify-between items-start font-semibold">
                         <div className="space-y-1">
                           <CardTitle className="text-lg">
-                            Report #{report.id ? report.id.slice(-8) : "N/A"}
+                            {t("reports.reportNumber").replace(
+                              "{number}",
+                              report.id ? report.id.slice(-8) : "N/A"
+                            )}
                           </CardTitle>
                           <div className="flex items-center gap-2 text-sm text-muted-foreground">
                             <Calendar className="h-4 w-4" />
-                            Submitted {formatDate(report.createdAt)}
+                            {t("reports.submittedAt")}{" "}
+                            {formatDate(report.createdAt, t)}
                             {report.ageAtReport && (
-                              <>• Age: {report.ageAtReport}</>
+                              <>
+                                • {t("reports.age")}: {report.ageAtReport}
+                              </>
                             )}
                           </div>
                         </div>
@@ -615,13 +633,15 @@ export default function ReportsPage() {
                             variant={"none"}
                             className={getStatusColor(report.status)}
                           >
-                            {report.status}
+                            {t(`reports.${report.status.toLowerCase()}`)}
                           </Badge>
                           <Badge
                             variant={"none"}
                             className={getSeverityColor(report.symptomSeverity)}
                           >
-                            {report.symptomSeverity}
+                            {t(
+                              `reports.${report.symptomSeverity.toLowerCase()}`
+                            )}
                           </Badge>
                         </div>
                       </div>
@@ -632,7 +652,7 @@ export default function ReportsPage() {
                           <div>
                             <div className="flex items-center gap-2 text-sm text-muted-foreground mb-1 font-semibold">
                               <MapPin className="h-4 w-4" />
-                              Location
+                              {t("reports.location")}
                             </div>
                             <p className="text-sm">
                               {[report.city, report.state, report.country]
@@ -642,7 +662,7 @@ export default function ReportsPage() {
                           </div>
                           <div>
                             <div className="text-sm text-muted-foreground mb-1 font-semibold">
-                              Symptoms
+                              {t("reports.symptoms")}
                             </div>
                             <div className="flex flex-wrap gap-1">
                               {(report.symptoms || [])
@@ -658,7 +678,8 @@ export default function ReportsPage() {
                                 ))}
                               {(report.symptoms || []).length > 3 && (
                                 <Badge variant="outline" className="text-xs">
-                                  +{(report.symptoms || []).length - 3} more
+                                  +{(report.symptoms || []).length - 3}{" "}
+                                  {t("common.more")}
                                 </Badge>
                               )}
                             </div>
@@ -668,7 +689,8 @@ export default function ReportsPage() {
                         {report.hasDocument && (
                           <div className="flex items-center gap-2 text-sm font-bold text-primary">
                             <FileText className="h-4 w-4" />
-                            PDF attached: {report.documentOriginalName}
+                            {t("reports.pdfAttached")}:{" "}
+                            {report.documentOriginalName}
                           </div>
                         )}
 
@@ -676,7 +698,7 @@ export default function ReportsPage() {
                           <div className="flex gap-2">
                             <Button variant="secondary" size="sm" asChild>
                               <Link href={`/reports/${report.id}`}>
-                                View Details
+                                {t("reports.viewDetails")}
                               </Link>
                             </Button>
                           </div>
@@ -687,7 +709,7 @@ export default function ReportsPage() {
                                 size="sm"
                                 onClick={() => handleApproveReport(report.id)}
                               >
-                                Approve
+                                {t("reports.approveReport")}
                               </Button>
                               <Button
                                 variant="destructive"
@@ -695,11 +717,11 @@ export default function ReportsPage() {
                                 onClick={() =>
                                   handleRejectReport(
                                     report.id,
-                                    "Rejected by doctor"
+                                    t("reports.rejectedByDoctor")
                                   )
                                 }
                               >
-                                Reject
+                                {t("reports.rejectReport")}
                               </Button>
                             </div>
                           )}
@@ -712,8 +734,10 @@ export default function ReportsPage() {
                 {/* Paginação */}
                 <div className="flex items-center justify-between pt-2">
                   <div className="text-sm text-muted-foreground">
-                    Page {current.page} of {current.totalPages} •{" "}
-                    {current.total} total
+                    {t("reports.page")
+                      .replace("{current}", String(current.page))
+                      .replace("{total}", String(current.totalPages))}{" "}
+                    • {current.total} {t("common.total")}
                   </div>
                   <div className="flex gap-2">
                     <Button
@@ -722,7 +746,7 @@ export default function ReportsPage() {
                       disabled={current.page <= 1 || current.loading}
                       onClick={() => setPage(activeTab, current.page - 1)}
                     >
-                      Previous
+                      {t("reports.previous")}
                     </Button>
                     <Button
                       variant="white"
@@ -732,7 +756,7 @@ export default function ReportsPage() {
                       }
                       onClick={() => setPage(activeTab, current.page + 1)}
                     >
-                      Next
+                      {t("reports.next")}
                     </Button>
                   </div>
                 </div>

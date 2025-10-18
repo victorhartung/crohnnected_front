@@ -10,6 +10,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { useLanguage } from "@/components/language-provider";
 import { formatDate } from "@/lib/utils";
 import {
   AlertCircle,
@@ -42,6 +43,7 @@ interface Story {
 }
 
 export default function StoryDetailPage() {
+  const { t } = useLanguage();
   const { data: session } = useSession();
   const params = useParams();
   const router = useRouter();
@@ -62,25 +64,26 @@ export default function StoryDetailPage() {
   }, [slug]);
 
   const loadStory = async () => {
+    const slug = params.slug as string;
     setIsLoading(true);
     setError("");
-
     try {
-      const response = await fetch(`/api/hub/stories/${slug}`);
+      const res = await fetch(`/api/hub/stories/${slug}`);
+      const data = await res.json();
 
-      if (!response.ok) {
-        if (response.status === 404) {
-          setError("Story not found");
+      if (!res.ok) {
+        if (res.status === 404) {
+          setError(t("hub.storyNotFound"));
         } else {
-          setError("Failed to load story");
+          setError(t("hub.failedToLoad"));
         }
+        setStory(null);
         return;
       }
 
-      const data = await response.json();
       setStory(data);
     } catch (error) {
-      setError("An unexpected error occurred");
+      setError(t("auth.unexpectedError"));
       console.error("Failed to load story:", error);
     } finally {
       setIsLoading(false);
@@ -113,7 +116,7 @@ export default function StoryDetailPage() {
       <div className="container mx-auto px-4 py-8">
         <Alert>
           <AlertCircle className="h-4 w-4" />
-          <AlertDescription>Story not found</AlertDescription>
+          <AlertDescription>{t("hub.storyNotFound")}</AlertDescription>
         </Alert>
       </div>
     );
@@ -126,14 +129,14 @@ export default function StoryDetailPage() {
         <div className="flex items-center justify-between">
           <Button variant="ghost" onClick={() => router.back()}>
             <ArrowLeft className="mr-2 h-4 w-4" />
-            Back
+            {t("hub.backToStories")}
           </Button>
 
           {canEdit && (
             <Button asChild>
               <Link href={`/hub/stories/${story.slug || story.id}/edit`}>
                 <Edit className="mr-2 h-4 w-4" />
-                Edit Story
+                {t("hub.editStory")}
               </Link>
             </Button>
           )}
@@ -157,7 +160,7 @@ export default function StoryDetailPage() {
               </div>
               <div className="flex items-center gap-1">
                 <Calendar className="h-4 w-4" />
-                {formatDate(story.createdAt)}
+                {formatDate(story.createdAt, t)}
               </div>
             </div>
 

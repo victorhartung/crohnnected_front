@@ -339,7 +339,7 @@ export default function HubPage() {
                         <div className="flex items-center gap-1 flex-shrink-0 ml-2">
                           <Calendar className="h-3 w-3 flex-shrink-0" />
                           <span className="whitespace-nowrap">
-                            {formatDate(item.createdAt)}
+                            {formatDate(item.createdAt, t)}
                           </span>
                         </div>
                       </div>
