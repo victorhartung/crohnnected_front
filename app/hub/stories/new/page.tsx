@@ -25,17 +25,17 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
 const STORY_TAGS = [
-  "Journey",
-  "Diagnosis",
-  "Treatment",
-  "Recovery",
-  "Challenges",
-  "Hope",
-  "Family",
-  "Work",
-  "Mental Health",
-  "Success",
-  "Support",
+  "Jornada",
+  "Diagnóstico",
+  "Tratamento",
+  "Recuperação",
+  "Desafios",
+  "Esperança",
+  "Família",
+  "Trabalho",
+  "Saúde Mental",
+  "Sucesso",
+  "Apoio",
 ].map((tag) => ({ label: tag, value: tag }));
 
 export default function NewStoryPage() {
@@ -53,7 +53,7 @@ export default function NewStoryPage() {
       summary: "",
       content: "",
       tags: [],
-      isPublic: false, // Stories are private by default
+      isPublic: false,
     },
   });
 
@@ -75,14 +75,14 @@ export default function NewStoryPage() {
 
       if (!response.ok) {
         const errorData = await response.json();
-        setError(errorData.error || "Failed to create story");
+        setError(errorData.error || t("hub.failedCreateStory"));
         return;
       }
 
       toast.success(t("hub.addStory"));
       router.push("/hub");
     } catch (error) {
-      setError("An unexpected error occurred");
+      setError(t("hub.unexpectedError"));
       console.error("Story creation error:", error);
     } finally {
       setIsLoading(false);
@@ -104,9 +104,7 @@ export default function NewStoryPage() {
       <div className="container mx-auto px-4 py-8">
         <Alert>
           <AlertCircle className="h-4 w-4" />
-          <AlertDescription>
-            Please sign in to share your story.
-          </AlertDescription>
+          <AlertDescription>{t("hub.signInToShareStory")}</AlertDescription>
         </Alert>
       </div>
     );
@@ -118,35 +116,32 @@ export default function NewStoryPage() {
         <div className="flex items-center justify-between">
           <Button variant="ghost" onClick={() => router.back()}>
             <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Hub
+            {t("hub.backToHub")}
           </Button>
         </div>
 
         <div>
           <h1 className="text-3xl font-bold flex items-center gap-2">
             <Heart className="h-8 w-8" />
-            Share Your Story
+            {t("hub.shareYourStory")}
           </h1>
           <p className="text-muted-foreground">
-            Share your experience with the Crohn's community to inspire and
-            support others.
+            {t("hub.shareStoryDescription")}
           </p>
         </div>
 
         <Card>
           <CardHeader>
-            <CardTitle>Your Story</CardTitle>
-            <CardDescription>
-              Your personal journey can help others facing similar challenges.
-            </CardDescription>
+            <CardTitle>{t("hub.yourStory")}</CardTitle>
+            <CardDescription>{t("hub.yourStoryDescription")}</CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
               <div className="space-y-2">
-                <Label htmlFor="title">Story Title *</Label>
+                <Label htmlFor="title">{t("hub.storyTitle")} *</Label>
                 <Input
                   id="title"
-                  placeholder="Give your story a meaningful title"
+                  placeholder={t("hub.storyTitlePlaceholder")}
                   {...form.register("title")}
                   disabled={isLoading}
                 />
@@ -158,10 +153,10 @@ export default function NewStoryPage() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="summary">Summary (optional)</Label>
+                <Label htmlFor="summary">{t("hub.storySummary")}</Label>
                 <Textarea
                   id="summary"
-                  placeholder="Brief summary of your story..."
+                  placeholder={t("hub.storySummaryPlaceholder")}
                   {...form.register("summary")}
                   disabled={isLoading}
                   rows={3}
@@ -169,23 +164,23 @@ export default function NewStoryPage() {
               </div>
 
               <div className="space-y-2">
-                <Label>Tags</Label>
+                <Label>{t("hub.storyTags")}</Label>
                 <MultiSelect
                   options={STORY_TAGS}
                   value={selectedTags}
                   onChange={setSelectedTags}
-                  placeholder="Select tags that describe your story..."
-                  searchPlaceholder="Search tags..."
-                  emptyText="No tags found"
+                  placeholder={t("hub.selectTagsPlaceholder")}
+                  searchPlaceholder={t("hub.searchTags")}
+                  emptyText={t("hub.noTagsFound")}
                   disabled={isLoading}
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="content">Your Story *</Label>
+                <Label htmlFor="content">{t("hub.storyContent")} *</Label>
                 <Textarea
                   id="content"
-                  placeholder="Share your journey, challenges, victories, and what you'd like others to know..."
+                  placeholder={t("hub.storyContentPlaceholder")}
                   {...form.register("content")}
                   disabled={isLoading}
                   rows={12}
@@ -207,13 +202,10 @@ export default function NewStoryPage() {
                   }
                   disabled={isLoading}
                 />
-                <Label htmlFor="isPublic">
-                  Make this story public (visible to all users)
-                </Label>
+                <Label htmlFor="isPublic">{t("hub.makeStoryPublic")}</Label>
               </div>
               <p className="text-sm text-muted-foreground">
-                By default, your story will be private and only visible to
-                healthcare providers.
+                {t("hub.storyPrivacyNote")}
               </p>
 
               {error && (
@@ -228,7 +220,7 @@ export default function NewStoryPage() {
                   {isLoading && (
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   )}
-                  Share Story
+                  {t("hub.shareStory")}
                 </Button>
                 <Button
                   type="button"
@@ -236,7 +228,7 @@ export default function NewStoryPage() {
                   onClick={() => router.push("/hub")}
                   disabled={isLoading}
                 >
-                  Cancel
+                  {t("common.cancel")}
                 </Button>
               </div>
             </form>

@@ -38,16 +38,15 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
 const PROTOCOL_TAGS = [
-  "Diagnosis",
-  "Treatment",
-  "Surgery",
-  "Medication",
-  "Monitoring",
-  "Emergency",
-  "Pediatric",
-  "Adult",
-  "Endoscopy",
-  "Imaging",
+  "Diagnóstico",
+  "Tratamento",
+  "Cirurgia",
+  "Medicação",
+  "Monitoramento",
+  "Emergência",
+  "Pediatria",
+  "Adulto",
+  "Endoscopia",
 ].map((tag) => ({ label: tag, value: tag }));
 
 interface Protocol {

@@ -28,16 +28,15 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
 const PROTOCOL_TAGS = [
-  "Diagnosis",
-  "Treatment",
-  "Surgery",
-  "Medication",
-  "Monitoring",
-  "Emergency",
-  "Pediatric",
-  "Adult",
-  "Endoscopy",
-  "Imaging",
+  "Diagnóstico",
+  "Tratamento",
+  "Cirurgia",
+  "Medicação",
+  "Monitoramento",
+  "Emergência",
+  "Pediatria",
+  "Adulto",
+  "Endoscopia",
 ].map((tag) => ({ label: tag, value: tag }));
 
 export default function NewProtocolPage() {
@@ -66,7 +65,7 @@ export default function NewProtocolPage() {
 
   const onSubmit = async (data: CreateProtocolInput) => {
     if (!canCreate) {
-      setError("You do not have permission to create protocols");
+      setError(t("hub.contentPermission"));
       return;
     }
 
@@ -87,14 +86,14 @@ export default function NewProtocolPage() {
 
       if (!response.ok) {
         const errorData = await response.json();
-        setError(errorData.error || "Failed to create protocol");
+        setError(errorData.error || t("hub.failedContentCreation"));
         return;
       }
 
       toast.success(t("hub.addProtocol"));
       router.push("/hub?tab=protocols");
     } catch (error) {
-      setError("An unexpected error occurred");
+      setError(t("auth.unexpectedError"));
       console.error("Protocol creation error:", error);
     } finally {
       setIsLoading(false);
@@ -116,9 +115,7 @@ export default function NewProtocolPage() {
       <div className="container mx-auto px-4 py-8">
         <Alert>
           <AlertCircle className="h-4 w-4" />
-          <AlertDescription>
-            Please sign in to create protocols.
-          </AlertDescription>
+          <AlertDescription>{t("hub.signInContent")}</AlertDescription>
         </Alert>
       </div>
     );
@@ -129,9 +126,7 @@ export default function NewProtocolPage() {
       <div className="container mx-auto px-4 py-8">
         <Alert>
           <AlertCircle className="h-4 w-4" />
-          <AlertDescription>
-            You do not have permission to create protocols.
-          </AlertDescription>
+          <AlertDescription>{t("hub.contentPermission")}</AlertDescription>
         </Alert>
       </div>
     );
@@ -143,35 +138,31 @@ export default function NewProtocolPage() {
         <div className="flex items-center justify-between">
           <Button variant="ghost" onClick={() => router.back()}>
             <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Hub
+            {t("hub.backToHub")}
           </Button>
         </div>
 
         <div>
           <h1 className="text-3xl font-bold flex items-center gap-2">
             <Shield className="h-8 w-8" />
-            Create New Protocol
+            {t("hub.createNewProtocol")}
           </h1>
-          <p className="text-muted-foreground">
-            Share clinical guidelines and procedures with healthcare
-            professionals.
-          </p>
+          <p className="text-muted-foreground">{t("hub.shareContent")}</p>
         </div>
 
         <Card>
           <CardHeader>
-            <CardTitle>Protocol Details</CardTitle>
-            <CardDescription>
-              Provide information about your clinical protocol.
-            </CardDescription>
+            <CardTitle>{t("hub.details")}</CardTitle>
+            <CardDescription>{t("hub.contentInfo")}</CardDescription>
           </CardHeader>
+
           <CardContent>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
               <div className="space-y-2">
-                <Label htmlFor="title">Title *</Label>
+                <Label htmlFor="title">{t("hub.titleLabel")} *</Label>
                 <Input
                   id="title"
-                  placeholder="Enter protocol title"
+                  placeholder={t("hub.titlePlaceholder", { type: "protocolo" })}
                   {...form.register("title")}
                   disabled={isLoading}
                 />
@@ -183,23 +174,23 @@ export default function NewProtocolPage() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="slug">URL Slug (optional)</Label>
+                <Label htmlFor="slug">{t("hub.slugOptional")}</Label>
                 <Input
                   id="slug"
-                  placeholder="protocol-url-slug"
+                  placeholder={t("hub.slugPlaceholder")}
                   {...form.register("slug")}
                   disabled={isLoading}
                 />
                 <p className="text-sm text-muted-foreground">
-                  Leave empty to auto-generate from title
+                  {t("hub.generateFromTitle")}
                 </p>
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="summary">Summary (optional)</Label>
+                <Label htmlFor="summary">{t("hub.summaryOptional")}</Label>
                 <Textarea
                   id="summary"
-                  placeholder="Brief overview of the protocol..."
+                  placeholder={t("hub.summaryPlaceholder")}
                   {...form.register("summary")}
                   disabled={isLoading}
                   rows={3}
@@ -207,23 +198,23 @@ export default function NewProtocolPage() {
               </div>
 
               <div className="space-y-2">
-                <Label>Tags</Label>
+                <Label>{t("hub.commonTags")}</Label>
                 <MultiSelect
                   options={PROTOCOL_TAGS}
                   value={selectedTags}
                   onChange={setSelectedTags}
-                  placeholder="Select tags..."
-                  searchPlaceholder="Search tags..."
-                  emptyText="No tags found"
+                  placeholder={t("hub.selectTags")}
+                  searchPlaceholder={t("hub.searchTags")}
+                  emptyText={t("hub.noTagsFound")}
                   disabled={isLoading}
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="content">Protocol Content *</Label>
+                <Label htmlFor="content">{t("hub.contentLabel")} *</Label>
                 <Textarea
                   id="content"
-                  placeholder="Write your protocol steps and guidelines here..."
+                  placeholder={t("hub.contentPlaceholderProtocol")}
                   {...form.register("content")}
                   disabled={isLoading}
                   rows={15}
@@ -245,7 +236,7 @@ export default function NewProtocolPage() {
                   }
                   disabled={isLoading}
                 />
-                <Label htmlFor="isPublic">Make this protocol public</Label>
+                <Label htmlFor="isPublic">{t("hub.publicContent")}</Label>
               </div>
 
               {error && (
@@ -260,7 +251,7 @@ export default function NewProtocolPage() {
                   {isLoading && (
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   )}
-                  Create Protocol
+                  {t("hub.createNewProtocol")}
                 </Button>
                 <Button
                   type="button"
@@ -268,7 +259,7 @@ export default function NewProtocolPage() {
                   onClick={() => router.push("/hub")}
                   disabled={isLoading}
                 >
-                  Cancel
+                  {t("hub.backToHub")}
                 </Button>
               </div>
             </form>

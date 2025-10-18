@@ -383,9 +383,6 @@ export default function EditArticlePage() {
                   rows={15}
                   required
                 />
-                <p className="text-sm text-muted-foreground">
-                  {t("hub.contentHelper")}
-                </p>
               </div>
 
               {/* Tags */}
@@ -399,10 +396,10 @@ export default function EditArticlePage() {
                     value={newTag}
                     onChange={(e) => setNewTag(e.target.value)}
                     onKeyPress={handleKeyPress}
-                    placeholder={t("hub.addTagPlaceholder")}
+                    placeholder={t("hub.tagPlaceholder")}
                   />
                   <Button type="button" onClick={handleAddTag}>
-                    {t("hub.add")}
+                    {t("hub.addTag")}
                   </Button>
                 </div>
 
@@ -440,12 +437,9 @@ export default function EditArticlePage() {
                     className="rounded border-gray-300"
                   />
                   <label htmlFor="isPublic" className="text-sm font-medium">
-                    {t("hub.makePublic")}
+                    {t("hub.publicContent")}
                   </label>
                 </div>
-                <p className="text-sm text-muted-foreground">
-                  {t("hub.visibilityHelper")}
-                </p>
               </div>
             </CardContent>
           </Card>

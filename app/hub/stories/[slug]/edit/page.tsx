@@ -19,17 +19,17 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
 const STORY_TAGS = [
-  "Journey",
-  "Diagnosis",
-  "Treatment",
-  "Recovery",
-  "Challenges",
-  "Hope",
-  "Family",
-  "Work",
-  "Mental Health",
-  "Success",
-  "Support",
+  "Jornada",
+  "Diagnóstico",
+  "Tratamento",
+  "Recuperação",
+  "Desafios",
+  "Esperança",
+  "Família",
+  "Trabalho",
+  "Saúde Mental",
+  "Sucesso",
+  "Apoio",
 ].map((tag) => ({ label: tag, value: tag }));
 
 export default function EditStoryPage() {

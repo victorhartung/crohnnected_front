@@ -24,16 +24,14 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
 const COMMON_TAGS = [
-  "Treatment",
-  "Symptoms",
-  "Diet",
-  "Medication",
-  "Surgery",
-  "Research",
-  "Lifestyle",
-  "Mental Health",
-  "Pediatric",
-  "Women's Health",
+  "Tratamento",
+  "Sintomas",
+  "Dieta",
+  "Medicação",
+  "Cirurgia",
+  "Pesquisa",
+  "Estilo de vida",
+  "Saúde Mental",
 ];
 
 export default function NewArticlePage() {
@@ -88,7 +86,7 @@ export default function NewArticlePage() {
 
   const onSubmit = async (data: CreateArticleInput) => {
     if (!canCreate) {
-      setError("You do not have permission to create articles");
+      setError(t("hub.contentPermission"));
       return;
     }
 
@@ -98,9 +96,7 @@ export default function NewArticlePage() {
     try {
       const response = await fetch("/api/hub/articles", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...data,
           tags: selectedTags,
@@ -108,15 +104,14 @@ export default function NewArticlePage() {
       });
 
       if (!response.ok) {
-        const errorData = await response.json();
-        setError(errorData.error || "Failed to create article");
+        setError(t("hub.failedContentCreation"));
         return;
       }
 
       toast.success(t("hub.addArticle"));
       router.push("/hub");
     } catch (error) {
-      setError("An unexpected error occurred");
+      setError(t("auth.unexpectedError"));
       console.error("Article creation error:", error);
     } finally {
       setIsLoading(false);
@@ -138,9 +133,7 @@ export default function NewArticlePage() {
       <div className="container mx-auto px-4 py-8">
         <Alert>
           <AlertCircle className="h-4 w-4" />
-          <AlertDescription>
-            Please sign in to create articles.
-          </AlertDescription>
+          <AlertDescription>{t("hub.signInContent")}</AlertDescription>
         </Alert>
       </div>
     );
@@ -152,7 +145,7 @@ export default function NewArticlePage() {
         <Alert>
           <AlertCircle className="h-4 w-4" />
           <AlertDescription>
-            You do not have permission to create articles.
+            {t("hub.insufficientPermissions")}
           </AlertDescription>
         </Alert>
       </div>
@@ -165,34 +158,32 @@ export default function NewArticlePage() {
         <div className="flex items-center justify-between">
           <Button variant="ghost" onClick={() => router.back()}>
             <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Hub
+            {t("hub.backToHub")}
           </Button>
         </div>
 
         <div>
           <h1 className="text-3xl font-bold flex items-center gap-2">
             <BookOpen className="h-8 w-8" />
-            Create New Article
+            {t("hub.createNewArticle")}
           </h1>
-          <p className="text-muted-foreground">
-            Share educational content with the Crohn's community.
-          </p>
+          <p className="text-muted-foreground">{t("hub.shareContent")}</p>
         </div>
 
         <Card>
           <CardHeader>
-            <CardTitle>Article Details</CardTitle>
-            <CardDescription>
-              Provide information about your article.
-            </CardDescription>
+            <CardTitle>{t("hub.details")}</CardTitle>
+            <CardDescription>{t("hub.contentInfo")}</CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
               <div className="space-y-2">
-                <Label htmlFor="title">Title *</Label>
+                <Label htmlFor="title">{t("hub.titleLabel")} *</Label>
                 <Input
                   id="title"
-                  placeholder="Enter article title"
+                  placeholder={t("hub.titlePlaceholder", {
+                    type: t("hub.articlesLabel"),
+                  })}
                   {...form.register("title")}
                   disabled={isLoading}
                 />
@@ -204,23 +195,20 @@ export default function NewArticlePage() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="slug">URL Slug (optional)</Label>
+                <Label htmlFor="slug">{t("hub.slugOptional")}</Label>
                 <Input
                   id="slug"
-                  placeholder="article-url-slug"
+                  placeholder={t("hub.slugPlaceholder")}
                   {...form.register("slug")}
                   disabled={isLoading}
                 />
-                <p className="text-sm text-muted-foreground">
-                  Leave empty to auto-generate from title
-                </p>
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="summary">Summary (optional)</Label>
+                <Label htmlFor="summary">{t("hub.summaryOptional")}</Label>
                 <Textarea
                   id="summary"
-                  placeholder="Brief summary of the article..."
+                  placeholder={t("hub.summaryPlaceholder")}
                   {...form.register("summary")}
                   disabled={isLoading}
                   rows={3}
@@ -228,23 +216,25 @@ export default function NewArticlePage() {
               </div>
 
               <div className="space-y-4">
-                <Label>Tags</Label>
+                <Label>{t("hub.tagsLabel")}</Label>
 
                 <div className="space-y-2">
                   <Input
-                    placeholder="Type a tag and press Enter..."
+                    placeholder={t("hub.tagPlaceholder")}
                     value={tagInput}
                     onChange={(e) => setTagInput(e.target.value)}
                     onKeyDown={handleTagInputKeyDown}
                     disabled={isLoading}
                   />
                   <p className="text-sm text-muted-foreground">
-                    Type a tag and press Enter to add it
+                    {t("hub.addTag")}
                   </p>
                 </div>
 
                 <div className="space-y-2">
-                  <p className="text-sm text-muted-foreground">Common tags:</p>
+                  <p className="text-sm text-muted-foreground">
+                    {t("hub.commonTags")}:
+                  </p>
                   <div className="flex flex-wrap gap-2">
                     {COMMON_TAGS.map((tag) => (
                       <Button
@@ -265,7 +255,7 @@ export default function NewArticlePage() {
                 {selectedTags.length > 0 && (
                   <div className="space-y-2">
                     <p className="text-sm text-muted-foreground">
-                      Selected tags:
+                      {t("hub.selectedTags")}:
                     </p>
                     <div className="flex flex-wrap gap-2">
                       {selectedTags.map((tag) => (
@@ -290,10 +280,10 @@ export default function NewArticlePage() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="content">Content *</Label>
+                <Label htmlFor="content">{t("hub.contentLabel")} *</Label>
                 <Textarea
                   id="content"
-                  placeholder="Write your article content here..."
+                  placeholder={t("hub.contentPlaceholder")}
                   {...form.register("content")}
                   disabled={isLoading}
                   rows={12}
@@ -315,7 +305,7 @@ export default function NewArticlePage() {
                   }
                   disabled={isLoading}
                 />
-                <Label htmlFor="isPublic">Make this article public</Label>
+                <Label htmlFor="isPublic">{t("hub.publicContent")}</Label>
               </div>
 
               {error && (
@@ -330,7 +320,7 @@ export default function NewArticlePage() {
                   {isLoading && (
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   )}
-                  Create Article
+                  {t("hub.newArticle")}
                 </Button>
                 <Button
                   type="button"
@@ -338,7 +328,7 @@ export default function NewArticlePage() {
                   onClick={() => router.push("/hub")}
                   disabled={isLoading}
                 >
-                  Cancel
+                  {t("common.cancel")}
                 </Button>
               </div>
             </form>
